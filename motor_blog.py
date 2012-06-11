@@ -5,11 +5,9 @@ import tornado.ioloop
 import tornado.web
 import tornado.options
 
-import pymongo
-from bson.objectid import ObjectId
-
 from api import APIHandler
-from motor_blog_web import PostHandler
+from api.rsd import RSDHandler
+from web import PostHandler
 
 # TODO: indexes, command-line arg to build them
 # TODO: command-line arg to add categories, since it seems Mars has no way to add
@@ -32,7 +30,12 @@ except ImportError:
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write("Hello, world")
+        # TODO
+        self.write("""
+        <html><head>
+        <link rel="EditURI" type="application/rsd+xml" title="RSD" href="rsd" />
+        </head>
+        <body>Hello World</body></html>""")
 
 if __name__ == "__main__":
     tornado.options.define('debug', default=False, type=bool, help=(
@@ -51,13 +54,18 @@ if __name__ == "__main__":
     options = tornado.options.options
 
     application = tornado.web.Application([
+            # XML-RPC API
+            (r"/rsd", RSDHandler),
             (r"/api", APIHandler),
+
+            # Web
             (r"/(?P<slug>.+)", PostHandler),
             (r"/", MainHandler),
         ],
         debug=options.debug,
         host=options.host,
-        db=motor.MotorConnection().open_sync().motorblog
+        db=motor.MotorConnection().open_sync().motorblog,
+        template_path='web/templates', # TODO: use Jinja2 instead of Tornado
     )
 
     application.listen(options.port)

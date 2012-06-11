@@ -1,6 +1,7 @@
 import re
 from unicodedata import normalize
 
+import tornado.options
 
 # From http://flask.pocoo.org/snippets/5/
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
@@ -14,3 +15,14 @@ def slugify(text, delim=u'-'):
         if word:
             result.append(word)
     return unicode(delim.join(result))
+
+def link(slug):
+    options = tornado.options.options
+
+    # TODO: reliably figure out server URL
+    return (
+        'http://' + options.host.rstrip('/')
+#        + (':%s' % options.port if options.debug else '')
+        + ':8888'
+        + '/'
+        + slug)
