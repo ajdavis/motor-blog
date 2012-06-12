@@ -9,7 +9,7 @@
 import xmlrpclib
 from tornadorpc.xml import XMLRPCHandler, XMLRPCParser
 
-from api import categories, posts, tags
+from api import categories, posts, tags, media
 
 
 # TODO: change 'result' params in callbacks to descriptive, like 'post' or 'posts' or 'categories'
@@ -26,7 +26,9 @@ class WordpressParser(XMLRPCParser):
         return ((method_name.replace('.', '_'), params),)
 
 
-class APIHandler(XMLRPCHandler, categories.Categories, posts.Posts, tags.Tags):
+class APIHandler(
+    XMLRPCHandler, categories.Categories, posts.Posts, tags.Tags, media.Media
+):
     _RPC_ = WordpressParser(xmlrpclib)
 
     def mt_supportedTextFilters(self):

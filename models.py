@@ -3,7 +3,7 @@ import datetime
 from bson.objectid import ObjectId
 from dictshield.document import Document, EmbeddedDocument
 from dictshield.fields import (
-    StringField, DateTimeField, URLField)
+    StringField, DateTimeField, IntField)
 from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
 from dictshield.fields.mongo import ObjectIdField
 
@@ -54,11 +54,13 @@ class EmbeddedCategory(Category, EmbeddedDocument):
 class Post(Document):
     title = StringField(default='')
     body = StringField(default='')
+    author = StringField(default='')
     status = StringField(choices=('Published', 'Draft'), default='Published')
     tags = SortedListField(StringField())
     categories = SortedListField(EmbeddedDocumentField(EmbeddedCategory))
     date_created = DateTimeField(default=lambda: datetime.datetime.utcnow())
     slug = StringField(default='')
+    wordpress_id = IntField() # legacy id from WordPress
 
     class Meta:
         id_field = ObjectIdField
@@ -78,23 +80,34 @@ class Post(Document):
             tags = None
 
         slug = common.slugify(title)
+        status = (
+            'Published' if struct.get('post_status', 'publish') == 'publish'
+            else 'Draft')
+
+        date_created = (
+            datetime.datetime.strptime(
+                struct['date_created_gmt'].value, "%Y%m%dT%H:%M:%S")
+            if 'date_created_gmt' in struct else None)
 
         return cls(
             title=title,
             body=struct.get('description', ''),
             tags=tags,
             slug=slug,
+            status=status,
+            date_created=date_created,
+            wordpress_id=struct.get('postid')
         )
 
     def to_metaweblog(self):
         return {
             'title': self.title,
             'description': self.body,
-            'link': self.full_url,
-            'permaLink': self.full_url,
+            'link': self.html_url,
+            'permaLink': self.html_url,
             'categories': [cat.to_metaweblog() for cat in self['categories']],
             'mt_keywords': ','.join(self['tags']),
-            'dateCreated': self.date_created, # TODO: tz
+            'dateCreated': self.local_date_created,
             'postid': str(self.id),
         }
 
@@ -111,5 +124,11 @@ class Post(Document):
         self.status = 'Published' if publish else 'Draft'
 
     @property
-    def full_url(self):
+    def html_url(self):
         return common.link(self.slug)
+
+    @property
+    def local_date_created(self):
+        # TODO timezone config option
+        utcdiff = datetime.datetime.utcnow() - datetime.datetime.now()
+        return self.date_created - utcdiff

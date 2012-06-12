@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}
+{{ post.title }} | {{ handler.settings['author']['display_name'] }}
+{% end %}
+
+{% block body-class %}single-post{% end %}
+
+{% block content %}
+{% module Template("post.html", post=post, handler=handler, title_link=False) %}
+
+<nav id="nav-below">
+    {% if prev %}
+        <div class="nav-previous">
+            <a href="{{ prev.html_url }}" rel="prev">
+                <span class="meta-nav">&larr;</span>
+                {{ prev.title }}
+            </a>
+        </div>
+    {% end %}
+    {% if next %}
+        <div class="nav-next">
+            <a href="{{ next.html_url }}" rel="next">
+                {{ next.title }}
+                <span class="meta-nav">&rarr;</span>
+            </a>
+        </div>
+    {% end %}
+</nav>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'emptysquare';
+
+    {% if post.wordpress_id %}
+        var disqus_identifier = '{{ post.wordpress_id }} http://emptysquare.net/blog/?p={{ post.wordpress_id }}';
+    {% end %}
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+{% end %}

@@ -7,7 +7,8 @@ import tornado.options
 
 from api import APIHandler
 from api.rsd import RSDHandler
-from web import PostHandler
+from web import (
+    HomeHandler, PostHandler, MediaHandler, RemoveSlashHandler, CategoryHandler)
 
 # TODO: indexes, command-line arg to build them
 # TODO: command-line arg to add categories, since it seems Mars has no way to add
@@ -28,15 +29,6 @@ except ImportError:
     raise
 
 
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        # TODO
-        self.write("""
-        <html><head>
-        <link rel="EditURI" type="application/rsd+xml" title="RSD" href="rsd" />
-        </head>
-        <body>Hello World</body></html>""")
-
 if __name__ == "__main__":
     tornado.options.define('debug', default=False, type=bool, help=(
         "Turn on autoreload"
@@ -52,21 +44,29 @@ if __name__ == "__main__":
 
     tornado.options.parse_command_line()
     options = tornado.options.options
-
     application = tornado.web.Application([
-            # XML-RPC API
-            (r"/rsd", RSDHandler),
-            (r"/api", APIHandler),
+        # XML-RPC API
+        (r"/rsd", RSDHandler),
+        (r"/api", APIHandler),
 
-            # Web
-            (r"/(?P<slug>.+)", PostHandler),
-            (r"/", MainHandler),
+        # Web
+        # TODO: drafts, and a login page so you can see drafts
+        (r"/media/(?P<url>.+)", MediaHandler),
+        (r"/blog/theme/(.*)", tornado.web.StaticFileHandler, {"path": "theme"}), # TODO: theming
+        (r"/category/(.+)", CategoryHandler),
+        (r"/page/(?P<page_num>\d+)/?", HomeHandler),
+        (r"/(?P<slug>[^/]+)/$", RemoveSlashHandler),
+        (r"/(?P<slug>.+)", PostHandler),
+        (r"/", HomeHandler),
         ],
         debug=options.debug,
         host=options.host,
         db=motor.MotorConnection().open_sync().motorblog,
-        template_path='web/templates', # TODO: use Jinja2 instead of Tornado
+        template_path='web/templates',
+        author={ 'username': 'emptysquare', 'display_name': 'A. Jesse Jiryu Davis'},
+        default_host='localhost:8888',
     )
+
 
     application.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()

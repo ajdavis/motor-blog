@@ -1,0 +1,412 @@
+@font-face {
+    font-family: "Museo";
+    src: url("/blog/theme/Museo300-Regular.otf");
+}
+
+body {
+    background: url("/blog/theme/paisley-4.png") no-repeat fixed 100% 100% white;
+    font-family: Museo,Palatino,Georgia,Serif;
+    font-size: 100%;
+}
+
+/* =Structure
+-------------------------------------------------------------- */
+
+#page {
+	display: block;
+	margin: 1em;
+}	
+#primary {
+  width: 660px;
+  padding-right: 5px;
+  margin: 50px 0 70px 200px;
+  background: white;
+  clear: both;
+}
+
+body.single #primary {
+	margin-top: 0;
+}
+
+body.home #primary {
+  border-top: 1px dotted #333333;
+  padding-top: 5px;
+}
+
+#content {
+  
+}
+#main .widget-area {
+    left: 25px;
+    padding: 18px 0;
+    position: fixed;
+    top: 5px;
+    width: 180px;
+}
+
+.widget_nav_menu h1 {
+	display: none;
+}
+
+.widget_search, .widget_text {
+    padding-left:39px;
+}
+
+ul.menu {
+	list-style-type: none;
+	margin-bottom: 10px;
+}
+
+#colophon {
+	position: fixed;	
+	bottom: 0;
+	height: 25px;
+	width: 21em;
+	left: 0;
+	background-color: white;
+	font-size: 70%;
+	color: #808080;
+}
+
+/* Increase the size of the content area for templates without sidebars */
+.full-width #content,
+.image-attachment #content,
+.error404 #content {
+	margin: 0;
+}
+
+/* Alignment */
+.alignleft {
+	display: inline;
+	float: left;
+}
+.alignright {
+	display: inline;
+	float: right;
+}
+.aligncenter {
+	clear: both;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+
+/* =Header
+-------------------------------------------------------------- */
+
+#site-title {
+	display:none;
+	font-size: 2em;
+	font-weight: bold;
+	margin: .67em 0;
+}
+#site-description {
+	display:none;
+	font-size: 1em;
+	font-weight: normal;
+	margin: 0 0 1em;
+}
+#access {
+    background: none repeat scroll 0 0 white;
+    margin: 0 0 30px 200px;
+    padding-right: 5px;
+    width: 660px;
+}
+#access ul {
+    list-style: none outside none;
+    margin: 0;
+    padding-left: 0;
+}
+#access li {
+    float: left;
+    position: relative;
+}
+#access a {
+    display: block;
+    line-height: 2em;
+    padding: 0 2em 0 0;
+    text-decoration: none;
+    color: #808080;
+}
+#access ul ul {
+    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
+    display: none;
+    float: left;
+    left: 0;
+    position: absolute;
+    top: 2em;
+    z-index: 99999;
+}
+#access ul ul ul {
+    left: 100%;
+    top: 0;
+}
+#access ul ul a {
+    background: none repeat scroll 0 0 #DEDEDE;
+    height: auto;
+    line-height: 1em;
+    padding: 0.5em 0.5em 0.5em 1em;
+    width: 10em;
+}
+#access li:hover > a, #access ul ul *:hover > a {
+    text-decoration: underline;
+}
+#access ul ul a:hover {
+    text-decoration: underline;
+}
+#access ul li:hover > ul {
+    display: block;
+}
+
+/* =Content
+-------------------------------------------------------------- */
+a {
+	color: #2060A0;
+}
+
+h1 {
+	font-size: 220%;
+}
+
+/* Hide nav controls on all but home page */
+#access { display: none; }
+body.home #access { display: block; }
+
+h1.entry-title {
+	margin: 15px 0 5px 0;
+}
+
+div.entry-meta {
+	margin-bottom: 25px;
+}
+
+.entry-meta a, .entry-title a {
+	text-decoration: none;
+	color: #808080;
+}
+.entry-meta a:hover, .entry-title a:hover {
+	text-decoration: underline;
+}
+.sticky {
+}
+.entry-meta {
+	clear: both;
+	display: block;
+	color: #808080;
+	font-size: 70%;
+}
+
+#content nav {
+	display: block;
+	overflow: hidden;
+}
+#content nav#nav-above .nav-previous, #content nav#nav-above .nav-next {
+	display: none;
+}
+
+#content nav .nav-previous {
+	float: left;
+	width: 50%;
+}
+
+#content nav .nav-previous a, #content nav .nav-next a {
+	text-decoration: none;
+	color: #808080;
+}
+
+#content nav .nav-previous a:hover {
+	text-decoration: underline;
+	color: #808080;
+}
+
+#content nav .nav-next {
+	float: right;
+	text-align: right;
+	width: 50%;
+}
+.page-link {
+	clear: both;
+	margin: 0 0 1em;
+}
+.page .edit-link {
+	clear: both;
+	display: block;
+}
+/* Image Attachments */
+.image-attachment div.entry-meta {
+	float: left;
+}
+.image-attachment nav {
+	float: right;
+	margin: 0 0 1em 0;
+}
+.image-attachment .entry-content {
+	clear: both;
+}
+.image-attachment .entry-content .entry-attachment {
+	background: #eee;
+	margin: 0 0 1em;
+	padding: 1em;
+	text-align: center;
+}
+.image-attachment .entry-content .attachment {
+	display: block;
+	margin: 0 auto;
+	text-align: center;
+}
+
+/* Aside Posts */
+.format-aside .entry-header {
+	display: none;
+}
+.single .format-aside .entry-header {
+	display: block;
+}
+.format-aside .entry-content,
+.format-aside .entry-summary {
+	padding-top: 1em;
+}
+.single .format-aside .entry-content,
+.single .format-aside .entry-summary {
+	padding-top: 0;
+}
+
+/* Gallery Posts */
+.format-gallery .gallery-thumb {
+	float: left;
+	margin: 0 1em 0 0;
+}
+
+/* Image Posts */
+.format-image .entry-header {
+	display: none;
+}
+.single .format-image .entry-header {
+	display: block;
+}
+.format-image .entry-content,
+.format-image .entry-summary {
+	padding-top: 1em;
+}
+.single .format-image .entry-content,
+.single .format-image .entry-summary {
+	padding-top: 0;
+}
+
+
+/* =Images
+-------------------------------------------------------------- */
+
+a img {
+	border: none;
+}
+p img {
+	margin-bottom: 0.5em; /* a small bottom margin prevents content floating under images */
+}
+/*
+Resize images to fit the main content area.
+- Applies only to images uploaded via WordPress by targeting size-* classes.
+- Other images will be left alone. Use "size-auto" class to apply to other images.
+*/
+img.size-auto,
+img.size-full,
+img.size-large,
+img.size-medium,
+.attachment img,
+.widget-area img {
+	max-width: 100%; /* When images are too wide for containing element, force them to fit. */
+	height: auto; /* Override height to match resized width for correct aspect ratio. */
+}
+img.alignleft {
+	margin-right: 1em;
+}
+img.alignright {
+	margin-left: 1em;
+}
+.wp-caption {
+	padding: .5em;
+	text-align: center;
+}
+.wp-caption img {
+	margin: .25em;
+}
+.wp-caption .wp-caption-text {
+	margin: .5em;
+}
+.gallery-caption {
+}
+.wp-smiley {
+	margin: 0;
+}
+
+
+/* =Widgets
+-------------------------------------------------------------- */
+
+.widget {
+	display: block;
+}
+.widget_categories ul {
+    padding: 0 39px;
+    margin: 0;
+}
+.widget_categories a {
+	color: #808080;
+	text-decoration: none;
+	text-transform:lowercase;
+	font-size: 80%;
+}
+.widget_categories a:hover {
+	text-decoration: underline;
+}
+li.cat-item {
+    list-style-type: square;
+    margin-left:13px;
+    color: #808080;
+}
+
+/* Start off with only the image background (the square)
+   on the first widget visible; clicking on it will reveal
+   the rest with jQuery.slideDown() in emptysquare_blog.js */
+#secondary aside.widget_nav_menu li:first-child {
+	background-image:url("/blog/theme/square96.png");
+	background-repeat:no-repeat;
+	padding-top: 104px; /* Move the "home" link below the bg image */
+}
+
+#secondary aside.widget_nav_menu li:first-child a {
+	display: block;
+	min-width: 96px;
+	max-width: 96px;
+	padding: 0;
+	text-align: center;
+	text-decoration: none;
+
+	/* Since user will often double-click to open toolbox beneath the square logo,
+	   prevent the clicks from selecting the 'home' link */
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#secondary aside.widget_nav_menu li:first-child a:hover {
+	text-decoration: underline;
+}
+
+#secondary aside, #secondary aside.widget_nav_menu li:first-child a {
+    color: #808080;
+}
+
+#secondary aside.widget_nav_menu {
+    display: block;
+}
+
+/* =Footer
+-------------------------------------------------------------- */
+
+#colophon {
+    padding: 1em 0 0;
+    z-index: 2;
+}

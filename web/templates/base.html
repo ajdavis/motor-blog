@@ -1,0 +1,71 @@
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta property="og:image" content="/blog/theme/square96.png"/>
+    <link rel="shortcut icon" href="/blog/theme/favicon.gif" />
+    <title>{% block title %}{{ handler.settings['author']['display_name'] }}{% end %}</title>
+    <link rel="stylesheet" type="text/css" media="all" href="/blog/theme/style.css" />
+    <link rel="pingback" href="/blog/api" />
+    <link rel="alternate" type="application/rss+xml" title="A. Jesse Jiryu Davis &raquo; Feed" href="/blog/feed" />
+
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount','UA-26577074-1']);
+        _gaq.push(['_trackPageview'],['_trackPageLoadTime']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <link rel="EditURI" type="application/rsd+xml" title="RSD" href="/blog/rsd" />
+    <meta name="generator" content="Motor-Blog" />
+</head>
+
+<body class="{% block body-class %}{% end %}">
+<div id="page">
+    {% block nav-header %}{% end %}
+    <div id="main">
+        <div id="primary">
+            <div id="content" role="main">
+                {% block content %}{% end %}
+            </div><!-- #content -->
+        </div><!-- #primary -->
+
+        <div id="secondary" class="widget-area" role="complementary">
+            <aside class="widget widget_nav_menu">
+                <div class="menu-navigation-container">
+                    <ul id="menu-navigation" class="menu">
+                        <li class="menu-item menu-item-home">
+                            <!-- TODO: blog url -->
+                            <a href="http://localhost:8888">Home</a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+            <aside class="widget widget_categories">
+                <ul>
+                    {% for category in categories %}
+                    <li class="cat-item">
+                        <a href="{{ category.html_url }}" title="View all posts filed under {{ category.name }}">
+                            {{ category.name }}
+                        </a>
+                    </li>
+                    {% end %}
+                </ul>
+            </aside>
+        </div><!-- #secondary .widget-area -->
+
+    </div><!-- #main -->
+
+    <footer id="colophon" role="contentinfo">
+        <div id="site-generator">
+            <a href="https://github.com/ajdavis/motor-blog" title="Motor-Blog" rel="generator">Motor-Blog</a>
+            <span class="sep"> | </span>
+            Design inspired by <a href="http://igstan.ro/">Ionut G. Stan</a>
+        </div>
+    </footer><!-- #colophon -->
+</div><!-- #page -->
+</body>
+</html>

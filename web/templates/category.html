@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block body-class %}archive category{% end %}
+
+{% block content %}
+    {% for post in posts %}
+        {% module Template("post.html", post=post, handler=handler, title_link=True) %}
+    {% end %}
+{% end %}

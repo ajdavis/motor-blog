@@ -1,0 +1,44 @@
+<article class="post">
+    <header class="entry-header">
+        <h1 class="entry-title">
+            {% if title_link %}
+                <a href="{{ post.html_url }}">
+            {% end %}
+                {{ post.title }}
+            {% if title_link %}
+                </a>
+            {% end %}
+        </h1>
+
+        <div class="entry-meta">
+            <span class="sep">Posted on </span>
+            TODO: better date formatting
+            <a href="{{ post.html_url }}" title="{{ post.date_created }}" rel="bookmark">
+                <time class="entry-date" datetime="{{ post.date_created }}" pubdate>{{ post.date_created }}</time>
+            </a>
+            <span class="byline">
+                <span class="sep">
+                    by
+                </span>
+                <span class="author">
+                    {{ handler.settings['author']['display_name'] }}
+                </span>
+            </span>
+        </div><!-- .entry-meta -->
+    </header><!-- .entry-header -->
+
+    <div class="entry-content">
+        {% raw post.body %}
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+        {% if post.categories %}
+            This entry was posted in
+            {% for i, category in enumerate(post.categories) %}
+                <a href="{{ category.html_url }}" title="View all posts in {{ category.name }}" rel="category tag">
+                    {{ category.name }}
+                </a>{% if i < len(post.categories) - 1 %},{% end %}
+            {% end %}
+        {% end %}
+    </footer><!-- .entry-meta -->
+</article>

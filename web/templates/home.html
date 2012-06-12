@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block body-class %}home{% end %}
+
+{% block nav-header %}
+<header id="branding" role="banner">
+    <nav id="access" role="navigation">
+        <div class="menu-main-container">
+            <ul id="menu-main" class="menu">
+                {# TODO: configurable #}
+                <li class="menu-item"><a href="http://emptysquare.net/blog/all-posts/" >All Posts</a></li>
+                <li class="menu-item"><a href="http://emptysquare.net/blog/about/" >About</a></li>
+                <li class="menu-item"><a href="http://emptysquare.net/photography" >Photography</a></li>
+                <li class="menu-item">
+                    <a href="http://feeds.feedburner.com/emptysquare" onclick="javascript:_gaq.push(['_trackEvent','outbound-menu','http://feeds.feedburner.com']);">
+                        RSS
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+{% end %}
+
+{% block content %}
+{% for post in posts %}
+    {% module Template("post.html", post=post, handler=handler, title_link=True) %}
+{% end %}
+
+<nav id="nav-below">
+    <div class="nav-previous">
+        <a href="/page/{{ page_num + 1 }}">
+            <span class="meta-nav">&larr;</span> Older posts
+        </a>
+    </div>
+    {% if page_num > 0 %}
+        {% set next_page = page_num - 1 %}
+        {# comment TODO use urlreverse #}
+        {% if next_page == 0 %}
+            {% set next_url = '/' %}
+        {% else %}
+            {% set next_url = '/page/%s' % (page_num - 1) %}
+        {% end %}
+
+        <div class="nav-next">
+            <a href="{{ next_url }}">
+                Newer posts <span class="meta-nav">&rarr;</span>
+            </a>
+        </div>
+    {% end %}
+</nav>
+
+{% end %}
