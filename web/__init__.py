@@ -25,6 +25,7 @@ def get_categories(db, callback):
 class HomeHandler(tornado.web.RequestHandler):
     @tornado.web.asynchronous
     @gen.engine
+    @tornado.web.addslash
     def get(self, page_num=0):
         postdocs = yield motor.Op(
             self.settings['db'].posts.find({'status': 'Published'})
@@ -40,11 +41,30 @@ class HomeHandler(tornado.web.RequestHandler):
             posts=posts, categories=categories, page_num=int(page_num))
 
 
+class AllPostsHandler(tornado.web.RequestHandler):
+    @tornado.web.asynchronous
+    @gen.engine
+    @tornado.web.addslash
+    def get(self):
+        postdocs = yield motor.Op(
+            self.settings['db'].posts.find({'status': 'Published'})
+                .sort([('date_created', -1)])
+                .to_list)
+
+        posts = [Post(**postdoc) for postdoc in postdocs]
+        categories = yield motor.Op(get_categories, self.settings['db'])
+        self.render(
+            'all-posts.html',
+            posts=posts, categories=categories)
+
+
 class PostHandler(tornado.web.RequestHandler):
     """Show a single blog post"""
     @tornado.web.asynchronous
     @gen.engine
+    @tornado.web.addslash
     def get(self, slug):
+        slug = slug.rstrip('/')
         postdoc = yield motor.Op(
             self.settings['db'].posts.find_one,
                 {'slug': slug, 'status': 'Published'})
@@ -77,11 +97,15 @@ class PostHandler(tornado.web.RequestHandler):
             'single.html',
             post=post, prev=prev, next=next, categories=categories)
 
+
 class CategoryHandler(tornado.web.RequestHandler):
     """Page of posts for a category"""
     @tornado.web.asynchronous
     @gen.engine
+    @tornado.web.addslash
     def get(self, category_name, page_num=0):
+        print 'CategoryHandler'
+        category_name = category_name.rstrip('/')
         # TODO: index
         postdocs = yield motor.Op(
             self.settings['db'].posts
@@ -111,7 +135,3 @@ class MediaHandler(tornado.web.RequestHandler):
         self.set_header('Content-Type', media['type'])
         self.write(media['content'])
         self.finish()
-
-class RemoveSlashHandler(tornado.web.RequestHandler):
-    def get(self, slug):
-        self.redirect('/' + slug.rstrip('/'), permanent=True)

@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from bson.objectid import ObjectId
 from dictshield.document import Document, EmbeddedDocument
@@ -8,7 +9,7 @@ from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
 from dictshield.fields.mongo import ObjectIdField
 
 import common
-
+from htmlabbrev import HTMLAbbrev
 
 class Category(Document):
     name = StringField()
@@ -89,9 +90,11 @@ class Post(Document):
                 struct['date_created_gmt'].value, "%Y%m%dT%H:%M:%S")
             if 'date_created_gmt' in struct else None)
 
+        description = struct.get('description', '')
+
         return cls(
             title=title,
-            body=struct.get('description', ''),
+            body=description,
             tags=tags,
             slug=slug,
             status=status,
@@ -132,3 +135,13 @@ class Post(Document):
         # TODO timezone config option
         utcdiff = datetime.datetime.utcnow() - datetime.datetime.now()
         return self.date_created - utcdiff
+
+    @property
+    def summary(self):
+        try:
+            parser = HTMLAbbrev(300)
+            parser.feed(self.body)
+            return parser.close()
+        except Exception, e:
+            logging.exception('truncating HTML for "%s"' % self.slug)
+            return '[ ... ]'

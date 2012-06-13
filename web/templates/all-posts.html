@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block body-class %}page{% end %}
+
+{% block content %}
+<h1>All Posts</h1>
+{% for post in posts %}
+    {% module Template("post-summary.html", post=post, handler=handler, title_link=True) %}
+{% end %}
+
+{% end %}

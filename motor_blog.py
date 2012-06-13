@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import logging
 import sys
 
 import tornado.ioloop
@@ -7,8 +8,10 @@ import tornado.options
 
 from api import APIHandler
 from api.rsd import RSDHandler
+import common
 from web import (
-    HomeHandler, PostHandler, MediaHandler, RemoveSlashHandler, CategoryHandler)
+    HomeHandler, PostHandler, MediaHandler, AllPostsHandler, CategoryHandler,
+    uimodules)
 
 # TODO: indexes, command-line arg to build them
 # TODO: command-line arg to add categories, since it seems Mars has no way to add
@@ -30,43 +33,37 @@ except ImportError:
 
 
 if __name__ == "__main__":
-    tornado.options.define('debug', default=False, type=bool, help=(
-        "Turn on autoreload"
-    ))
+    options = common.options()
+    base_url = options.base_url
+    
+    class BlogURL(tornado.web.URLSpec):
+        def __init__(self, pattern, *args, **kwargs):
+            super(BlogURL, self).__init__(
+                '/' + base_url.strip('/') + '/' + pattern.lstrip('/'),
+                *args, **kwargs
+            )
 
-    tornado.options.define('host', default='localhost', type=str, help=(
-        "Server hostname"
-    ))
-
-    tornado.options.define('port', default=8888, type=int, help=(
-        "Server port"
-    ))
-
-    tornado.options.parse_command_line()
-    options = tornado.options.options
     application = tornado.web.Application([
         # XML-RPC API
-        (r"/rsd", RSDHandler),
-        (r"/api", APIHandler),
+        BlogURL(r"/rsd", RSDHandler),
+        BlogURL(r"/api", APIHandler),
 
         # Web
         # TODO: drafts, and a login page so you can see drafts
-        (r"/media/(?P<url>.+)", MediaHandler),
-        (r"/blog/theme/(.*)", tornado.web.StaticFileHandler, {"path": "theme"}), # TODO: theming
-        (r"/category/(.+)", CategoryHandler),
-        (r"/page/(?P<page_num>\d+)/?", HomeHandler),
-        (r"/(?P<slug>[^/]+)/$", RemoveSlashHandler),
-        (r"/(?P<slug>.+)", PostHandler),
-        (r"/", HomeHandler),
+        BlogURL(r"media/(?P<url>.+)", MediaHandler),
+        BlogURL(r"theme/(.+)", tornado.web.StaticFileHandler, {"path": "theme"}), # TODO: theming
+        BlogURL(r"category/(.+)/?", CategoryHandler),
+        BlogURL(r"page/(?P<page_num>\d+)/?", HomeHandler),
+        BlogURL(r"all-posts/?", AllPostsHandler),
+        BlogURL(r"(?P<slug>.+)/?", PostHandler),
+        BlogURL(r"/?", HomeHandler),
         ],
-        debug=options.debug,
-        host=options.host,
         db=motor.MotorConnection().open_sync().motorblog,
         template_path='web/templates',
-        author={ 'username': 'emptysquare', 'display_name': 'A. Jesse Jiryu Davis'},
-        default_host='localhost:8888',
+        ui_modules=uimodules,
+        **options
     )
 
-
     application.listen(options.port)
+    logging.info('Listening on http://%s:%s' % (options.host, options.port))
     tornado.ioloop.IOLoop.instance().start()

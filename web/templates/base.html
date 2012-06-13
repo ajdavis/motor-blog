@@ -1,17 +1,18 @@
+{% set base_url = handler.application.settings['base_url'].value() %}
 <html>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta property="og:image" content="/blog/theme/square96.png"/>
-    <link rel="shortcut icon" href="/blog/theme/favicon.gif" />
-    <title>{% block title %}{{ handler.settings['author']['display_name'] }}{% end %}</title>
-    <link rel="stylesheet" type="text/css" media="all" href="/blog/theme/style.css" />
-    <link rel="pingback" href="/blog/api" />
-    <link rel="alternate" type="application/rss+xml" title="A. Jesse Jiryu Davis &raquo; Feed" href="/blog/feed" />
+    <meta property="og:image" content="/{{ base_url }}/theme/square96.png"/>
+    <link rel="shortcut icon" href="/{{ base_url }}/theme/favicon.gif" />
+    <title>{% block title %}{% module Setting('author_display_name') %}{% end %}</title>
+    <link rel="stylesheet" type="text/css" media="all" href="/{{ base_url }}/theme/style.css" />
+    <link rel="pingback" href="/{{ base_url }}/api" />
+    <link rel="alternate" type="application/rss+xml" title="{% module Setting('blog_name') %} &raquo; Feed" href="/{{ base_url }}/feed" />
 
     <script type="text/javascript">
         var _gaq = _gaq || [];
-        _gaq.push(['_setAccount','UA-26577074-1']);
+        _gaq.push(['_setAccount','{% module Setting("google_analytics_id") %}']);
         _gaq.push(['_trackPageview'],['_trackPageLoadTime']);
         (function() {
             var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
@@ -19,7 +20,7 @@
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
         })();
     </script>
-    <link rel="EditURI" type="application/rsd+xml" title="RSD" href="/blog/rsd" />
+    <link rel="EditURI" type="application/rsd+xml" title="RSD" href="/{{ base_url }}/rsd" />
     <meta name="generator" content="Motor-Blog" />
 </head>
 
@@ -38,8 +39,7 @@
                 <div class="menu-navigation-container">
                     <ul id="menu-navigation" class="menu">
                         <li class="menu-item menu-item-home">
-                            <!-- TODO: blog url -->
-                            <a href="http://localhost:8888">Home</a>
+                            <a href="/{{ base_url }}/">Home</a>
                         </li>
                     </ul>
                 </div>

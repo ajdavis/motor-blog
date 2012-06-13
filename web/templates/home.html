@@ -7,15 +7,12 @@
     <nav id="access" role="navigation">
         <div class="menu-main-container">
             <ul id="menu-main" class="menu">
-                {# TODO: configurable #}
-                <li class="menu-item"><a href="http://emptysquare.net/blog/all-posts/" >All Posts</a></li>
+                {# comment TODO use urlreverse #}
+                <li class="menu-item"><a href="/{{ base_url }}/all-posts/" >All Posts</a></li>
                 <li class="menu-item"><a href="http://emptysquare.net/blog/about/" >About</a></li>
-                <li class="menu-item"><a href="http://emptysquare.net/photography" >Photography</a></li>
-                <li class="menu-item">
-                    <a href="http://feeds.feedburner.com/emptysquare" onclick="javascript:_gaq.push(['_trackEvent','outbound-menu','http://feeds.feedburner.com']);">
-                        RSS
-                    </a>
-                </li>
+                {% for url, title in handler.application.settings['nav_menu'].value() %}
+                    <li class="menu-item"><a href="{{ url }}" >{{ title }}</a></li>
+                {% end %}
             </ul>
         </div>
     </nav>
@@ -29,7 +26,7 @@
 
 <nav id="nav-below">
     <div class="nav-previous">
-        <a href="/page/{{ page_num + 1 }}">
+        <a href="/{{ base_url }}/page/{{ page_num + 1 }}">
             <span class="meta-nav">&larr;</span> Older posts
         </a>
     </div>

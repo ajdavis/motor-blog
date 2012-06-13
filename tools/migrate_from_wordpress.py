@@ -1,13 +1,24 @@
 import argparse
+import logging # TODO: set requests' logging to 'warn' level
+import pickle
+import os
 import xmlrpclib
 from urlparse import urlparse, urljoin
-import bson
 
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name, guess_lexer
+from pygments.formatters import HtmlFormatter
+import sys
+
+import tornado.escape
 import pymongo
+import bson
 import time
+import re
 import requests
 
 from models import Category, Post
+import common
 
 
 class Blog(object):
@@ -23,6 +34,7 @@ class Blog(object):
 
     def get_media_library(self):
         return self.server.wp.getMediaLibrary(0, self.username, self.password)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -44,18 +56,83 @@ def parse_args():
     parser.add_argument('source_url', type=str,
         help='WordPress XML-RPC endpoint')
 
-    parser.add_argument('destination_url', type=str,
-        help='Base URL of destination blog, e.g. http://emptysquare.net/blog')
-
     args = parser.parse_args()
     return args
 
 
-def massage_body(body, media_library, db, destination_url, source_base_url):
-    body = ''.join(
-        '<p>%s</p>' % graf for graf in body.split('\n\n')
-    )
+def pygmentize(code, language, highlighted_lines):
+    if language:
+        lexer = get_lexer_by_name(language)
+    else:
+        lexer = guess_lexer(code)
 
+    formatter = HtmlFormatter(
+        style='friendly', noclasses=True, hl_lines=highlighted_lines)
+
+    return highlight(code, lexer, formatter)
+
+
+def replace_crayon_and_paragraphize(body, media_library, db, destination_url, source_base_url):
+    """Specific to emptysquare.net/blog: replace Crayon's markup, like
+       [cc lang="python"] ... [/cc] or [cci][/cci], with <code></code>"""
+
+    crayon_pat = re.compile(r"\[cc(?P<inline>i?)(?P<options>.*?)\](?P<code>.*?)\[/cci?\]", re.S)
+
+    def repl(match):
+        # Python 2.7 dict literal
+        #        options = {
+        #            name.strip(): value.strip().strip('"')
+        #            for name, value in [
+        #                option.strip().split('=')
+        #                for option in match.group('options').split()
+        #            ]
+        #        }
+        inline = match.group('inline')
+        code = tornado.escape.xhtml_escape(match.group('code'))
+        print '\n\n\n\n----CODE---\n\n\n\n', code, '\n\n\n\n-------\n\n\n\n'
+        options = match.group('options')
+        if inline:
+            return '<code %s>%s</code>' % (options, code)
+        else:
+            return '<div><pre>%s</pre></div>' % code
+
+    out = []
+    pos = 0
+
+    while True:
+        match = crayon_pat.search(body)
+        crayon_pos = match.start() if match else sys.maxint
+        try:
+            double_newline_pos = body.index('\n\n')
+        except ValueError:
+            double_newline_pos = sys.maxint # Not found
+
+        if crayon_pos == double_newline_pos == sys.maxint:
+            # Done
+            out.append(body)
+            break
+
+        # Consume
+        n = min(crayon_pos, double_newline_pos)
+        print '\n\n\n\n---BODY----\n\n\n\n', body[:n]
+        out.append(body[:n])
+        body = body[n:]
+
+        if crayon_pos < double_newline_pos:
+            # Consume the crayon portion without replacing newlines within it
+            out.append(repl(match))
+            start, end = match.span()
+            body = body[end - start:]
+        else:
+            # Replace newlines with <br />
+            out.append('<br />' * 2)
+            body = body[2:]
+
+    rv = ''.join(out)
+    return rv
+
+
+def replace_media_links(body, media_library, db, destination_url, source_base_url):
     for link in media_library:
         if link in body:
             # This is making some big assumptions about the structure
@@ -63,7 +140,6 @@ def massage_body(body, media_library, db, destination_url, source_base_url):
             # http://emptysquare.net/blog/wp-content/uploads/2011/10/img.png
             url = link.split('/uploads/')[-1]
 
-            # TODO: cache
             media_doc = db.media.find_one({'url': link})
             if not media_doc:
                 r = requests.get(link)
@@ -75,15 +151,44 @@ def massage_body(body, media_library, db, destination_url, source_base_url):
                 })
 
             body = body.replace(
-                link, urljoin(urljoin(destination_url, 'media/'), url))
-
-    body = body.replace(source_base_url, destination_url)
+                link, os.path.join(destination_url, 'media', url))
 
     return body
 
 
+def replace_internal_links(body, media_library, db, destination_url, source_base_url):
+    return body.replace(source_base_url, destination_url)
+
+
+def massage_body(post, media_library, db, destination_url, source_base_url):
+    filters = [
+        replace_crayon_and_paragraphize,
+        replace_media_links,
+        replace_internal_links,
+    ]
+
+    body = post.body
+    for filter in filters:
+        try:
+            body = filter(
+                body, media_library, db, destination_url, source_base_url)
+        except Exception, e:
+            logging.error('%s processing %s' % (e, repr(post.title)))
+            raise
+
+    post.body = body
+
+
 def main(args):
     start = time.time()
+
+    print 'Loading', common.config_path
+    options = common.options()
+    destination_url = 'http://%s%s/%s' % (
+        options.host,
+        ':' + str(options.port) if options.port else '',
+        options.base_url
+    )
 
     parts = urlparse(args.source_url)
     source_base_url = urljoin(
@@ -99,13 +204,27 @@ def main(args):
     source = Blog(args.source_url, args.source_username, args.source_password)
     print 'Getting media library'
 
-    media_library = set([
-        m['link'] for m in source.get_media_library()])
+    if not os.path.exists('media.cache'):
+        media_library = set([
+            m['link'] for m in source.get_media_library()])
+        with open('media.cache', 'w+') as f:
+            f.write(pickle.dumps(media_library))
+    else:
+        media_library = pickle.load(open('media.cache'))
 
     print '    %s assets\n' % len(media_library)
 
-    print 'Getting posts from %s' % args.source_url
-    post_structs = source.get_recent_posts(args.nposts)
+    if not os.path.exists('posts.cache'):
+        print 'Getting posts from %s' % args.source_url
+        # TODO remove caching
+        post_structs = source.get_recent_posts(args.nposts)
+        with open('posts.cache', 'w+') as f:
+            print 'writing posts.cache'
+            f.write(pickle.dumps(post_structs))
+    else:
+        print 'loading posts.cache'
+        post_structs = pickle.load(open('posts.cache'))
+
     print '    %s posts\n' % len(post_structs)
     for post_struct in post_structs:
         # TODO: convert crayon shortcodes to something we parse w/ pygments
@@ -114,8 +233,7 @@ def main(args):
         post = Post.from_metaweblog(post_struct)
 
         # Wordpress replaces \n\n with paragraphs
-        post.body = massage_body(
-            post.body, media_library, db, args.destination_url, source_base_url)
+        massage_body(post, media_library, db, destination_url, source_base_url)
 
         print '%-34s %s' % (post.title, post.status.upper())
         for category_name in categories:
