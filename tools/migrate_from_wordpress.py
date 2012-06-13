@@ -88,9 +88,9 @@ def codify(match):
     print '\n\n----CODE---\n', code, '\n-------\n'
     options = match.group('options')
     if inline:
-        return '<code %s>%s</code>' % (options, code)
+        return '<code %s>%s</code>' % ('', code)
     else:
-        return '<pre %s>%s</pre>' % (options, code)
+        return '<pre %s><code>%s</code></pre>' % (options, code)
 
 
 def replace_crayon_and_paragraphize(body, media_library, db, destination_url, source_base_url):
@@ -133,12 +133,11 @@ def replace_crayon_and_paragraphize(body, media_library, db, destination_url, so
     out = []
     for i, token in enumerate(tokens):
         if isinstance(token, basestring):
+            out.append(token)
             if i < len(tokens) - 1 and isinstance(tokens[i+1], basestring):
                 # Add newline between text portions that were separated by
                 # '\n\n'
-                out.append('<p>' + token + '</p>')
-            else:
-                out.append(token)
+                out.append('<p/>')
         else:
             # It's a code regex match
             out.append(codify(token))
