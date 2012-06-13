@@ -12,7 +12,6 @@ from tornadorpc.xml import XMLRPCHandler, XMLRPCParser
 from api import categories, posts, tags, media
 
 
-# TODO: change 'result' params in callbacks to descriptive, like 'post' or 'posts' or 'categories'
 # TODO: auth decorator? like in http://www.allyourpixel.com/site_media/src/metaweblog.py.txt
 
 class WordpressParser(XMLRPCParser):

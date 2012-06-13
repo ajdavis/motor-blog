@@ -21,12 +21,11 @@ class Posts(object):
 
     @tornadorpc.async
     def metaWeblog_newPost(self, blogid, user, password, struct, publish):
-        def new_post_inserted(result, error):
+        def new_post_inserted(_id, error):
             if error:
                 raise error
 
-            # result is new post _id
-            self.result(str(result))
+            self.result(str(_id))
 
         new_post = Post.from_metaweblog(struct)
         new_post.set_published(publish)
@@ -50,11 +49,11 @@ class Posts(object):
 
     @tornadorpc.async
     def metaWeblog_getPost(self, postid, user, password):
-        def got_post(result, error):
+        def got_post(postdoc, error):
             if error:
                 raise error
 
-            post = Post(**result)
+            post = Post(**postdoc)
             self.result(post.to_metaweblog())
 
         self.settings['db'].posts.find_one(

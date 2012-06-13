@@ -14,7 +14,7 @@ class Media(object):
         now = datetime.datetime.utcnow()
         url = '%s/%s/%s' % (now.year, now.month, text.slugify(name))
 
-        def inserted(result, error):
+        def inserted(_id, error):
             if error:
                 raise error
 

@@ -6,9 +6,6 @@ import os
 import xmlrpclib
 from urlparse import urlparse, urljoin
 
-from pygments import highlight
-from pygments.lexers import get_lexer_by_name, guess_lexer
-from pygments.formatters import HtmlFormatter
 import sys
 
 import tornado.escape
@@ -24,6 +21,7 @@ import text
 
 
 class Blog(object):
+    """Wordpress XML-RPC client, connect to source blog"""
     def __init__(self, url, username, password):
         self.url = url
         self.username = username
@@ -62,45 +60,34 @@ def parse_args():
     return args
 
 
-def pygmentize(code, language, highlighted_lines):
-    if language:
-        lexer = get_lexer_by_name(language)
-    else:
-        lexer = guess_lexer(code)
-
-    formatter = HtmlFormatter(
-        style='friendly', noclasses=True, hl_lines=highlighted_lines)
-
-    return highlight(code, lexer, formatter)
-
-
-def codify(match):
-    # Python 2.7 dict literal
-    #        options = {
-    #            name.strip(): value.strip().strip('"')
-    #            for name, value in [
-    #                option.strip().split('=')
-    #                for option in match.group('options').split()
-    #            ]
-    #        }
-    inline = match.group('inline')
-    code = tornado.escape.xhtml_escape(match.group('code'))
-    print '\n\n----CODE---\n', code, '\n-------\n'
-    options = match.group('options')
-    if inline:
-        return '<code %s>%s</code>' % ('', code)
-    else:
-        return '<pre %s><code>%s</code></pre>' % (options, code)
-
-
 def replace_crayon_and_paragraphize(body, media_library, db, destination_url, source_base_url):
-    """Specific to emptysquare.net/blog: replace Crayon's markup, like
-       [cc lang="python"] ... [/cc] or [cci][/cci], with <code></code>"""
+    """Specific to emptysquare.net/blog: replace the CodeColorer Wordpress
+       plugin's markup, like this:
+
+           [cc lang="python"][/cc]
+
+       or
+
+           [cci][/cci]
+
+       with <code></code>
+    """
 
     crayon_pat = re.compile(r"\[cc(?P<inline>i?)(?P<options>.*?)\](?P<code>.*?)\[/cci?\]", re.S)
 
+    def codify(match):
+        inline = match.group('inline')
+        code = tornado.escape.xhtml_escape(match.group('code'))
+        options = match.group('options')
+        if inline:
+            return '<code %s>%s</code>' % ('', code)
+        else:
+            return '<pre %s><code>%s</code></pre>' % (options, code)
+
     tokens = []
 
+    # Handmade parser, sorry. I find CodeColorer code blocks or paragraphs
+    # separated by double-newlines and make them valid HTML.
     while True:
         match = crayon_pat.search(body)
         crayon_pos = match.start() if match else sys.maxint
@@ -116,12 +103,11 @@ def replace_crayon_and_paragraphize(body, media_library, db, destination_url, so
 
         # Consume
         n = min(crayon_pos, double_newline_pos)
-        print '\n\n---BODY----\n', body[:n]
         tokens.append(body[:n])
         body = body[n:]
 
         if crayon_pos < double_newline_pos:
-            # Consume the crayon portion without replacing newlines within it
+            # Consume the code portion
             tokens.append(match)
             start, end = match.span()
             body = body[end - start:]
@@ -142,8 +128,7 @@ def replace_crayon_and_paragraphize(body, media_library, db, destination_url, so
             # It's a code regex match
             out.append(codify(token))
 
-    rv = ''.join(out)
-    return rv
+    return ''.join(out)
 
 
 def replace_media_links(body, media_library, db, destination_url, source_base_url):
@@ -187,6 +172,7 @@ def replace_internal_links(body, media_library, db, destination_url, source_base
 
 
 def html_to_markdown(body, media_library, db, destination_url, source_base_url):
+    # Requires pandoc from http://johnmacfarlane.net/pandoc/
     p = subprocess.Popen(
         ['/usr/local/bin/pandoc', '--from=html', '--to=markdown'],
         stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -262,11 +248,10 @@ def main(args):
 
     print '    %s posts\n' % len(post_structs)
     for post_struct in post_structs:
-        # TODO: convert crayon shortcodes to something we parse w/ pygments
-        # TODO: convert blog's internal links
         categories = post_struct.pop('categories', [])
         massage_body(
             post_struct, media_library, db, destination_url, source_base_url)
+
         post = Post.from_metaweblog(post_struct)
 
         print '%-34s %s' % (post.title, post.status.upper())

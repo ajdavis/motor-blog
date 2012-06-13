@@ -39,11 +39,11 @@ class Categories(object):
     @tornadorpc.async
     def wp_newCategory(self, blogid, user, password, struct):
         # TODO: unique index on name
-        def inserted_category(result, error):
+        def inserted_category(_id, error):
             if error:
                 raise error # TODO: XML-RPC error
 
-            self.result(str(result))
+            self.result(str(_id))
 
         category = Category.from_wordpress(struct)
         self.settings['db'].categories.insert(
