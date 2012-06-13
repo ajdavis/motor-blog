@@ -32,7 +32,10 @@ class APIHandler(
     _RPC_ = WordpressParser(xmlrpclib)
 
     def mt_supportedTextFilters(self):
-        return []
+        return [
+            {'key': 'markdown', 'label': 'Markdown' },
+            {'key': 'htmlauto', 'label': "Convert line breaks" },
+        ]
 
     def wp_getPages(self, blogid, user, password, num_pages):
         # Not implemented
