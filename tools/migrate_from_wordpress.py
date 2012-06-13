@@ -180,12 +180,37 @@ def html_to_markdown(body, media_library, db, destination_url, source_base_url):
     return stdout.decode('utf-8')
 
 
+def reformat_markdown_code(body, media_library, db, destination_url, source_base_url):
+    """Replace pandoc's markdown code blocks, like this:
+
+        ~~~~ {lang="Python" highlight="8,12,13,20"}
+            ... code ...
+        ~~~~
+    with this:
+
+            ::: lang="Python" highlight="8,12,13,20"
+    """
+    pat = re.compile(
+        r'^~~~~\s\{(?P<options>.+?)\}\s*$(?P<code>.*?)^~~~~\s*$',
+        re.M | re.S)
+
+    def sub(match):
+        options = match.group('options')
+        lines = match.group('code').split('\n')
+        return '    ::: %s%s' % (
+            options,
+            '\n'.join(' ' * 4 + line for line in lines))
+
+    return pat.sub(sub, body)
+
+
 def massage_body(post_struct, media_library, db, destination_url, source_base_url):
     filters = [
         replace_crayon_and_paragraphize,
         replace_media_links,
         replace_internal_links,
         html_to_markdown,
+        reformat_markdown_code,
     ]
 
     body = post_struct['description']

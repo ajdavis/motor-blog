@@ -40,7 +40,7 @@ class Posts(object):
             assert result['n'] == 1
             self.result(True)
 
-        new_post = Post.from_metaweblog(struct)
+        new_post = Post.from_metaweblog(struct, is_edit=True)
         new_post.set_published(publish)
         self.settings['db'].posts.update(
             {'_id': ObjectId(postid)},

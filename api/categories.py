@@ -51,7 +51,6 @@ class Categories(object):
 
     @tornadorpc.async
     def mt_setPostCategories(self, postid, user, password, categories):
-        print 'mt_setPostCategories'
         embedded_cats = [
             EmbeddedCategory.from_metaweblog(cat).to_python()
             for cat in categories]

@@ -16,8 +16,6 @@ from api import categories, posts, tags, media
 
 class WordpressParser(XMLRPCParser):
     def parse_request(self, request_body):
-        print 'parse_request', request_body
-
         ((method_name, params),) = super(WordpressParser, self).parse_request(
             request_body)
 

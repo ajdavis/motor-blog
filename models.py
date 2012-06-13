@@ -9,6 +9,7 @@ from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
 from dictshield.fields.mongo import ObjectIdField
 
 import common
+import markup
 import text
 from htmlabbrev import HTMLAbbrev
 
@@ -63,7 +64,7 @@ class Post(Document):
     status = StringField(choices=('Published', 'Draft'), default='Published')
     tags = SortedListField(StringField())
     categories = SortedListField(EmbeddedDocumentField(EmbeddedCategory))
-    date_created = DateTimeField(default=lambda: datetime.datetime.utcnow())
+    date_created = DateTimeField(None)
     slug = StringField(default='')
     wordpress_id = IntField() # legacy id from WordPress
 
@@ -71,7 +72,7 @@ class Post(Document):
         id_field = ObjectIdField
 
     @classmethod
-    def from_metaweblog(cls, struct):
+    def from_metaweblog(cls, struct, is_edit=False):
         title = struct.get('title', '')
         # We expect MarsEdit to set categories with mt_setPostCategories()
         assert 'categories' not in struct
@@ -89,16 +90,19 @@ class Post(Document):
             'Published' if struct.get('post_status', 'publish') == 'publish'
             else 'Draft')
 
-        date_created = (
-            datetime.datetime.strptime(
+        if not is_edit and 'date_created_gmt' in struct:
+            date_created = datetime.datetime.strptime(
                 struct['date_created_gmt'].value, "%Y%m%dT%H:%M:%S")
-            if 'date_created_gmt' in struct else None)
+        elif not is_edit:
+            date_created = datetime.datetime.utcnow()
+        else:
+            date_created = None
 
-        description = struct.get('description', '')
+        description = struct.get('description', '').encode('ascii', errors='xmlcharrefreplace')
 
         return cls(
             title=title,
-            body=text.from_marsedit(description), # Format for display
+            body=markup.markup(description), # Format for display
             original=description,
             tags=tags,
             slug=slug,
