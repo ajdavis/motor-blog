@@ -19,6 +19,7 @@ import requests
 
 from models import Category, Post
 import common
+import text
 
 
 class Blog(object):
@@ -72,32 +73,32 @@ def pygmentize(code, language, highlighted_lines):
     return highlight(code, lexer, formatter)
 
 
+def codify(match):
+    # Python 2.7 dict literal
+    #        options = {
+    #            name.strip(): value.strip().strip('"')
+    #            for name, value in [
+    #                option.strip().split('=')
+    #                for option in match.group('options').split()
+    #            ]
+    #        }
+    inline = match.group('inline')
+    code = match.group('code')
+    print '\n\n----CODE---\n', code, '\n-------\n'
+    options = match.group('options')
+    if inline:
+        return '<code %s>%s</code>' % (options, code)
+    else:
+        return '<code inline="true" %s>%s</code>' % (options, code)
+
+
 def replace_crayon_and_paragraphize(body, media_library, db, destination_url, source_base_url):
     """Specific to emptysquare.net/blog: replace Crayon's markup, like
        [cc lang="python"] ... [/cc] or [cci][/cci], with <code></code>"""
 
     crayon_pat = re.compile(r"\[cc(?P<inline>i?)(?P<options>.*?)\](?P<code>.*?)\[/cci?\]", re.S)
 
-    def repl(match):
-        # Python 2.7 dict literal
-        #        options = {
-        #            name.strip(): value.strip().strip('"')
-        #            for name, value in [
-        #                option.strip().split('=')
-        #                for option in match.group('options').split()
-        #            ]
-        #        }
-        inline = match.group('inline')
-        code = tornado.escape.xhtml_escape(match.group('code'))
-        print '\n\n\n\n----CODE---\n\n\n\n', code, '\n\n\n\n-------\n\n\n\n'
-        options = match.group('options')
-        if inline:
-            return '<code %s>%s</code>' % (options, code)
-        else:
-            return '<div><pre>%s</pre></div>' % code
-
-    out = []
-    pos = 0
+    tokens = []
 
     while True:
         match = crayon_pat.search(body)
@@ -109,24 +110,36 @@ def replace_crayon_and_paragraphize(body, media_library, db, destination_url, so
 
         if crayon_pos == double_newline_pos == sys.maxint:
             # Done
-            out.append(body)
+            tokens.append(body)
             break
 
         # Consume
         n = min(crayon_pos, double_newline_pos)
-        print '\n\n\n\n---BODY----\n\n\n\n', body[:n]
-        out.append(body[:n])
+        print '\n\n---BODY----\n', body[:n]
+        tokens.append(body[:n])
         body = body[n:]
 
         if crayon_pos < double_newline_pos:
             # Consume the crayon portion without replacing newlines within it
-            out.append(repl(match))
+            tokens.append(match)
             start, end = match.span()
             body = body[end - start:]
         else:
-            # Replace newlines with <br />
-            out.append('<br />' * 2)
+            # Consume '\n\n'
             body = body[2:]
+
+    # Replace newlines with <br /> and code with <code>
+    out = []
+    for i, token in enumerate(tokens):
+        if isinstance(token, basestring):
+            out.append(token)
+            if i < len(tokens) - 1 and isinstance(tokens[i+1], basestring):
+                # Add newline between text portions that were separated by
+                # \n\n
+                out.append('<br/><br/>')
+        else:
+            # It's a code regex match
+            out.append(codify(token))
 
     rv = ''.join(out)
     return rv
@@ -142,11 +155,23 @@ def replace_media_links(body, media_library, db, destination_url, source_base_ur
 
             media_doc = db.media.find_one({'url': link})
             if not media_doc:
-                r = requests.get(link)
+                # TODO: remove
+                cache_path = os.path.join('cache', text.slugify(link))
+                if os.path.exists(cache_path):
+                    content, content_type = pickle.load(open(cache_path))
+                else:
+                    r = requests.get(link)
+                    content = r.content
+                    content_type = r.headers['content-type']
+                    if not os.path.exists('cache'):
+                        os.mkdir('cache')
+                    with open(cache_path, 'w+') as f:
+                        pickle.dump((content, content_type), f)
+
                 db.media.insert({
                     'name': link.split('/')[-1],
-                    'content': bson.Binary(r.content),
-                    'type': r.headers['content-type'],
+                    'content': bson.Binary(content),
+                    'type': content_type,
                     'url': url,
                 })
 
@@ -160,23 +185,23 @@ def replace_internal_links(body, media_library, db, destination_url, source_base
     return body.replace(source_base_url, destination_url)
 
 
-def massage_body(post, media_library, db, destination_url, source_base_url):
+def massage_body(post_struct, media_library, db, destination_url, source_base_url):
     filters = [
         replace_crayon_and_paragraphize,
         replace_media_links,
         replace_internal_links,
     ]
 
-    body = post.body
+    body = post_struct['description']
     for filter in filters:
         try:
             body = filter(
                 body, media_library, db, destination_url, source_base_url)
         except Exception, e:
-            logging.error('%s processing %s' % (e, repr(post.title)))
+            logging.error('%s processing %s' % (e, repr(post_struct['title'])))
             raise
 
-    post.body = body
+    post_struct['description'] = body
 
 
 def main(args):
@@ -230,10 +255,9 @@ def main(args):
         # TODO: convert crayon shortcodes to something we parse w/ pygments
         # TODO: convert blog's internal links
         categories = post_struct.pop('categories', [])
+        massage_body(
+            post_struct, media_library, db, destination_url, source_base_url)
         post = Post.from_metaweblog(post_struct)
-
-        # Wordpress replaces \n\n with paragraphs
-        massage_body(post, media_library, db, destination_url, source_base_url)
 
         print '%-34s %s' % (post.title, post.status.upper())
         for category_name in categories:

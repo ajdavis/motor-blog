@@ -9,6 +9,7 @@ from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
 from dictshield.fields.mongo import ObjectIdField
 
 import common
+import text
 from htmlabbrev import HTMLAbbrev
 
 class Category(Document):
@@ -54,7 +55,10 @@ class EmbeddedCategory(Category, EmbeddedDocument):
 
 class Post(Document):
     title = StringField(default='')
+    # Formatted for display
     body = StringField(default='')
+    # Input from MarsEdit or migrate_from_wordpress
+    original = StringField(default='')
     author = StringField(default='')
     status = StringField(choices=('Published', 'Draft'), default='Published')
     tags = SortedListField(StringField())
@@ -80,7 +84,7 @@ class Post(Document):
         else:
             tags = None
 
-        slug = common.slugify(title)
+        slug = text.slugify(title)
         status = (
             'Published' if struct.get('post_status', 'publish') == 'publish'
             else 'Draft')
@@ -94,7 +98,8 @@ class Post(Document):
 
         return cls(
             title=title,
-            body=description,
+            body=text.from_marsedit(description), # Format for display
+            original=description,
             tags=tags,
             slug=slug,
             status=status,
@@ -105,7 +110,8 @@ class Post(Document):
     def to_metaweblog(self):
         return {
             'title': self.title,
-            'description': self.body,
+            # Note we're returning the original, not the display version
+            'description': self.original,
             'link': self.html_url,
             'permaLink': self.html_url,
             'categories': [cat.to_metaweblog() for cat in self['categories']],

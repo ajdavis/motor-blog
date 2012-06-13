@@ -3,6 +3,7 @@ import bson
 
 import tornadorpc
 import common
+import text
 
 class Media(object):
     @tornadorpc.async
@@ -11,7 +12,7 @@ class Media(object):
         content = struct['bits'].data # xmlrpclib created a 'Binary' object
         media_type = struct['type']
         now = datetime.datetime.utcnow()
-        url = '%s/%s/%s' % (now.year, now.month, common.slugify(name))
+        url = '%s/%s/%s' % (now.year, now.month, text.slugify(name))
 
         def inserted(result, error):
             if error:
