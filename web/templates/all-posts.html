@@ -4,8 +4,13 @@
 
 {% block content %}
 <h1>All Posts</h1>
+<ul>
 {% for post in posts %}
-    {% module Template("post-summary.html", post=post, handler=handler, title_link=True) %}
+    <li>
+        <a class="title" href="{{ post.html_url }}">{{ post.title }} </a>
+        <span class="date">{{ post.local_short_date }}</span>
+        <span class="excerpt"><p>{% raw post.summary %}</p></span>
+    </li>
 {% end %}
-
+</ul>
 {% end %}

@@ -13,6 +13,10 @@ import markup
 import text
 from htmlabbrev import HTMLAbbrev
 
+import pytz
+utc_tz, newyork_tz = pytz.timezone('UTC'), pytz.timezone('America/New_York')
+
+
 class Category(Document):
     name = StringField()
     class Meta:
@@ -156,11 +160,38 @@ class Post(Document):
 
     @property
     def summary(self):
+        # TODO: consider caching; depends whether this is frequently used
+        # TODO: seems to double-html-escape things, even with {% raw %}
         try:
-            parser = HTMLAbbrev(200, ellipsis=' [ ... ]')
+            parser = HTMLAbbrev(200)
             parser.feed(self.body)
             summary = parser.close()
-            return summary
+            if parser.done: # Truncated
+                return summary + ' [ ... ]'
+            else:
+                return summary
         except Exception, e:
             logging.exception('truncating HTML for "%s"' % self.slug)
             return '[ ... ]'
+
+    @property
+    def local_date_created(self):
+        # Assume New York
+        # TODO: configure in conf file
+        dc = self.date_created
+        return newyork_tz.normalize(dc.astimezone(newyork_tz))
+
+    @property
+    def local_short_date(self):
+        dc = self.local_date_created
+        return '%s/%s/%s' % (dc.month, dc.day, dc.year)
+
+    @property
+    def local_long_date(self):
+        dc = self.local_date_created
+        return '%s %s, %s' % (dc.strftime('%B'), dc.day, dc.year)
+
+    @property
+    def local_time_of_day(self):
+        dc = self.local_date_created
+        return '%s:%s %s' % (dc.hour % 12, dc.minute, dc.strftime('%p'))

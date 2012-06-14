@@ -12,9 +12,8 @@
 
         <div class="entry-meta">
             <span class="sep">Posted on </span>
-            TODO: better date formatting
-            <a href="{{ post.html_url }}" title="{{ post.date_created }}" rel="bookmark">
-                <time class="entry-date" datetime="{{ post.date_created }}" pubdate>{{ post.date_created }}</time>
+            <a href="{{ post.html_url }}" title="{{ post.local_time_of_day }}" rel="bookmark">
+                <time class="entry-date" datetime="{{ post.local_long_date }}" pubdate>{{ post.local_long_date }}</time>
             </a>
             <span class="byline">
                 <span class="sep">

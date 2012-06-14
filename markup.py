@@ -133,6 +133,7 @@ class PreCodeFinder(HTMLParser):
 
 def markup(text):
     html = markdown(text)
+    # TODO: also center images?
     pcf = PreCodeFinder()
     pcf.feed(html)
     return pcf.close()

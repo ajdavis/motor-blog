@@ -14,7 +14,11 @@ from web import (
     uimodules)
 
 # TODO: indexes, command-line arg to build them
-# TODO: command-line arg to add categories, since it seems Mars has no way to add
+# TODO: pages, particularly the about page
+# TODO: RPC auth
+# TODO: RPC over HTTPS
+# TODO: clean up RDS
+# TODO: clarify text processing pipelines and clean up
 
 try:
     import motor
