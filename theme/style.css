@@ -169,6 +169,17 @@ h1 {
 	font-size: 220%;
 }
 
+pre {
+    background-color: #f3f3f3;
+    padding: .4em;
+    padding-left: .8em;
+    border: 1px solid #cccccc;
+    font-family: Monaco,Lucida Console,monospace;
+    font-size: 1em;
+    overflow: auto;
+    line-height: 1.1em;
+}
+
 /* Hide nav controls on all but home page */
 #access { display: none; }
 body.home #access { display: block; }

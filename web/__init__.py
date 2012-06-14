@@ -29,7 +29,7 @@ class HomeHandler(tornado.web.RequestHandler):
     def get(self, page_num=0):
         postdocs = yield motor.Op(
             self.settings['db'].posts.find({'status': 'Published'})
-                .sort([('date_created', -1)])
+                .sort([('_id', -1)])
                 .skip(int(page_num) * 10)
                 .limit(10)
                 .to_list)
@@ -48,7 +48,7 @@ class AllPostsHandler(tornado.web.RequestHandler):
     def get(self):
         postdocs = yield motor.Op(
             self.settings['db'].posts.find({'status': 'Published'})
-                .sort([('date_created', -1)])
+                .sort([('_id', -1)])
                 .to_list)
 
         posts = [Post(**postdoc) for postdoc in postdocs]
@@ -75,21 +75,17 @@ class PostHandler(tornado.web.RequestHandler):
         post=Post(**postdoc)
 
         prevdoc = yield motor.Op(
-            self.settings['db'].posts.find_one,
-            {
+            self.settings['db'].posts.find({
                 'status': 'Published',
-                'date_created': {'$lte': post['date_created']},
-                '_id': {'$ne': post.id }
-            })
+                '_id': {'$lt': post.id}, # ids grow over time
+            }).sort([('_id', -1)]).limit(-1).next)
         prev = Post(**prevdoc) if prevdoc else None
 
         nextdoc = yield motor.Op(
-            self.settings['db'].posts.find_one,
-            {
+            self.settings['db'].posts.find({
                 'status': 'Published',
-                'date_created': {'$gte': post['date_created']},
-                '_id': {'$ne': post.id }
-            })
+                '_id': {'$gt': post.id}, # ids grow over time
+            }).sort([('_id', 1)]).limit(-1).next)
         next = Post(**nextdoc) if nextdoc else None
 
         categories = yield motor.Op(get_categories, self.settings['db'])
@@ -110,7 +106,7 @@ class CategoryHandler(tornado.web.RequestHandler):
         postdocs = yield motor.Op(
             self.settings['db'].posts
             .find({'status': 'Published', 'categories.name': category_name})
-            .sort([('date_created', -1)])
+            .sort([('_id', -1)])
             .limit(10)
             .to_list)
 

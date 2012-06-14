@@ -64,7 +64,6 @@ class Post(Document):
     status = StringField(choices=('Published', 'Draft'), default='Published')
     tags = SortedListField(StringField())
     categories = SortedListField(EmbeddedDocumentField(EmbeddedCategory))
-    date_created = DateTimeField(None)
     slug = StringField(default='')
     wordpress_id = IntField() # legacy id from WordPress
 
@@ -73,6 +72,10 @@ class Post(Document):
 
     @classmethod
     def from_metaweblog(cls, struct, is_edit=False):
+        """Receive metaWeblog RPC struct and initialize a Post.
+           Used both by migrate_from_wordpress and when receiving a new or
+           edited post from MarsEdit.
+        """
         title = struct.get('title', '')
         # We expect MarsEdit to set categories with mt_setPostCategories()
         assert 'categories' not in struct
@@ -90,26 +93,24 @@ class Post(Document):
             'Published' if struct.get('post_status', 'publish') == 'publish'
             else 'Draft')
 
-        if not is_edit and 'date_created_gmt' in struct:
-            date_created = datetime.datetime.strptime(
-                struct['date_created_gmt'].value, "%Y%m%dT%H:%M:%S")
-        elif not is_edit:
-            date_created = datetime.datetime.utcnow()
-        else:
-            date_created = None
-
         description = struct.get('description', '').encode('ascii', errors='xmlcharrefreplace')
 
-        return cls(
+        rv = cls(
             title=title,
             body=markup.markup(description), # Format for display
             original=description,
             tags=tags,
             slug=slug,
             status=status,
-            date_created=date_created,
             wordpress_id=struct.get('postid')
         )
+
+        if not is_edit and 'date_created_gmt' in struct:
+            date_created = datetime.datetime.strptime(
+                struct['date_created_gmt'].value, "%Y%m%dT%H:%M:%S")
+            rv.id = ObjectId.from_datetime(date_created)
+
+        return rv
 
     def to_metaweblog(self):
         return {
@@ -120,7 +121,7 @@ class Post(Document):
             'permaLink': self.html_url,
             'categories': [cat.to_metaweblog() for cat in self['categories']],
             'mt_keywords': ','.join(self['tags']),
-            'dateCreated': self.local_date_created,
+            'dateCreated': self.date_created,
             'postid': str(self.id),
         }
 
@@ -131,6 +132,9 @@ class Post(Document):
         if not self.categories:
             dct.pop('categories', None)
 
+        # TODO: for other models, too?
+        if 'id' in dct:
+            dct['_id'] = dct.pop('id')
         return dct
 
     def set_published(self, publish):
@@ -141,6 +145,10 @@ class Post(Document):
         return common.link(self.slug)
 
     @property
+    def date_created(self):
+        return self.id.generation_time
+
+    @property
     def local_date_created(self):
         # TODO timezone config option
         utcdiff = datetime.datetime.utcnow() - datetime.datetime.now()
@@ -149,9 +157,10 @@ class Post(Document):
     @property
     def summary(self):
         try:
-            parser = HTMLAbbrev(300)
+            parser = HTMLAbbrev(200, ellipsis=' [ ... ]')
             parser.feed(self.body)
-            return parser.close()
+            summary = parser.close()
+            return summary
         except Exception, e:
             logging.exception('truncating HTML for "%s"' % self.slug)
             return '[ ... ]'

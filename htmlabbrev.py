@@ -7,7 +7,7 @@ whitespace = re.compile('(\w+)')
 
 class HTMLAbbrev(HTMLParser):
 
-    def __init__(self, maxlength, *args, **kwargs):
+    def __init__(self, maxlength, ellipsis, *args, **kwargs):
         HTMLParser.__init__(self, *args, **kwargs)
         self.stack = []
         self.maxlength = maxlength
@@ -30,16 +30,18 @@ class HTMLAbbrev(HTMLParser):
             self.done = True
 
     def handle_starttag(self, tag, attrs):
+        self.stack.append(tag)
         # Strip images
         if tag == 'img':
             return
-        self.stack.append(tag)
         attrs = ' '.join('%s="%s"' % (k, v) for k, v in attrs)
         self.emit('<%s%s>' % (tag, (' ' + attrs).rstrip()))
 
     def handle_endtag(self, tag):
         if tag == self.stack[-1]:
-            self.emit('</%s>' % tag)
+            # Strip images
+            if tag != 'img':
+                self.emit('</%s>' % tag)
             del self.stack[-1]
         else:
             raise Exception('end tag %r does not match stack: %r' % (tag, self.stack))

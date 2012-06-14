@@ -7,7 +7,7 @@ from models import Post
 class Posts(object):
     @tornadorpc.async
     def metaWeblog_getRecentPosts(self, blogid, user, password, num_posts):
-        assert num_posts < 100 # TODO: raise XML RPC error
+        assert num_posts < 1000 # TODO: raise XML RPC error
 
         def got_recent_posts(posts, error):
             if error:

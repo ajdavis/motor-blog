@@ -4,7 +4,6 @@
             <a href="{{ post.html_url }}">{{ post.title }}</a>
         </h1>
 
-        TODO: more like http://emptysquare.net/blog/all-posts/
         <div class="entry-meta">
             <span class="sep">Posted on </span>
             TODO: better date formatting
@@ -19,11 +18,11 @@
                     {% module Setting('author_display_name') %}
                 </span>
             </span>
-        </div><!-- .entry-meta -->
-    </header><!-- .entry-header -->
+        </div>
+    </header>
 
     <div class="entry-content">
         {% raw post.summary %}
-    </div><!-- .entry-content -->
+    </div>
 
 </article>
