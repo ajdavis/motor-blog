@@ -19,6 +19,12 @@ from web import (
 # TODO: RPC over HTTPS
 # TODO: clean up RDS
 # TODO: clarify text processing pipelines and clean up
+# TODO: store mod_date on posts and support ETags -- how expensive is hashing
+#   each response? is that something to hate about Tornado?
+# TODO: a static-url function to set long cache TTL on media URLs
+# TODO: Nginx cache media
+# TODO: replace all asserts and raises w/ proper RPC errors
+
 
 try:
     import motor

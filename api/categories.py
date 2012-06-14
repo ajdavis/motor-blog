@@ -59,7 +59,7 @@ class Categories(object):
             if error:
                 raise error
 
-            self.result(True)
+            self.result(result['n'] == 1)
 
         self.settings['db'].posts.update(
             {'_id': ObjectId(postid)},

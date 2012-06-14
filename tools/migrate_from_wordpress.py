@@ -4,9 +4,8 @@ import pickle
 import subprocess
 import os
 import xmlrpclib
-from urlparse import urlparse, urljoin
-
 import sys
+from urlparse import urlparse, urljoin
 
 import tornado.escape
 import pymongo
@@ -20,18 +19,59 @@ import common
 import text
 
 
+def pickle_cache(method):
+    def _pickle_cache(blog, *args, **kwargs):
+        class_name = blog.__class__.__name__
+        method_name = method.func_name
+        strargs = '%s----%s' % (
+            '--'.join(text.slugify(str(arg)) for arg in args),
+            '--'.join('%s=%s' % (
+                text.slugify(key), text.slugify(str(value)))
+                for key, value in kwargs.items()
+            ),
+        )
+
+        cache_path = os.path.join(
+            'cache', class_name, method_name, strargs)
+
+        if blog.use_cache:
+            if os.path.exists(cache_path):
+                print '        Loading %s.%s(%s, %s) from cache %s' % (
+                    class_name, method_name, args, kwargs, cache_path
+                )
+                return pickle.load(open(cache_path))
+
+        result = method(blog, *args, **kwargs)
+        dirname = os.path.dirname(cache_path)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        with open(cache_path, 'w+') as f:
+            pickle.dump(result, f)
+        return result
+
+    return _pickle_cache
+
+
 class Blog(object):
     """Wordpress XML-RPC client, connect to source blog"""
-    def __init__(self, url, username, password):
+    def __init__(self, url, username, password, use_cache):
         self.url = url
         self.username = username
         self.password = password
+        self.use_cache = use_cache
         self.server = xmlrpclib.ServerProxy(self.url, allow_none=True)
 
+    @pickle_cache
     def get_recent_posts(self, n):
         return self.server.metaWeblog.getRecentPosts(
             0, self.username, self.password, n)
 
+    @pickle_cache
+    def get_pages(self):
+        return self.server.wp.getPages(
+            0, self.username, self.password, 999999)
+
+    @pickle_cache
     def get_media_library(self):
         return self.server.wp.getMediaLibrary(0, self.username, self.password)
 
@@ -45,6 +85,9 @@ def parse_args():
     )
     parser.add_argument('--wipe', '-w', action='store_true', default=False,
         help="Wipe MongoDB before importing",
+    )
+    parser.add_argument('--refresh', '-r', action='store_true', default=False,
+        help="Don't use cached data",
     )
     parser.add_argument('-u', '--username', help="Wordpress username",
         dest='source_username')
@@ -228,7 +271,6 @@ def massage_body(post_struct, media_library, db, destination_url, source_base_ur
 def main(args):
     start = time.time()
 
-    print 'Loading', common.config_path
     options = common.options()
     destination_url = 'http://%s%s/%s' % (
         options.host,
@@ -247,55 +289,54 @@ def main(args):
         print 'Wiping motorblog database'
         db.connection.drop_database('motorblog')
 
-    source = Blog(args.source_url, args.source_username, args.source_password)
+    source = Blog(
+        args.source_url, args.source_username, args.source_password,
+        use_cache=not args.refresh)
     print 'Getting media library'
 
-    if not os.path.exists('media.cache'):
-        media_library = set([
-            m['link'] for m in source.get_media_library()])
-        with open('media.cache', 'w+') as f:
-            f.write(pickle.dumps(media_library))
-    else:
-        media_library = pickle.load(open('media.cache'))
+    media_library = set([
+        m['link'] for m in source.get_media_library()])
 
     print '    %s assets\n' % len(media_library)
 
-    if not os.path.exists('posts.cache'):
-        print 'Getting posts from %s' % args.source_url
-        # TODO remove caching
-        post_structs = source.get_recent_posts(args.nposts)
-        with open('posts.cache', 'w+') as f:
-            print 'writing posts.cache'
-            f.write(pickle.dumps(post_structs))
-    else:
-        print 'loading posts.cache'
-        post_structs = pickle.load(open('posts.cache'))
+    print 'Getting posts and pages'
+    post_structs = source.get_recent_posts(args.nposts)
+    print '    %s posts' % len(post_structs)
+    page_structs = source.get_pages()
+    print '    %s pages' % len(page_structs)
+    print
 
-    print '    %s posts\n' % len(post_structs)
-    for post_struct in post_structs:
-        categories = post_struct.pop('categories', [])
-        massage_body(
-            post_struct, media_library, db, destination_url, source_base_url)
+    for structs, type in [
+        (post_structs, 'post'),
+        (page_structs, 'page'),
+    ]:
+        print '%sS' % type.upper()
+        for struct in structs:
+            categories = struct.pop('categories', [])
+            massage_body(
+                struct, media_library, db, destination_url, source_base_url)
 
-        post = Post.from_metaweblog(post_struct)
+            post = Post.from_metaweblog(struct, type)
 
-        print '%-34s %s' % (post.title, post.status.upper())
-        for category_name in categories:
-            doc = db.categories.find_one({'name': category_name})
-            if doc:
-                category = Category(**doc)
-            else:
-                category = Category(name=category_name)
-                category.id = db.categories.insert(category.to_python())
-            print '    %-30s %s%s' % (
-                category_name, category.id, ' NEW' if not doc else ''
-            )
+            print '%-34s %s' % (post.title, post.status.upper())
+            for category_name in categories:
+                doc = db.categories.find_one({'name': category_name})
+                if doc:
+                    category = Category(**doc)
+                else:
+                    category = Category(name=category_name)
+                    category.id = db.categories.insert(category.to_python())
+                print '    %-30s %s' % (
+                    category_name, ' NEW' if not doc else ''
+                )
 
-            post.categories.append(category)
+                post.categories.append(category)
 
-        db.posts.insert(post.to_python())
+            db.posts.insert(post.to_python())
 
-    print '\nFinished %s posts' % len(post_structs)
+        print '\nFinished %s %ss' % (len(structs), type)
+
+
 
     print '\nFinished in %.2f seconds' % (time.time() - start)
 

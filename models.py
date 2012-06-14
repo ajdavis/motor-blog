@@ -59,13 +59,15 @@ class EmbeddedCategory(Category, EmbeddedDocument):
 
 
 class Post(Document):
+    """A post or a page"""
     title = StringField(default='')
     # Formatted for display
     body = StringField(default='')
     # Input from MarsEdit or migrate_from_wordpress
     original = StringField(default='')
     author = StringField(default='')
-    status = StringField(choices=('Published', 'Draft'), default='Published')
+    type = StringField(choices=('post', 'page'), default='post')
+    status = StringField(choices=('publish', 'draft'), default='publish')
     tags = SortedListField(StringField())
     categories = SortedListField(EmbeddedDocumentField(EmbeddedCategory))
     slug = StringField(default='')
@@ -75,7 +77,7 @@ class Post(Document):
         id_field = ObjectIdField
 
     @classmethod
-    def from_metaweblog(cls, struct, is_edit=False):
+    def from_metaweblog(cls, struct, post_type='post', is_edit=False):
         """Receive metaWeblog RPC struct and initialize a Post.
            Used both by migrate_from_wordpress and when receiving a new or
            edited post from MarsEdit.
@@ -93,19 +95,18 @@ class Post(Document):
             tags = None
 
         slug = text.slugify(title)
-        status = (
-            'Published' if struct.get('post_status', 'publish') == 'publish'
-            else 'Draft')
-
-        description = struct.get('description', '').encode('ascii', errors='xmlcharrefreplace')
+        description = struct.get('description', '').encode(
+            'ascii', errors='xmlcharrefreplace')
 
         rv = cls(
             title=title,
-            body=markup.markup(description), # Format for display
+            # Format for display
+            body=markup.markup(description) if description else '',
             original=description,
             tags=tags,
             slug=slug,
-            status=status,
+            type=post_type,
+            status=struct.get('status', 'publish'),
             wordpress_id=struct.get('postid')
         )
 
@@ -117,7 +118,10 @@ class Post(Document):
         return rv
 
     def to_metaweblog(self):
-        return {
+        # We're kind of throwing fieldnames at the wall and seeing what sticks,
+        # MarsEdit expects different names in the responses to different API
+        # calls
+        rv = {
             'title': self.title,
             # Note we're returning the original, not the display version
             'description': self.original,
@@ -125,9 +129,18 @@ class Post(Document):
             'permaLink': self.html_url,
             'categories': [cat.to_metaweblog() for cat in self['categories']],
             'mt_keywords': ','.join(self['tags']),
-            'dateCreated': self.date_created,
+            'dateCreated': self.local_date_created,
+            'date_created_gmt': self.date_created,
             'postid': str(self.id),
+            'id': str(self.id),
+            'status': self.status,
         }
+
+        if self.type == 'page':
+            rv['page_id'] = str(self.id)
+            rv['page_status'] = self.status
+
+        return rv
 
     def to_python(self):
         dct = super(Post, self).to_python()
@@ -140,9 +153,6 @@ class Post(Document):
         if 'id' in dct:
             dct['_id'] = dct.pop('id')
         return dct
-
-    def set_published(self, publish):
-        self.status = 'Published' if publish else 'Draft'
 
     @property
     def html_url(self):

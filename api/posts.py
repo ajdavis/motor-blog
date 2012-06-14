@@ -1,3 +1,6 @@
+"""XML-RPC API for posts and pages
+"""
+
 from bson.objectid import ObjectId
 import tornadorpc
 
@@ -5,8 +8,7 @@ from models import Post
 
 
 class Posts(object):
-    @tornadorpc.async
-    def metaWeblog_getRecentPosts(self, blogid, user, password, num_posts):
+    def _recent(self, user, password, num_posts, type):
         assert num_posts < 1000 # TODO: raise XML RPC error
 
         def got_recent_posts(posts, error):
@@ -15,37 +17,57 @@ class Posts(object):
 
             self.result([Post(**post).to_metaweblog() for post in posts])
 
-        cursor = self.settings['db'].posts.find()
+        cursor = self.settings['db'].posts.find({'type': type})
         cursor.sort([('create_date', -1)]).limit(num_posts)
         cursor.to_list(callback=got_recent_posts)
 
     @tornadorpc.async
-    def metaWeblog_newPost(self, blogid, user, password, struct, publish):
+    def metaWeblog_getRecentPosts(self, blogid, user, password, num_posts):
+        self._recent(user, password, num_posts, 'post')
+
+    @tornadorpc.async
+    def wp_getPages(self, blogid, user, password, num_posts):
+        self._recent(user, password, num_posts, 'page')
+
+    def _new_post(self, user, password, struct, publish, type):
         def new_post_inserted(_id, error):
             if error:
                 raise error
 
             self.result(str(_id))
 
-        new_post = Post.from_metaweblog(struct)
-        new_post.set_published(publish)
+        new_post = Post.from_metaweblog(struct, type)
         self.settings['db'].posts.insert(
             new_post.to_python(),
             callback=new_post_inserted)
 
     @tornadorpc.async
-    def metaWeblog_editPost(self, postid, user, password, struct, publish):
+    def metaWeblog_newPost(self, blogid, user, password, struct, publish):
+        self._new_post(user, password, struct, publish, 'post')
+
+    @tornadorpc.async
+    def wp_newPage(self, blogid, user, password, struct, publish):
+        self._new_post(user, password, struct, publish, 'page')
+
+    def _edit_post(self, postid, user, password, struct, publish, type):
         # TODO: if link changes, add redirect from old
         def edited_post(result, error):
-            assert result['n'] == 1
+            assert result['n'] == 1 # TODO: XML-RPC error
             self.result(True)
 
-        new_post = Post.from_metaweblog(struct, is_edit=True)
-        new_post.set_published(publish)
+        new_post = Post.from_metaweblog(struct, type, is_edit=True)
         self.settings['db'].posts.update(
-            {'_id': ObjectId(postid)},
-            {'$set': new_post.to_python()}, # set fields to new values
+                {'_id': ObjectId(postid)},
+                {'$set': new_post.to_python()}, # set fields to new values
             callback=edited_post)
+
+    @tornadorpc.async
+    def metaWeblog_editPost(self, postid, user, password, struct, publish):
+        self._edit_post(postid, user, password, struct, publish, 'post')
+
+    @tornadorpc.async
+    def wp_editPage(self, blogid, postid, user, password, struct, publish):
+        self._edit_post(postid, user, password, struct, publish, 'page')
 
     @tornadorpc.async
     def metaWeblog_getPost(self, postid, user, password):
