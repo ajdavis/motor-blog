@@ -12,7 +12,7 @@
 <nav id="nav-below">
     {% if prev %}
         <div class="nav-previous">
-            <a href="{{ prev.html_url }}" rel="prev">
+            <a href="{{ reverse_url('post', prev.slug) }}" rel="prev">
                 <span class="meta-nav">&larr;</span>
                 {{ prev.title }}
             </a>
@@ -20,7 +20,7 @@
     {% end %}
     {% if next %}
         <div class="nav-next">
-            <a href="{{ next.html_url }}" rel="next">
+            <a href="{{ reverse_url('post', next.slug) }}" rel="next">
                 {{ next.title }}
                 <span class="meta-nav">&rarr;</span>
             </a>

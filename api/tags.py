@@ -18,7 +18,6 @@ class Tags(object):
                     {
                         'name': tag,
                         'tag_id': tag,
-                        # TODO: count, slug, html_url, rss_url
                     }
                     for tag in sorted(list(self.wp_tags))])
 

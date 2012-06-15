@@ -8,13 +8,12 @@ import tornado.web
 import tornado.options
 from tornado.web import StaticFileHandler
 
-from api.handlers import APIHandler, RSDHandler, RSSHandler
 import options
+import indexes
+from api.handlers import APIHandler, RSDHandler, RSSHandler
 from web.handlers import (
     HomeHandler, PostHandler, MediaHandler, AllPostsHandler, CategoryHandler)
 
-# TODO: logging
-# TODO: indexes, command-line arg to build them
 # TODO: RPC auth
 # TODO: RPC over HTTPS
 # TODO: store mod_date on posts and support ETags -- how expensive is hashing
@@ -22,7 +21,6 @@ from web.handlers import (
 # TODO: a static-url function to set long cache TTL on media URLs
 # TODO: Nginx cache media
 # TODO: replace all asserts and raises w/ proper RPC errors
-
 
 try:
     import motor
@@ -39,9 +37,17 @@ except ImportError:
 
     raise
 
-
 if __name__ == "__main__":
     opts = options.options()
+
+    # TODO: Mongo connection options
+    db = motor.MotorConnection().open_sync().motorblog
+
+    if opts.ensure_indexes:
+        logging.info('Ensuring indexes...')
+        indexes.ensure_indexes(db)
+        logging.info('    done.')
+
     base_url = opts.base_url
     
     class U(tornado.web.URLSpec):
@@ -79,9 +85,9 @@ if __name__ == "__main__":
         U(r"(?P<slug>.+)/?", PostHandler, name='post'),
         U(r"/?", HomeHandler, name='home'),
         ],
-        db=motor.MotorConnection().open_sync().motorblog,
+        db=db,
         template_path=os.path.join(opts.theme, 'templates'),
-        **opts
+        **{k: v.value() for k, v in opts.items()}
     )
 
     application.listen(opts.port)

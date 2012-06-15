@@ -8,8 +8,10 @@ from urlparse import urlparse, urljoin
 
 import pymongo
 
+import options
+from indexes import ensure_indexes
 from models import Category, Post
-import common
+from text.slugify import slugify
 from text.wordpress_to_markdown import wordpress_to_markdown
 
 
@@ -21,9 +23,9 @@ def cache(method):
         class_name = blog.__class__.__name__
         method_name = method.func_name
         strargs = '%s----%s' % (
-            '--'.join(common.slugify(str(arg)) for arg in args),
+            '--'.join(slugify(str(arg)) for arg in args),
             '--'.join('%s=%s' % (
-                common.slugify(key), common.slugify(str(value)))
+                slugify(key), slugify(str(value)))
                 for key, value in kwargs.items()
             ),
         )
@@ -103,11 +105,11 @@ def parse_args():
 def main(args):
     start = time.time()
 
-    options = common.options()
+    opts = options.options()
     destination_url = 'http://%s%s/%s' % (
-        options.host,
-        ':' + str(options.port) if options.port else '',
-        options.base_url
+        opts.host,
+        ':' + str(opts.port) if opts.port else '',
+        opts.base_url
     )
 
     parts = urlparse(args.source_url)
@@ -120,6 +122,8 @@ def main(args):
     if args.wipe:
         print 'Wiping motorblog database'
         db.connection.drop_database('motorblog')
+        print 'Recreating indexes'
+        ensure_indexes(db)
 
     source = Blog(
         args.source_url, args.source_username, args.source_password,

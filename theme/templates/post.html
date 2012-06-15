@@ -2,7 +2,7 @@
     <header class="entry-header">
         <h1 class="entry-title">
             {% if title_link %}
-                <a href="{{ post.html_url }}">
+                <a href="{{ reverse_url('post', post.slug) }}">
             {% end %}
                 {{ post.title }}
             {% if title_link %}
@@ -13,7 +13,7 @@
         {% if post.type == 'post' %}
             <div class="entry-meta">
                 <span class="sep">Posted on </span>
-                <a href="{{ post.html_url }}" title="{{ post.local_time_of_day }}" rel="bookmark">
+                <a href="{{ reverse_url('post', post.slug) }}" title="{{ post.local_time_of_day }}" rel="bookmark">
                     <time class="entry-date" datetime="{{ post.local_long_date }}" pubdate>{{ post.local_long_date }}</time>
                 </a>
                 <span class="byline">
@@ -36,7 +36,7 @@
         {% if post.categories %}
             This entry was posted in
             {% for i, category in enumerate(post.categories) %}
-                <a href="{{ category.html_url }}" title="View all posts in {{ category.name }}" rel="category tag">
+                <a href="{{ reverse_url('category', category.slug) }}" title="View all posts in {{ category.name }}" rel="category tag">
                     {{ category.name }}
                 </a>{% if i < len(post.categories) - 1 %},{% end %}
             {% end %}

@@ -5,11 +5,15 @@ config_path = 'motor_blog.conf'
 
 def options():
     tornado.options.define('debug', default=False, type=bool, help=(
-        "Turn on autoreload"))
+        "Turn on autoreload, log to stderr only"))
+    tornado.options.define('ensure_indexes', default=False, type=bool, help=(
+        "Ensure collection indexes before starting"))
     tornado.options.define('host', default='localhost', type=str, help=(
         "Server hostname"))
     tornado.options.define('port', default=8888, type=int, help=(
         "Server port"))
+    tornado.options.define('logdir', type=str, default='log', help=(
+        "Location of logging (if debug mode is off)"))
     tornado.options.define('blog_name', type=str, help=(
         "Display name for the site"))
     tornado.options.define('base_url', type=str, help=(

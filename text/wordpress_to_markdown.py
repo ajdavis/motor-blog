@@ -9,7 +9,7 @@ import tornado.escape
 import bson
 import requests
 
-import common
+from text.slugify import slugify
 
 
 def replace_crayon_and_paragraphize(body, media_library, db, destination_url, source_base_url):
@@ -92,10 +92,10 @@ def replace_media_links(body, media_library, db, destination_url, source_base_ur
             # http://emptysquare.net/blog/wp-content/uploads/2011/10/img.png
             url = link.split('/uploads/')[-1]
 
-            media_doc = db.media.find_one({'url': link})
+            media_doc = db.media.find_one({'_id': link})
             if not media_doc:
                 # TODO: remove
-                cache_path = os.path.join('cache', common.slugify(link))
+                cache_path = os.path.join('cache', slugify(link))
                 if os.path.exists(cache_path):
                     content, content_type = pickle.load(open(cache_path))
                 else:
@@ -108,11 +108,10 @@ def replace_media_links(body, media_library, db, destination_url, source_base_ur
                         pickle.dump((content, content_type), f)
 
                 db.media.insert({
-                    'name': link.split('/')[-1],
                     'content': bson.Binary(content),
                     'type': content_type,
-                    'url': url,
-                    })
+                    '_id': url,
+                })
 
             body = body.replace(
                 link, os.path.join(destination_url, 'media', url))

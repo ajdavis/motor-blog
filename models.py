@@ -3,12 +3,12 @@ import logging
 
 from bson.objectid import ObjectId
 from dictshield.document import Document, EmbeddedDocument
-from dictshield.fields import (
-    StringField, IntField)
+from dictshield.fields import StringField, IntField
 from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
 from dictshield.fields.mongo import ObjectIdField
 
-import common
+from text.link import absolute
+from text.slugify import slugify
 from text.summarize import summarize
 
 import pytz
@@ -32,25 +32,20 @@ class Category(Document):
         _id = ObjectId(struct['categoryId']) if 'categoryId' in struct else None
         return cls(name=struct['categoryName'], id=_id)
 
-    def to_wordpress(self):
+    def to_wordpress(self, application):
+        url = absolute(application.reverse_url('category', self.slug))
         return {
             'categoryId': str(self.id),
             'categoryName': self.name,
-            'htmlUrl': self.html_url,
-            'rssUrl': self.rss_url
+            'htmlUrl': url,
+            'rssUrl': url,
         }
 
     to_metaweblog = to_wordpress
 
     @property
-    def html_url(self):
-        # TODO: use urlreverse and slugify
-        return common.link('category/' + self.name)
-
-    @property
-    def rss_url(self):
-        # TODO: use urlreverse and slugify
-        return self.html_url + '/feed'
+    def slug(self):
+        return slugify(self.name)
 
 
 class EmbeddedCategory(Category, EmbeddedDocument):
@@ -93,7 +88,7 @@ class Post(Document):
         else:
             tags = None
 
-        slug = common.slugify(title)
+        slug = slugify(title)
         description = struct.get('description', '')
 
         rv = cls(
@@ -115,17 +110,21 @@ class Post(Document):
 
         return rv
 
-    def to_metaweblog(self):
+    def to_metaweblog(self, application):
         # We're kind of throwing fieldnames at the wall and seeing what sticks,
         # MarsEdit expects different names in the responses to different API
-        # calls
+        # calls.
+
+        # self.type is 'post' or 'page', happens to correspond to handler names
+
+        url = absolute(application.reverse_url(self.type, self.slug))
         rv = {
             'title': self.title,
             # Note we're returning the original, not the display version
             'description': self.original,
-            'link': self.html_url,
-            'permaLink': self.html_url,
-            'categories': [cat.to_metaweblog() for cat in self['categories']],
+            'link': url,
+            'permaLink': url,
+            'categories': [cat.to_metaweblog(application) for cat in self['categories']],
             'mt_keywords': ','.join(self['tags']),
             'dateCreated': self.local_date_created,
             'date_created_gmt': self.date_created,
@@ -151,10 +150,6 @@ class Post(Document):
         if 'id' in dct:
             dct['_id'] = dct.pop('id')
         return dct
-
-    @property
-    def html_url(self):
-        return common.link(self.slug)
 
     @property
     def date_created(self):

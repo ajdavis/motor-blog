@@ -24,7 +24,7 @@ def get_categories(db, callback):
 
 class MotorBlogHandler(tornado.web.RequestHandler):
     def _get_setting(self, setting_name):
-        return self.application.settings[setting_name].value()
+        return self.application.settings[setting_name]
 
     def render(self, template_name, **kwargs):
         kwargs.setdefault('setting', self._get_setting)
@@ -132,18 +132,16 @@ class CategoryHandler(MotorBlogHandler):
 
         posts = [Post(**postdoc) for postdoc in postdocs]
         categories = yield motor.Op(get_categories, self.settings['db'])
-        self.render(
-            'category.html',
-            posts=posts, categories=categories)
+        self.render('category.html', posts=posts, categories=categories)
+
 
 class MediaHandler(MotorBlogHandler):
     """Retrieve media object, like an image"""
     @tornado.web.asynchronous
     @gen.engine
     def get(self, url):
-        # TODO: index url
         media = yield motor.Op(
-            self.settings['db'].media.find_one, {'url': url})
+            self.settings['db'].media.find_one, {'_id': url})
 
         if not media:
             raise tornado.web.HTTPError(404)

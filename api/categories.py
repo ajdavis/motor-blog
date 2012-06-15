@@ -1,4 +1,5 @@
 import tornadorpc
+from tornado.web import HTTPError
 from bson.objectid import ObjectId
 
 from models import Post, Category, EmbeddedCategory
@@ -14,7 +15,7 @@ class Categories(object):
             if error:
                 raise error
             elif category:
-                wp_categories.append(Category(**category).to_wordpress())
+                wp_categories.append(Category(**category).to_wordpress(self.application))
             else:
                 # Done
                 self.result(wp_categories)
@@ -27,9 +28,11 @@ class Categories(object):
         def got_post(post, error):
             if error:
                 raise error
+            if not post:
+                raise HTTPError(404)
 
             self.result([
-                cat.to_metaweblog()
+                cat.to_metaweblog(self.application)
                 for cat in Post(**post).categories
             ])
 
@@ -38,10 +41,9 @@ class Categories(object):
 
     @tornadorpc.async
     def wp_newCategory(self, blogid, user, password, struct):
-        # TODO: unique index on name
         def inserted_category(_id, error):
             if error:
-                raise error # TODO: XML-RPC error
+                raise error
 
             self.result(str(_id))
 

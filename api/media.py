@@ -1,8 +1,10 @@
 import datetime
-import bson
+import os
 
+import bson
 import tornadorpc
-import common
+from tornado.options import options as opts
+from text.link import media_link, absolute
 
 
 class Media(object):
@@ -12,19 +14,17 @@ class Media(object):
         content = struct['bits'].data # xmlrpclib created a 'Binary' object
         media_type = struct['type']
         now = datetime.datetime.utcnow()
-        url = '%s/%s/%s' % (now.year, now.month, common.slugify(name))
+
+        # This is the tail end of the URL, like 2012/06/foo.png
+        mlink = media_link(now.year, now.month, name)
 
         def inserted(_id, error):
             if error:
                 raise error
 
-            self.result({
-                'file': name,
-                'url': common.link('media/' + url), # TODO: use urlreverse
-                'type': media_type
-            })
+            full_link = absolute(os.path.join(opts.base_url, 'media', mlink))
+            self.result({'file': name, 'url': full_link, 'type': media_type})
 
         self.settings['db'].media.insert({
-            'name': name, 'content': bson.Binary(content), 'type': media_type,
-            'url': url
+            'content': bson.Binary(content), 'type': media_type, '_id': mlink,
         }, callback=inserted)
