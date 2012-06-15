@@ -54,6 +54,9 @@ TODO
 
 # Customization
 
+TODO: where to put theme templates and static files
+How to use the 'setting()' function in templates and what settings are available
+
 # A Tour of the Code
 
 * motor_blog.py: Web application server
@@ -62,9 +65,9 @@ TODO
 * theme/: Default theme for emptysquare.net, overridable with your theme
     * static/: Images and stylesheet
     * templates/: HTML templates
-* api/: Implementation of the XML-RPC API that MarsEdit uses
+* api/
+    * handlers.py: Implementation of the XML-RPC API that MarsEdit uses
 * models.py: DictShield document definitions
-* common.py: Utilities for configuration, slugification, and link-formatting
 * text/
     * markup.py: convert from markdown into HTML for display, including some custom syntax
     * wordpress_to_markdown.py: convert from the WordPress's particular HTML to markdown, for migrate_from_wordpress.py
