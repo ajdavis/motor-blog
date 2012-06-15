@@ -1,10 +1,10 @@
 @font-face {
     font-family: "Museo";
-    src: url("/blog/theme/Museo300-Regular.otf");
+    src: url("/blog/theme/static/Museo300-Regular.otf");
 }
 
 body {
-    background: url("/blog/theme/paisley-4.png") no-repeat fixed 100% 100% white;
+    background: url("/blog/theme/static/paisley-4.png") no-repeat fixed 100% 100% white;
     font-family: Museo,Palatino,Georgia,Serif;
     font-size: 100%;
 }
@@ -19,7 +19,7 @@ body {
 #primary {
   width: 660px;
   padding-right: 5px;
-  margin: 50px 0 70px 200px;
+  margin: 32px 0 70px 200px;
   background: white;
   clear: both;
 }
@@ -371,7 +371,7 @@ img.alignright {
 .widget_categories a:hover {
 	text-decoration: underline;
 }
-li.cat-item {
+li.cat-item, li.menu-item-home {
     list-style-type: square;
     margin-left:13px;
     color: #808080;
@@ -380,34 +380,11 @@ li.cat-item {
 /* Start off with only the image background (the square)
    on the first widget visible; clicking on it will reveal
    the rest with jQuery.slideDown() in emptysquare_blog.js */
-#secondary aside.widget_nav_menu li:first-child {
-	background-image:url("/blog/theme/square96.png");
+#secondary div.widget_square {
+	background-image:url("/blog/theme/static/square96.png");
 	background-repeat:no-repeat;
-	padding-top: 104px; /* Move the "home" link below the bg image */
-}
-
-#secondary aside.widget_nav_menu li:first-child a {
-	display: block;
-	min-width: 96px;
-	max-width: 96px;
-	padding: 0;
-	text-align: center;
-	text-decoration: none;
-
-	/* Since user will often double-click to open toolbox beneath the square logo,
-	   prevent the clicks from selecting the 'home' link */
-	-moz-user-select: -moz-none;
-	-khtml-user-select: none;
-	-webkit-user-select: none;
-	user-select: none;
-}
-
-#secondary aside.widget_nav_menu li:first-child a:hover {
-	text-decoration: underline;
-}
-
-#secondary aside, #secondary aside.widget_nav_menu li:first-child a {
-    color: #808080;
+	padding-top: 104px; /* Room for the background image */
+    margin: 13px 0 0 37px;
 }
 
 #secondary aside.widget_nav_menu {

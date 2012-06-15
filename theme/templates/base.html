@@ -1,18 +1,18 @@
-{% set base_url = handler.application.settings['base_url'].value() %}
+{% set base_url = setting('base_url') %}
 <html>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta property="og:image" content="/{{ base_url }}/theme/square96.png"/>
-    <link rel="shortcut icon" href="/{{ base_url }}/theme/favicon.gif" />
-    <title>{% block title %}{% module Setting('author_display_name') %}{% end %}</title>
-    <link rel="stylesheet" type="text/css" media="all" href="/{{ base_url }}/theme/style.css" />
-    <link rel="pingback" href="/{{ base_url }}/api" />
-    <link rel="alternate" type="application/rss+xml" title="{% module Setting('blog_name') %} &raquo; Feed" href="/{{ base_url }}/feed" />
+    <meta property="og:image" content="/{{ base_url }}/theme/static/square96.png"/>
+    <link rel="shortcut icon" href="/{{ base_url }}/theme/static/favicon.gif" />
+    <title>{% block title %}{{ setting('author_display_name') }}{% end %}</title>
+    <link rel="stylesheet" type="text/css" media="all" href="/{{ base_url }}/theme/static/style.css" />
+    <link rel="pingback" href="{{ reverse_url('api') }}" />
+    <link rel="alternate" type="application/rss+xml" title="{{ setting('blog_name') }} &raquo; Feed" href="{{ reverse_url('feed') }}" />
 
     <script type="text/javascript">
         var _gaq = _gaq || [];
-        _gaq.push(['_setAccount','{% module Setting("google_analytics_id") %}']);
+        _gaq.push(['_setAccount','{{ setting("google_analytics_id") }}']);
         _gaq.push(['_trackPageview'],['_trackPageLoadTime']);
         (function() {
             var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
@@ -20,7 +20,7 @@
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
         })();
     </script>
-    <link rel="EditURI" type="application/rsd+xml" title="RSD" href="/{{ base_url }}/rsd" />
+    <link rel="EditURI" type="application/rsd+xml" title="RSD" href="{{ reverse_url('rsd') }}" />
     <meta name="generator" content="Motor-Blog" />
 </head>
 
@@ -35,20 +35,16 @@
         </div><!-- #primary -->
 
         <div id="secondary" class="widget-area" role="complementary">
-            <aside class="widget widget_nav_menu">
-                <div class="menu-navigation-container">
-                    <ul id="menu-navigation" class="menu">
-                        <li class="menu-item menu-item-home">
-                            <a href="/{{ base_url }}/">Home</a>
-                        </li>
-                    </ul>
-                </div>
-            </aside>
+            <div class="widget widget_square">
+            </div>
             <aside class="widget widget_categories">
                 <ul>
+                    <li class="menu-item menu-item-home">
+                        <a href="{{ reverse_url('home') }}">Home</a>
+                    </li>
                     {% for category in categories %}
                     <li class="cat-item">
-                        <a href="{{ category.html_url }}" title="View all posts filed under {{ category.name }}">
+                        <a href="{{ reverse_url('category', category.name) }}" title="View all posts filed under {{ category.name }}">
                             {{ category.name }}
                         </a>
                     </li>

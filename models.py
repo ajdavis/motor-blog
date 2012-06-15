@@ -4,16 +4,16 @@ import logging
 from bson.objectid import ObjectId
 from dictshield.document import Document, EmbeddedDocument
 from dictshield.fields import (
-    StringField, DateTimeField, IntField)
+    StringField, IntField)
 from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
 from dictshield.fields.mongo import ObjectIdField
 
 import common
-import markup
-import text
-from htmlabbrev import HTMLAbbrev
+from text.summarize import summarize
 
 import pytz
+from text import markup
+
 utc_tz, newyork_tz = pytz.timezone('UTC'), pytz.timezone('America/New_York')
 
 
@@ -45,7 +45,6 @@ class Category(Document):
     @property
     def html_url(self):
         # TODO: use urlreverse and slugify
-        # TODO: recurse up parent hierarchy
         return common.link('category/' + self.name)
 
     @property
@@ -94,14 +93,13 @@ class Post(Document):
         else:
             tags = None
 
-        slug = text.slugify(title)
-        description = struct.get('description', '').encode(
-            'ascii', errors='xmlcharrefreplace')
+        slug = common.slugify(title)
+        description = struct.get('description', '')
 
         rv = cls(
             title=title,
             # Format for display
-            body=markup.markup(description) if description else '',
+            body=markup.markup(description),
             original=description,
             tags=tags,
             slug=slug,
@@ -171,12 +169,9 @@ class Post(Document):
     @property
     def summary(self):
         # TODO: consider caching; depends whether this is frequently used
-        # TODO: seems to double-html-escape things, even with {% raw %}
         try:
-            parser = HTMLAbbrev(200)
-            parser.feed(self.body)
-            summary = parser.close()
-            if parser.done: # Truncated
+            summary, was_truncated = summarize(self.body, 200)
+            if was_truncated:
                 return summary + ' [ ... ]'
             else:
                 return summary

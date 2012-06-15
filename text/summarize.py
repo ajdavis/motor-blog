@@ -3,10 +3,14 @@ import re
 from HTMLParser import HTMLParser
 
 
+__all__ = ('abbrev', )
+
+
 whitespace = re.compile('(\w+)')
 
+
 # Adapted from http://late.am/post/2011/12/02/truncating-html-with-python
-class HTMLAbbrev(HTMLParser):
+class HTMLSummary(HTMLParser):
     """Strip tags, return first n chars clipped to nearest word
     """
     def __init__(self, maxlength, *args, **kwargs):
@@ -32,7 +36,16 @@ class HTMLAbbrev(HTMLParser):
         self.emit('&%s;' % name)
 
     def handle_charref(self, name):
-        return self.handle_entityref(name)
+        return self.handle_entityref('#' + name)
 
     def close(self):
         return ''.join(self.out)
+
+
+def summarize(html, n):
+    """Returns plain-text summary and bool, whether text was truncated before
+       nth char
+    """
+    parser = HTMLSummary(n)
+    parser.feed(html)
+    return parser.close(), parser.done

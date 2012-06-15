@@ -1,24 +1,22 @@
 #!/usr/bin/env python
 import logging
+import os
 import sys
 
 import tornado.ioloop
 import tornado.web
 import tornado.options
+from tornado.web import StaticFileHandler
 
-from api import APIHandler
-from api.rsd import RSDHandler
-import common
-from web import (
-    HomeHandler, PostHandler, MediaHandler, AllPostsHandler, CategoryHandler,
-    uimodules)
+from api.handlers import APIHandler, RSDHandler, RSSHandler
+import options
+from web.handlers import (
+    HomeHandler, PostHandler, MediaHandler, AllPostsHandler, CategoryHandler)
 
+# TODO: logging
 # TODO: indexes, command-line arg to build them
-# TODO: pages, particularly the about page
 # TODO: RPC auth
 # TODO: RPC over HTTPS
-# TODO: clean up RDS
-# TODO: clarify text processing pipelines and clean up
 # TODO: store mod_date on posts and support ETags -- how expensive is hashing
 #   each response? is that something to hate about Tornado?
 # TODO: a static-url function to set long cache TTL on media URLs
@@ -43,37 +41,49 @@ except ImportError:
 
 
 if __name__ == "__main__":
-    options = common.options()
-    base_url = options.base_url
+    opts = options.options()
+    base_url = opts.base_url
     
-    class BlogURL(tornado.web.URLSpec):
+    class U(tornado.web.URLSpec):
         def __init__(self, pattern, *args, **kwargs):
-            super(BlogURL, self).__init__(
+            """Include base_url in pattern"""
+            super(U, self).__init__(
                 '/' + base_url.strip('/') + '/' + pattern.lstrip('/'),
                 *args, **kwargs
             )
 
+        def _find_groups(self):
+            """Get rid of final '?' -- Tornado's reverse_url() works poorly
+               with tornado.web.addslash
+            """
+            path, group_count = super(U, self)._find_groups()
+            if path.endswith('?'):
+                path = path[:-1]
+            return path, group_count
+
+    static_path = os.path.join(opts.theme, 'static')
+
     application = tornado.web.Application([
         # XML-RPC API
-        BlogURL(r"/rsd", RSDHandler),
-        BlogURL(r"/api", APIHandler),
+        U(r"/rsd", RSDHandler, name='rsd'),
+        U(r"/api", APIHandler, name='api'),
+        U(r"/feed", RSSHandler, name='feed'),
 
         # Web
         # TODO: drafts, and a login page so you can see drafts
-        BlogURL(r"media/(?P<url>.+)", MediaHandler),
-        BlogURL(r"theme/(.+)", tornado.web.StaticFileHandler, {"path": "theme"}), # TODO: theming
-        BlogURL(r"category/(.+)/?", CategoryHandler),
-        BlogURL(r"page/(?P<page_num>\d+)/?", HomeHandler),
-        BlogURL(r"all-posts/?", AllPostsHandler),
-        BlogURL(r"(?P<slug>.+)/?", PostHandler),
-        BlogURL(r"/?", HomeHandler),
+        U(r"media/(?P<url>.+)", MediaHandler, name='media'),
+        U(r"theme/static/(.+)", StaticFileHandler, {"path": static_path}),
+        U(r"category/(?P<category_name>.+)/?", CategoryHandler, name='category'),
+        U(r"page/(?P<page_num>\d+)/?", HomeHandler, name='page'),
+        U(r"all-posts/?", AllPostsHandler, name='all-posts'),
+        U(r"(?P<slug>.+)/?", PostHandler, name='post'),
+        U(r"/?", HomeHandler, name='home'),
         ],
         db=motor.MotorConnection().open_sync().motorblog,
-        template_path='web/templates',
-        ui_modules=uimodules,
-        **options
+        template_path=os.path.join(opts.theme, 'templates'),
+        **opts
     )
 
-    application.listen(options.port)
-    logging.info('Listening on http://%s:%s' % (options.host, options.port))
+    application.listen(opts.port)
+    logging.info('Listening on http://%s:%s' % (opts.host, opts.port))
     tornado.ioloop.IOLoop.instance().start()
