@@ -18,7 +18,7 @@ def options():
         "Display name for the site"))
     tornado.options.define('base_url', type=str, help=(
         "Base url, e.g. 'blog'"))
-    tornado.options.define('username', type=str, help=(
+    tornado.options.define('user', type=str, help=(
         "Login"))
     tornado.options.define('password', type=str, help=(
         "Login"))

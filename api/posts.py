@@ -1,10 +1,11 @@
 """XML-RPC API for posts and pages
 """
+import xmlrpclib
 
 from bson.objectid import ObjectId
 import tornadorpc
-from tornado.web import HTTPError
 
+from api import auth
 from models import Post
 
 
@@ -24,10 +25,12 @@ class Posts(object):
         cursor.to_list(callback=got_recent_posts)
 
     @tornadorpc.async
+    @auth
     def metaWeblog_getRecentPosts(self, blogid, user, password, num_posts):
         self._recent(user, password, num_posts, 'post')
 
     @tornadorpc.async
+    @auth
     def wp_getPages(self, blogid, user, password, num_posts):
         self._recent(user, password, num_posts, 'page')
 
@@ -44,10 +47,12 @@ class Posts(object):
             callback=new_post_inserted)
 
     @tornadorpc.async
+    @auth
     def metaWeblog_newPost(self, blogid, user, password, struct, publish):
         self._new_post(user, password, struct, publish, 'post')
 
     @tornadorpc.async
+    @auth
     def wp_newPage(self, blogid, user, password, struct, publish):
         self._new_post(user, password, struct, publish, 'page')
 
@@ -55,8 +60,9 @@ class Posts(object):
         # TODO: if link changes, add redirect from old
         def edited_post(result, error):
             if result['n'] != 1:
-                raise HTTPError(404)
-            self.result(True)
+                self.result(xmlrpclib.Fault(404, "Not found"))
+            else:
+                self.result(True)
 
         new_post = Post.from_metaweblog(struct, type, is_edit=True)
         self.settings['db'].posts.update(
@@ -65,34 +71,38 @@ class Posts(object):
             callback=edited_post)
 
     @tornadorpc.async
+    @auth
     def metaWeblog_editPost(self, postid, user, password, struct, publish):
         self._edit_post(postid, user, password, struct, publish, 'post')
 
     @tornadorpc.async
+    @auth
     def wp_editPage(self, blogid, postid, user, password, struct, publish):
         self._edit_post(postid, user, password, struct, publish, 'page')
 
     @tornadorpc.async
+    @auth
     def metaWeblog_getPost(self, postid, user, password):
         def got_post(postdoc, error):
             if error:
                 raise error
             if not postdoc:
-                raise HTTPError(404)
-
-            post = Post(**postdoc)
-            self.result(post.to_metaweblog(self.application))
+                self.result(xmlrpclib.Fault(404, "Not found"))
+            else:
+                post = Post(**postdoc)
+                self.result(post.to_metaweblog(self.application))
 
         self.settings['db'].posts.find_one(
             {'_id': ObjectId(postid)}, callback=got_post)
 
     @tornadorpc.async
+    @auth
     def blogger_deletePost(self, appkey, postid, user, password, publish):
         def post_deleted(result, error):
             if result['n'] != 1:
-                raise HTTPError(404)
-
-            self.result(True)
+                self.result(xmlrpclib.Fault(404, "Not found"))
+            else:
+                self.result(True)
 
         # TODO: a notion of 'trashed', not removed
         self.settings['db'].posts.remove(

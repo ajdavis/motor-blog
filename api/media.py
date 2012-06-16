@@ -3,12 +3,15 @@ import os
 
 import bson
 import tornadorpc
+
+from api import auth
 from tornado.options import options as opts
 from text.link import media_link, absolute
 
 
 class Media(object):
     @tornadorpc.async
+    @auth
     def metaWeblog_newMediaObject(self, blogid, user, password, struct):
         name = struct['name']
         content = struct['bits'].data # xmlrpclib created a 'Binary' object

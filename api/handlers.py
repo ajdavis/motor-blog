@@ -18,8 +18,6 @@ from api.rsd import RSDHandler
 __all__ = ('APIHandler', 'RSDHandler')
 
 
-# TODO: auth decorator? like in http://www.allyourpixel.com/site_media/src/metaweblog.py.txt
-
 class WordpressParser(XMLRPCParser):
     """Special parsing for method names like 'wp.getRecentPosts' to dispatch
        to wp_getRecentPosts()
@@ -37,9 +35,11 @@ class APIHandler(
     _RPC_ = WordpressParser(xmlrpclib)
 
     def mt_supportedTextFilters(self):
+        # TODO, someday: read MarsEdit's incoming mt_textFilter and handle it
+        # on new and edited posts
         return [
             {'key': 'markdown', 'label': 'Markdown' },
-            {'key': 'htmlauto', 'label': "Convert line breaks" },
+#            {'key': 'htmlauto', 'label': "Convert line breaks" },
         ]
 
 # TODO
