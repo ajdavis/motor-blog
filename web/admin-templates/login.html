@@ -1,0 +1,31 @@
+<html>
+<head>
+    <title>
+        {{ setting('blog_name') }} - Login
+    </title>
+</head>
+<body>
+    {% if next_url %}
+        {% set action = '%s?next=%s' % (reverse_url('login'), url_escape(next_url)) %}
+    {% else %}
+        {% set action = reverse_url('login') %}
+    {% end %}
+
+    <form action="{{ action }}" method="post">
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% end %}
+        <p>
+            <label for="user">Username</label>
+            <input type="text" id="user" name="user" />
+        </p>
+        <p>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" />
+        </p>
+        <p>
+            <input type="submit" value="Log in" />
+        </p>
+    </form>
+</body>
+</html>

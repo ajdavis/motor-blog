@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>{{ setting('blog_name') }} - Drafts</title>
+</head>
+<body>
+    <form id="logout" action="{{ reverse_url('logout') }}" method="post">
+        <input type="submit" id="logoutbtn" value="Log out">
+    </form>
+    <ul>
+        {% for post in drafts %}
+            <li>
+                {# TODO: refactor w/ all-posts #}
+                <a class="title" href="{{ reverse_url('draft', post.slug) }}">{{ post.title }} </a>
+                <span class="date">{{ post.local_short_date }}</span>
+                <span class="excerpt"><p>{% raw post.summary %}</p></span>
+            </li>
+        {% end %}
+    </ul>
+</body>
+</html>

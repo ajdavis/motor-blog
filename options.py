@@ -30,6 +30,7 @@ def options():
         "List of url, title pairs (define this in your motor_blog.conf)'"))
     tornado.options.define('theme', type=str, default='theme', help=(
         "Directory name of your theme files"))
+    tornado.options.define('cookie_secret', type=str)
 
     if os.path.exists(config_path):
         print 'Loading', config_path

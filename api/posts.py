@@ -41,7 +41,7 @@ class Posts(object):
 
             self.result(str(_id))
 
-        new_post = Post.from_metaweblog(struct, type)
+        new_post = Post.from_metaweblog(struct, type, publish=publish)
         self.settings['db'].posts.insert(
             new_post.to_python(),
             callback=new_post_inserted)
@@ -64,7 +64,7 @@ class Posts(object):
             else:
                 self.result(True)
 
-        new_post = Post.from_metaweblog(struct, type, is_edit=True)
+        new_post = Post.from_metaweblog(struct, type, publish=publish, is_edit=True)
         self.settings['db'].posts.update(
             {'_id': ObjectId(postid)},
             {'$set': new_post.to_python()}, # set fields to new values

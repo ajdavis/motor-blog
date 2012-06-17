@@ -71,7 +71,7 @@ class Post(Document):
         id_field = ObjectIdField
 
     @classmethod
-    def from_metaweblog(cls, struct, post_type='post', is_edit=False):
+    def from_metaweblog(cls, struct, post_type='post', publish=True, is_edit=False):
         """Receive metaWeblog RPC struct and initialize a Post.
            Used both by migrate_from_wordpress and when receiving a new or
            edited post from MarsEdit.
@@ -90,6 +90,7 @@ class Post(Document):
 
         slug = slugify(title)
         description = struct.get('description', '')
+        status = 'publish' if publish else 'draft'
 
         rv = cls(
             title=title,
@@ -99,7 +100,7 @@ class Post(Document):
             tags=tags,
             slug=slug,
             type=post_type,
-            status=struct.get('status', 'publish'),
+            status=status,
             wordpress_id=struct.get('postid')
         )
 
@@ -116,8 +117,11 @@ class Post(Document):
         # calls.
 
         # self.type is 'post' or 'page', happens to correspond to handler names
+        if self.status == 'publish':
+            url = absolute(application.reverse_url(self.type, self.slug))
+        else:
+            url = absolute(application.reverse_url('draft', self.slug))
 
-        url = absolute(application.reverse_url(self.type, self.slug))
         rv = {
             'title': self.title,
             # Note we're returning the original, not the display version
@@ -133,7 +137,10 @@ class Post(Document):
             'status': self.status,
         }
 
-        if self.type == 'page':
+        if self.type == 'post':
+            rv['post_id'] = str(self.id)
+            rv['post_status'] = self.status
+        elif self.type == 'page':
             rv['page_id'] = str(self.id)
             rv['page_status'] = self.status
 

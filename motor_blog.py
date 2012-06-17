@@ -11,8 +11,7 @@ from tornado.web import StaticFileHandler
 import options
 import indexes
 from api.handlers import APIHandler, RSDHandler, RSSHandler
-from web.handlers import (
-    HomeHandler, PostHandler, MediaHandler, AllPostsHandler, CategoryHandler)
+from web.handlers import *
 
 # TODO: RPC over HTTPS
 # TODO: store mod_date on posts and support ETags -- how expensive is hashing
@@ -73,8 +72,13 @@ if __name__ == "__main__":
         U(r"/api", APIHandler, name='api'),
         U(r"/feed", RSSHandler, name='feed'),
 
+        # Admin
+        U(r"login/?", LoginHandler, name='login'),
+        U(r"logout/?", LogoutHandler, name='logout'),
+        U(r"drafts/?", DraftsHandler, name='drafts'),
+        U(r"draft/(?P<slug>.+)/?", DraftHandler, name='draft'),
+
         # Web
-        # TODO: drafts, and a login page so you can see drafts
         U(r"media/(?P<url>.+)", MediaHandler, name='media'),
         U(r"theme/static/(.+)", StaticFileHandler, {"path": static_path}),
         U(r"category/(?P<category_name>.+)/?", CategoryHandler, name='category'),
