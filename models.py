@@ -19,18 +19,24 @@ utc_tz, newyork_tz = pytz.timezone('UTC'), pytz.timezone('America/New_York')
 
 class Category(Document):
     name = StringField()
+    slug = StringField()
     class Meta:
         id_field = ObjectIdField
 
     @classmethod
-    def from_wordpress(cls, struct):
+    def _from_rpc(cls, struct, name):
         _id = ObjectId(struct['categoryId']) if 'categoryId' in struct else None
-        return cls(name=struct['name'], id=_id)
+        return cls(name=name, slug=slugify(name), id=_id)
+
+    @classmethod
+    def from_wordpress(cls, struct):
+        name = struct['name']
+        return cls._from_rpc(struct, name)
 
     @classmethod
     def from_metaweblog(cls, struct):
-        _id = ObjectId(struct['categoryId']) if 'categoryId' in struct else None
-        return cls(name=struct['categoryName'], id=_id)
+        name = struct['categoryName']
+        return cls._from_rpc(struct, name)
 
     def to_wordpress(self, application):
         url = absolute(application.reverse_url('category', self.slug))
@@ -42,10 +48,6 @@ class Category(Document):
         }
 
     to_metaweblog = to_wordpress
-
-    @property
-    def slug(self):
-        return slugify(self.name)
 
 
 class EmbeddedCategory(Category, EmbeddedDocument):

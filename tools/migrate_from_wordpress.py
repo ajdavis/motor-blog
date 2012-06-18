@@ -160,7 +160,8 @@ def main(args):
                 if doc:
                     category = Category(**doc)
                 else:
-                    category = Category(name=category_name)
+                    category = Category(
+                        name=category_name, slug=slugify(category_name))
                     category.id = db.categories.insert(category.to_python())
                 print '    %-30s %s' % (
                     category_name, ' NEW' if not doc else ''

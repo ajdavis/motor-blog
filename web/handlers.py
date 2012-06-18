@@ -5,6 +5,7 @@ import tornado.web
 from tornado import gen
 from tornado.options import options as opts
 import motor
+import cache
 
 from models import Post, Category
 
@@ -19,10 +20,10 @@ __all__ = (
 )
 
 # TODO: document this as a means of refactoring
+@cache.cached(key='categories', invalidate_event='categories_changed')
 @gen.engine
 def get_categories(db, callback):
     try:
-        # TODO: cache
         category_docs = yield motor.Op(
             db.categories.find().sort('name').to_list)
 
@@ -137,15 +138,14 @@ class CategoryHandler(MotorBlogHandler):
     @tornado.web.asynchronous
     @gen.engine
     @tornado.web.addslash
-    def get(self, category_name, page_num=0):
-        category_name = category_name.rstrip('/')
-        # TODO: index
+    def get(self, slug, page_num=0):
+        slug = slug.rstrip('/')
         postdocs = yield motor.Op(
-            self.settings['db'].posts
-            .find({'status': 'publish', 'categories.name': category_name})
-            .sort([('_id', -1)])
-            .limit(10)
-            .to_list)
+            self.settings['db'].posts.find({
+                'status': 'publish',
+                'type': 'post',
+                'categories.slug': slug,
+            }).sort([('_id', -1)]).limit(10).to_list)
 
         posts = [Post(**postdoc) for postdoc in postdocs]
         categories = yield motor.Op(get_categories, self.settings['db'])
@@ -248,4 +248,3 @@ class DraftHandler(MotorBlogHandler):
         self.render(
             'single.html',
             post=post, prev=None, next=None, categories=categories)
-

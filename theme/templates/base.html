@@ -44,7 +44,7 @@
                     </li>
                     {% for category in categories %}
                     <li class="cat-item">
-                        <a href="{{ reverse_url('category', category.name) }}" title="View all posts filed under {{ category.name }}">
+                        <a href="{{ reverse_url('category', category.slug) }}" title="View all posts filed under {{ category.name }}">
                             {{ category.name }}
                         </a>
                     </li>

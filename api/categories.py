@@ -1,10 +1,10 @@
 import xmlrpclib
 
 import tornadorpc
-from tornado.web import HTTPError
 from bson.objectid import ObjectId
 
 from api import auth
+import cache
 from models import Post, Category, EmbeddedCategory
 
 
@@ -19,7 +19,8 @@ class Categories(object):
             if error:
                 raise error
             elif category:
-                wp_categories.append(Category(**category).to_wordpress(self.application))
+                wp_categories.append(
+                    Category(**category).to_wordpress(self.application))
             else:
                 # Done
                 self.result(wp_categories)
@@ -51,6 +52,7 @@ class Categories(object):
             if error:
                 raise error
 
+            cache.event(self.settings['db'], 'categories_changed')
             self.result(str(_id))
 
         category = Category.from_wordpress(struct)

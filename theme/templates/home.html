@@ -26,7 +26,7 @@
 
 <nav id="nav-below">
     <div class="nav-previous">
-        <a href="/{{ base_url }}/page/{{ page_num + 1 }}">
+        <a href="{{ reverse_url('page', page_num + 1) }}">
             <span class="meta-nav">&larr;</span> Older posts
         </a>
     </div>
@@ -34,9 +34,9 @@
         {% set next_page = page_num - 1 %}
         {# comment TODO use urlreverse #}
         {% if next_page == 0 %}
-            {% set next_url = '/' %}
+            {% set next_url = reverse_url('home') %}
         {% else %}
-            {% set next_url = '/page/%s' % (page_num - 1) %}
+            {% set next_url = reverse_url('page', page_num - 1) %}
         {% end %}
 
         <div class="nav-next">

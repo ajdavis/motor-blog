@@ -7,6 +7,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.options
 from tornado.web import StaticFileHandler
+import cache
 
 import options
 import indexes
@@ -39,6 +40,8 @@ if __name__ == "__main__":
 
     # TODO: Mongo connection options
     db = motor.MotorConnection().open_sync().motorblog
+    cache.create_events_collection(db)
+    cache.startup(db)
 
     if opts.ensure_indexes:
         logging.info('Ensuring indexes...')
@@ -81,7 +84,7 @@ if __name__ == "__main__":
         # Web
         U(r"media/(?P<url>.+)", MediaHandler, name='media'),
         U(r"theme/static/(.+)", StaticFileHandler, {"path": static_path}),
-        U(r"category/(?P<category_name>.+)/?", CategoryHandler, name='category'),
+        U(r"category/(?P<slug>.+)/?", CategoryHandler, name='category'),
         U(r"page/(?P<page_num>\d+)/?", HomeHandler, name='page'),
         U(r"all-posts/?", AllPostsHandler, name='all-posts'),
         U(r"(?P<slug>.+)/?", PostHandler, name='post'),
