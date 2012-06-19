@@ -1,0 +1,28 @@
+[inet_http_server]
+port = 9001
+username = emptysquare
+password = Password
+ 
+[supervisord]
+logfile=/var/log/supervisord/supervisord.log
+pidfile=/var/run/supervisord.pid
+user=root
+childlogdir=/var/log/supervisord
+
+[supervisorctl]
+serverurl=http://localhost:9001
+username = admin
+password = Password
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+ 
+[program:motor_blog]
+numprocs=4
+numprocs_start=8000
+process_name=motor_blog-%(process_num)s
+command=%(here)s/../server.py --port %(process_num)s
+user=emptysquare
+autorestart=unexpected
+redirect_stderr=true
+stdout_logfile=%(here)s/supervisor-%(process_num)s.log

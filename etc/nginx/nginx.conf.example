@@ -1,0 +1,39 @@
+http {
+    # Enumerate all the Tornado servers here
+    upstream motor_blog {
+        server 127.0.0.1:8000;
+        server 127.0.0.1:8001;
+        server 127.0.0.1:8002;
+        server 127.0.0.1:8003;
+    }
+
+    include mime.types;
+    default_type application/octet-stream;
+
+    keepalive_timeout 65;
+    proxy_read_timeout 200;
+    tcp_nopush on;
+    tcp_nodelay on;
+    gzip on;
+    gzip_min_length 1000;
+    gzip_proxied any;
+    gzip_types text/plain text/css text/xml
+               application/x-javascript application/xml
+               application/atom+xml text/javascript;
+
+    proxy_next_upstream off;
+
+    server {
+        listen 80;
+        # listen 443 default ssl;
+        server_name localhost emptysquare.net;
+
+        location /blog {
+            proxy_pass http://motor_blog;
+        }
+
+        location / {
+            root ~emptysquare/emptysquare.net/static;
+        }
+    } 
+}
