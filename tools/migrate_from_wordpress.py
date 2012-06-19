@@ -55,12 +55,12 @@ def cache(method):
 
 class Blog(object):
     """Wordpress XML-RPC client, connect to source blog"""
-    def __init__(self, url, username, password, use_cache):
+    def __init__(self, url, username, password, use_cache, verbose):
         self.url = url
         self.username = username
         self.password = password
         self.use_cache = use_cache
-        self.server = xmlrpclib.ServerProxy(self.url, allow_none=True)
+        self.server = xmlrpclib.ServerProxy(self.url, allow_none=True, verbose=verbose)
 
     @cache
     def get_recent_posts(self, n):
@@ -108,12 +108,7 @@ def main(args):
     start = time.time()
 
     opts = options.options()
-    destination_url = 'http://%s%s/%s' % (
-        opts.host,
-        ':' + str(opts.port) if opts.port else '',
-        opts.base_url
-    )
-
+    destination_url = '/' + opts.base_url.lstrip('/')
     parts = urlparse(args.source_url)
     source_base_url = urljoin(
         '%s://%s' % (parts[0], parts[1]), parts[2].split('/xmlrpc.php')[0])
@@ -132,7 +127,7 @@ def main(args):
 
     source = Blog(
         args.source_url, args.source_username, args.source_password,
-        use_cache=not args.refresh)
+        use_cache=not args.refresh, verbose=args.verbose)
     print 'Getting media library'
 
     media_library = set([

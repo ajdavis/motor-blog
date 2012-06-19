@@ -117,7 +117,8 @@ def cached(key, invalidate_event):
                 callback(_cache[key], None)
             else:
                 def inner_callback(result, error):
-                    _cache[key] = result
+                    if not error:
+                        _cache[key] = result
                     callback(result, error)
 
                 kwargs['callback'] = inner_callback

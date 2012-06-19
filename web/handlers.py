@@ -31,15 +31,19 @@ HTTP_DATE_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 @cache.cached(key='categories', invalidate_event='categories_changed')
 @gen.engine
 def get_categories(db, callback):
+    # This odd control flow ensures we don't confuse exceptions thrown
+    # by find() with exceptions thrown by the callback
+    categories = None
     try:
         category_docs = yield motor.Op(
             db.categories.find().sort('name').to_list)
 
         categories = [Category(**doc) for doc in category_docs]
-        callback(categories, None)
     except Exception, e:
         callback(None, e)
+        return
 
+    callback(categories, None)
 
 class MotorBlogHandler(tornado.web.RequestHandler):
     def __init__(self, *args, **kwargs):
@@ -291,26 +295,27 @@ class DraftHandler(MotorBlogHandler):
 class FeedHandler(MotorBlogHandler):
     @tornado.web.asynchronous
     @gen.engine
-    def get(self, category_slug=None):
-        if not category_slug:
+    def get(self, slug=None):
+        if not slug:
             category = None
         else:
+            # Get all the categories and search for one with the right slug,
+            # instead of actually querying for the right category, since
+            # get_categories() is cached.
             categories = yield motor.Op(get_categories, self.settings['db'])
-            for categorydoc in categories:
-                if categorydoc['slug'] == category_slug:
+            for category in categories:
+                if category.slug == slug:
                     break
             else:
                 raise tornado.web.HTTPError(404)
-
-            category = Category(**categorydoc)
 
         title = opts.blog_name
         if category:
             title = '%s - Posts about %s' % (title, category.name)
 
         query = {'status': 'publish', 'type': 'post'}
-        if category_slug:
-            query['categories.slug'] = category_slug
+        if slug:
+            query['categories.slug'] = slug
 
         postdocs = yield motor.Op(
             self.settings['db'].posts.find(
