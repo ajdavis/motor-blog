@@ -3,6 +3,7 @@
 {% block body-class %}archive category{% end %}
 
 {% block content %}
+<h1 class="page-title">Category: {{ this_category.name }}</h1>
 {% set title_link = True %}
 {% for post in posts %}
         {% include "post.html" %}

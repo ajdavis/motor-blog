@@ -187,8 +187,15 @@ class CategoryHandler(MotorBlogHandler):
 
         posts = [Post(**postdoc) for postdoc in postdocs]
         categories = yield motor.Op(get_categories, self.settings['db'])
+        for this_category in categories:
+            if this_category.slug == slug:
+                break
+        else:
+            raise HTTPError(404)
+
         self.etag_from_posts(posts)
-        self.render('category.html', posts=posts, categories=categories)
+        self.render('category.html',
+            posts=posts, categories=categories, this_category=this_category)
 
 
 class MediaHandler(MotorBlogHandler):
