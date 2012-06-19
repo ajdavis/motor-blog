@@ -326,10 +326,14 @@ class FeedHandler(MotorBlogHandler):
 
         posts = [Post(**postdoc) for postdoc in postdocs]
         author = {'name': opts.author_display_name, 'email': opts.author_email}
+        if category:
+            feed_url = absolute(self.reverse_url('category-feed', category.slug))
+        else:
+            feed_url = absolute(self.reverse_url('feed'))
 
         feed = AtomFeed(
             title=title,
-            feed_url=absolute(self.reverse_url('feed')),
+            feed_url=feed_url,
             url=absolute(self.reverse_url('home')),
             author=author,
             updated=self.last_modified(posts),
