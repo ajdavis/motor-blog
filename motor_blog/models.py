@@ -7,12 +7,10 @@ from dictshield.fields import StringField, IntField, DateTimeField
 from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
 from dictshield.fields.mongo import ObjectIdField
 
-from text.link import absolute
-from text.slugify import slugify
-from text.summarize import summarize
+from motor_blog.text.link import absolute
 
 import pytz
-from text import markup
+from motor_blog.text import markup, summarize, slugify
 
 utc_tz = pytz.timezone('UTC')
 
@@ -177,7 +175,7 @@ class Post(Document):
     def summary(self):
         # TODO: consider caching; depends whether this is frequently used
         try:
-            summary, was_truncated = summarize(self.body, 200)
+            summary, was_truncated = summarize.summarize(self.body, 200)
             if was_truncated:
                 return summary + ' [ ... ]'
             else:

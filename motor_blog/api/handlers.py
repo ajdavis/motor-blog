@@ -10,8 +10,8 @@ import xmlrpclib
 
 from tornadorpc.xml import XMLRPCHandler, XMLRPCParser
 
-from api import categories, posts, tags, media
-from api.rsd import RSDHandler
+from motor_blog.api import categories, posts, media, tags
+from motor_blog.api.rsd import RSDHandler
 
 
 __all__ = ('APIHandler', 'RSDHandler')

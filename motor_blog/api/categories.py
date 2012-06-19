@@ -2,10 +2,10 @@ import xmlrpclib
 
 import tornadorpc
 from bson.objectid import ObjectId
+from motor_blog import cache
 
-from api import auth
-import cache
-from models import Post, Category, EmbeddedCategory
+from motor_blog.api import auth
+from motor_blog.models import Post, Category, EmbeddedCategory
 
 
 class Categories(object):

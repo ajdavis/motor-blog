@@ -1,15 +1,16 @@
 host = 'localhost'
 port = 8888
 base_url = 'blog'
-user = 'emptysquare'
+user = 'admin'
 password = 'foobar'
 blog_name = author_display_name = 'A. Jesse Jiryu Davis'
-google_analytics_id = 'UA-26577074-1'
+google_analytics_id = 'UA-1234578-1' # Replace with your own
 theme = 'theme'
 log_file_prefix = 'log/motor-blog.log'
 cookie_secret = 'long secret string'
 timezone = 'America/New_York'
 
+# List of URL, Title pairs
 nav_menu = [
     ('/blog/about/', 'About'),
     ('/photography/', 'Photography'),

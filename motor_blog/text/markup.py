@@ -18,7 +18,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name, guess_lexer, TextLexer
 
 
-from text import HTMLPassThrough
+from motor_blog.text import HTMLPassThrough
 
 
 __all__ = ('markup', )

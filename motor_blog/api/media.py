@@ -4,9 +4,9 @@ import os
 import bson
 import tornadorpc
 
-from api import auth
+from motor_blog.api import auth
 from tornado.options import options as opts
-from text.link import media_link, absolute
+from motor_blog.text.link import media_link, absolute
 
 
 class Media(object):

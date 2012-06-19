@@ -1,5 +1,5 @@
 import tornadorpc
-from api import auth
+from motor_blog.api import auth
 
 
 class Tags(object):

@@ -1,16 +1,15 @@
 """Web frontend for motor-blog: actually show web pages to visitors
 """
-import datetime
 
 import tornado.web
 from tornado import gen
 from tornado.options import options as opts
 import motor
-import cache
 from werkzeug.contrib.atom import AtomFeed
 
-from models import Post, Category
-from text.link import absolute
+from motor_blog.models import Post, Category
+from motor_blog import cache
+from motor_blog.text.link import absolute
 
 __all__ = (
     # Admin

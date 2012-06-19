@@ -59,18 +59,20 @@ How to use the 'setting()' function in templates and what settings are available
 
 # A Tour of the Code
 
-* motor_blog.py: Web application server
-* web/
-    * handlers.py: RequestHandlers for the blog's website
-* theme/: Default theme for emptysquare.net, overridable with your theme
-    * static/: Images and stylesheet
-    * templates/: HTML templates
-* api/
-    * handlers.py: Implementation of the XML-RPC API that MarsEdit uses
-* models.py: DictShield document definitions
-* text/
-    * markup.py: convert from markdown into HTML for display, including some custom syntax
-    * wordpress_to_markdown.py: convert from the WordPress's particular HTML to markdown, for migrate_from_wordpress.py
-    * abbrev.py: convert from HTML to truncated plain text for all-posts page
-* tools/:
-    * migrate_from_wordpress.py: Tool for migrating from my old Wordpress blog to Motor-Blog
+* server.py: Web application server
+* motor_blog/: Package code
+    * web/
+        * handlers.py: RequestHandlers for the blog's website
+        * admin-templates/: Templates for login/out, drafts, and other admin stuff
+    * theme/: Default theme for emptysquare.net, overridable with your theme
+    * api/: Implementation of the XML-RPC API that MarsEdit uses
+    * models.py: document definitions
+    * text/
+        * markup.py: convert from Markdown into HTML for display, including some custom syntax
+        * wordpress_to_markdown.py: convert from the WordPress's particular HTML to markdown, for migrate_from_wordpress.py
+        * abbrev.py: convert from HTML to truncated plain text for all-posts page
+    * tools/:
+        * migrate_from_wordpress.py: Tool for migrating from my old Wordpress blog to Motor-Blog
+    * cache.py: Cache results from MongoDB, invalidate when events are emitted
+    * indexes.py: Index definitions for server.py --ensure_indexes
+    * options.py: Configuration parsing

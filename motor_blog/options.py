@@ -37,11 +37,11 @@ def options():
     tornado.options.define('cookie_secret', type=str)
 
     # Appearance
-    tornado.options.define('nav_menu', type=list, help=(
+    tornado.options.define('nav_menu', type=list, default=[], help=(
         "List of url, title pairs (define this in your motor_blog.conf)'"))
     tornado.options.define('theme', type=str, default='theme', help=(
         "Directory name of your theme files"))
-    tornado.options.define('timezone', type=str, default='theme', help=(
+    tornado.options.define('timezone', type=str, default='America/New_York', help=(
         "Directory name of your theme files"))
 
     # Parse config file, then command line, so command line switches take
@@ -53,4 +53,12 @@ def options():
         print 'No config file at', config_path
 
     tornado.options.parse_command_line()
-    return tornado.options.options
+    opts = tornado.options.options
+
+    for required in (
+        'host', 'port', 'blog_name', 'base_url', 'cookie_secret', 'timezone',
+    ):
+        if not opts[required].value():
+            raise Exception('%s required' % required)
+
+    return opts

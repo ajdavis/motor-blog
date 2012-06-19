@@ -5,8 +5,8 @@ import xmlrpclib
 from bson.objectid import ObjectId
 import tornadorpc
 
-from api import auth
-from models import Post
+from motor_blog.api import auth
+from motor_blog.models import Post
 
 
 class Posts(object):

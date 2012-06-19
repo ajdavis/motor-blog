@@ -1,6 +1,6 @@
 import os
 from tornado.options import options as opts
-from text.slugify import slugify
+from motor_blog.text import slugify
 
 
 def media_link(year, month, filename):

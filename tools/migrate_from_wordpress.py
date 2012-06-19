@@ -1,6 +1,5 @@
 import argparse
 import datetime
-import logging # TODO: set requests' logging to 'warn' level
 import os
 import pickle
 import time
@@ -9,13 +8,12 @@ from urlparse import urlparse, urljoin
 
 import motor
 import pymongo
+from motor_blog import options
+from motor_blog.text import wordpress_to_markdown, slugify
 
-import options
-from cache import create_events_collection
-from indexes import ensure_indexes
-from models import Category, Post
-from text.slugify import slugify
-from text.wordpress_to_markdown import wordpress_to_markdown
+from motor_blog.cache import create_events_collection
+from motor_blog.indexes import ensure_indexes
+from motor_blog.models import Category, Post
 
 
 def cache(method):

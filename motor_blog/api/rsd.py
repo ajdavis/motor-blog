@@ -1,7 +1,7 @@
 import tornado.web
 import tornado.template
 
-from text.link import absolute
+from motor_blog.text.link import absolute
 
 
 class RSDHandler(tornado.web.RequestHandler):

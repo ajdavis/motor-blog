@@ -8,11 +8,9 @@ import tornado.ioloop
 import tornado.web
 import tornado.options
 from tornado.web import StaticFileHandler
-import cache
+from motor_blog import indexes, cache, options
 
-import options
-import indexes
-from api.handlers import APIHandler, RSDHandler
+from motor_blog.api.handlers import APIHandler, RSDHandler
 from web.handlers import *
 
 # TODO: RPC over HTTPS
