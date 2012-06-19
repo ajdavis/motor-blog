@@ -73,7 +73,8 @@ class Post(Document):
 
     def __init__(self, *args, **kwargs):
         super(Post, self).__init__(*args, **kwargs)
-        self.mod = utc_tz.localize(self.mod)
+        if not self.mod.tzinfo:
+            self.mod = utc_tz.localize(self.mod)
 
     @classmethod
     def from_metaweblog(cls, struct, post_type='post', publish=True, is_edit=False):
@@ -96,6 +97,11 @@ class Post(Document):
         slug = slugify.slugify(title)
         description = struct.get('description', '')
         status = 'publish' if publish else 'draft'
+        if 'date_modified_gmt' in struct:
+            tup = struct['date_modified_gmt'].timetuple()
+            mod = utc_tz.localize(datetime.datetime(*tup[0:6]))
+        else:
+            mod = datetime.datetime.utcnow()
 
         rv = cls(
             title=title,
@@ -107,7 +113,7 @@ class Post(Document):
             type=post_type,
             status=status,
             wordpress_id=struct.get('postid'),
-            mod=datetime.datetime.utcnow()
+            mod=mod
         )
 
         if not is_edit and 'date_created_gmt' in struct:
