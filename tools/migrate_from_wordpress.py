@@ -9,7 +9,8 @@ from urlparse import urlparse, urljoin
 import motor
 import pymongo
 from motor_blog import options
-from motor_blog.text import wordpress_to_markdown, slugify
+from motor_blog.text.wordpress_to_markdown import wordpress_to_markdown
+from motor_blog.text.slugify import slugify
 
 from motor_blog.cache import create_events_collection
 from motor_blog.indexes import ensure_indexes

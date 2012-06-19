@@ -8,3 +8,4 @@ git+git://github.com/ajdavis/mongo-python-driver.git@motor
 dictshield
 cMarkdown
 beautifulsoup4
+requests

@@ -9,7 +9,7 @@ import sys
 import tornado.escape
 import bson
 import requests
-from motor_blog.text import slugify
+from motor_blog.text.slugify import slugify
 
 
 def replace_crayon_and_paragraphize(body, media_library, db, destination_url, source_base_url):

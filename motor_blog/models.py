@@ -24,7 +24,7 @@ class Category(Document):
     @classmethod
     def _from_rpc(cls, struct, name):
         _id = ObjectId(struct['categoryId']) if 'categoryId' in struct else None
-        return cls(name=name, slug=slugify(name), id=_id)
+        return cls(name=name, slug=slugify.slugify(name), id=_id)
 
     @classmethod
     def from_wordpress(cls, struct):
@@ -93,7 +93,7 @@ class Post(Document):
         else:
             tags = None
 
-        slug = slugify(title)
+        slug = slugify.slugify(title)
         description = struct.get('description', '')
         status = 'publish' if publish else 'draft'
 
