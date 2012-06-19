@@ -1,17 +1,9 @@
 #!/bin/bash -e
-
-sudo emptysquare bash
-. /usr/local/bin/virtualenvwrapper.sh
-workon motor_blog
-
-SUPERVISORD=supervisord
+source ~emptysquare/.virtualenvs/motor_blog/bin/activate
+SUPERVISORD=`which supervisord`
 PIDFILE=$VIRTUAL_ENV/etc/supervisord.pid
-OPTS="-c $VIRTUAL_ENV/etc/supervisord.conf"
-
-test -x $SUPERVISORD || exit 0
-
+OPTS="-c $VIRTUAL_ENV/motor-blog/etc/supervisord.conf"
 . /lib/lsb/init-functions
-
 export PATH="${PATH:+$PATH:}/usr/local/bin:/usr/sbin:/sbin"
 
 case "$1" in
