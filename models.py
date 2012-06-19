@@ -3,7 +3,7 @@ import logging
 
 from bson.objectid import ObjectId
 from dictshield.document import Document, EmbeddedDocument
-from dictshield.fields import StringField, IntField
+from dictshield.fields import StringField, IntField, DateTimeField
 from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
 from dictshield.fields.mongo import ObjectIdField
 
@@ -14,7 +14,7 @@ from text.summarize import summarize
 import pytz
 from text import markup
 
-utc_tz, newyork_tz = pytz.timezone('UTC'), pytz.timezone('America/New_York')
+utc_tz = pytz.timezone('UTC')
 
 
 class Category(Document):
@@ -68,9 +68,14 @@ class Post(Document):
     categories = SortedListField(EmbeddedDocumentField(EmbeddedCategory))
     slug = StringField(default='')
     wordpress_id = IntField() # legacy id from WordPress
+    mod = DateTimeField()
 
     class Meta:
         id_field = ObjectIdField
+
+    def __init__(self, *args, **kwargs):
+        super(Post, self).__init__(*args, **kwargs)
+        self.mod = utc_tz.localize(self.mod)
 
     @classmethod
     def from_metaweblog(cls, struct, post_type='post', publish=True, is_edit=False):
@@ -103,10 +108,13 @@ class Post(Document):
             slug=slug,
             type=post_type,
             status=status,
-            wordpress_id=struct.get('postid')
+            wordpress_id=struct.get('postid'),
+            mod=datetime.datetime.utcnow()
         )
 
         if not is_edit and 'date_created_gmt' in struct:
+            # TODO: can fail if two posts created in same second, add random
+            #   suffix to ObjectId
             date_created = datetime.datetime.strptime(
                 struct['date_created_gmt'].value, "%Y%m%dT%H:%M:%S")
             rv.id = ObjectId.from_datetime(date_created)
@@ -132,7 +140,7 @@ class Post(Document):
             'permaLink': url,
             'categories': [cat.to_metaweblog(application) for cat in self['categories']],
             'mt_keywords': ','.join(self['tags']),
-            'dateCreated': self.local_date_created,
+            'dateCreated': self.local_date_created(application),
             'date_created_gmt': self.date_created,
             'postid': str(self.id),
             'id': str(self.id),
@@ -162,13 +170,8 @@ class Post(Document):
 
     @property
     def date_created(self):
+        """datetime when this post was created, timezone-aware in UTC"""
         return self.id.generation_time
-
-    @property
-    def local_date_created(self):
-        # TODO timezone config option
-        utcdiff = datetime.datetime.utcnow() - datetime.datetime.now()
-        return self.date_created - utcdiff
 
     @property
     def summary(self):
@@ -183,24 +186,19 @@ class Post(Document):
             logging.exception('truncating HTML for "%s"' % self.slug)
             return '[ ... ]'
 
-    @property
-    def local_date_created(self):
-        # Assume New York
-        # TODO: configure in conf file
+    def local_date_created(self, application):
         dc = self.date_created
-        return newyork_tz.normalize(dc.astimezone(newyork_tz))
+        tz = application.settings['tz']
+        return tz.normalize(dc.astimezone(tz))
 
-    @property
-    def local_short_date(self):
-        dc = self.local_date_created
+    def local_short_date(self, application):
+        dc = self.local_date_created(application)
         return '%s/%s/%s' % (dc.month, dc.day, dc.year)
 
-    @property
-    def local_long_date(self):
-        dc = self.local_date_created
+    def local_long_date(self, application):
+        dc = self.local_date_created(application)
         return '%s %s, %s' % (dc.strftime('%B'), dc.day, dc.year)
 
-    @property
-    def local_time_of_day(self):
-        dc = self.local_date_created
+    def local_time_of_day(self, application):
+        dc = self.local_date_created(application)
         return '%s:%s %s' % (dc.hour % 12, dc.minute, dc.strftime('%p'))

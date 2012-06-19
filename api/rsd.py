@@ -1,6 +1,8 @@
 import tornado.web
 import tornado.template
 
+from text.link import absolute
+
 
 class RSDHandler(tornado.web.RequestHandler):
     """MarsEdit uses RSD to determine the blog's XML-RPC capabilities. Link to
@@ -13,7 +15,8 @@ class RSDHandler(tornado.web.RequestHandler):
     def get(self):
         self.set_header('Content-Type', 'text/xml')
         t = tornado.template.Template(rsd_template)
-        self.write(t.generate(reverse_url=self.reverse_url))
+        self.write(t.generate(
+            reverse_url=self.reverse_url, absolute=absolute))
 
 
 rsd_template = """<?xml version="1.0" encoding="UTF-8"?>
@@ -24,7 +27,7 @@ rsd_template = """<?xml version="1.0" encoding="UTF-8"?>
         <homePageLink>{{ reverse_url('api') }}</homePageLink>
         <apis>
             <api name="WordPress" blogID="1" preferred="true"
-                 apiLink="http://localhost:8888{{ reverse_url('api') }}" />
+                 apiLink="{{ absolute(reverse_url('api')) }}" />
         </apis>
     </service>
 </rsd>"""

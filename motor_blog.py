@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 
+import pytz
 import tornado.ioloop
 import tornado.web
 import tornado.options
@@ -11,14 +12,13 @@ import cache
 
 import options
 import indexes
-from api.handlers import APIHandler, RSDHandler, RSSHandler
+from api.handlers import APIHandler, RSDHandler
 from web.handlers import *
 
 # TODO: RPC over HTTPS
-# TODO: store mod_date on posts and support ETags -- how expensive is hashing
-#   each response? is that something to hate about Tornado?
 # TODO: a static-url function to set long cache TTL on media URLs
 # TODO: Nginx cache media
+# TODO: sitemap.xml
 
 try:
     import motor
@@ -40,7 +40,6 @@ if __name__ == "__main__":
 
     # TODO: Mongo connection options
     db = motor.MotorConnection().open_sync().motorblog
-    cache.create_events_collection(db)
     cache.startup(db)
 
     if opts.ensure_indexes:
@@ -73,7 +72,6 @@ if __name__ == "__main__":
         # XML-RPC API
         U(r"/rsd", RSDHandler, name='rsd'),
         U(r"/api", APIHandler, name='api'),
-        U(r"/feed", RSSHandler, name='feed'),
 
         # Admin
         U(r"login/?", LoginHandler, name='login'),
@@ -81,17 +79,23 @@ if __name__ == "__main__":
         U(r"drafts/?", DraftsHandler, name='drafts'),
         U(r"draft/(?P<slug>.+)/?", DraftHandler, name='draft'),
 
+        # Atom
+        U(r"feed/?", FeedHandler, name='feed'),
+        U(r"category/(?P<slug>.+)/feed/?", FeedHandler, name='category-feed'),
+
         # Web
         U(r"media/(?P<url>.+)", MediaHandler, name='media'),
-        U(r"theme/static/(.+)", StaticFileHandler, {"path": static_path}),
+        U(r"theme/static/(.+)", StaticFileHandler, {"path": static_path}, name='theme-static'),
         U(r"category/(?P<slug>.+)/?", CategoryHandler, name='category'),
         U(r"page/(?P<page_num>\d+)/?", HomeHandler, name='page'),
         U(r"all-posts/?", AllPostsHandler, name='all-posts'),
         U(r"(?P<slug>.+)/?", PostHandler, name='post'),
         U(r"/?", HomeHandler, name='home'),
+
         ],
         db=db,
         template_path=os.path.join(opts.theme, 'templates'),
+        tz=pytz.timezone(opts.timezone),
         **{k: v.value() for k, v in opts.items()}
     )
 

@@ -8,7 +8,6 @@
 
 import xmlrpclib
 
-import tornado.web
 from tornadorpc.xml import XMLRPCHandler, XMLRPCParser
 
 from api import categories, posts, tags, media
@@ -41,7 +40,3 @@ class APIHandler(
             {'key': 'markdown', 'label': 'Markdown' },
 #            {'key': 'htmlauto', 'label': "Convert line breaks" },
         ]
-
-# TODO
-class RSSHandler(tornado.web.RequestHandler):
-    pass

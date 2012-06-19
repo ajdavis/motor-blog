@@ -1,12 +1,18 @@
 """Manage in-memory cache of some data from Mongo, tail an 'events'
    capped collection to know when to invalidate
 """
+import functools
 
 import logging
 import sys
 import datetime
+import time
 
+from tornado import gen
+
+import motor
 import pymongo.errors
+from tornado.ioloop import IOLoop
 
 
 _cache = {}
@@ -15,7 +21,7 @@ _cursor = None
 
 
 def create_events_collection(db):
-    """Pass in pymongo Database, create capped collection synchronously at
+    """Pass in MotorDatabase, create capped collection synchronously at
        startup
     """
     sync_cx = db.connection.sync_connection()
@@ -51,14 +57,41 @@ def shutdown():
         _cursor.close()
 
 
-def event(db, name, callback=None):
-    """Insert event into events collection; optional callback executed after
-       insert
+@gen.engine
+def event(name, callback=None):
+    """Insert event into events collection; optional callback taking
+       (result, error) executed after insert
     """
-    db.events.insert(
-        {'ts': datetime.datetime.utcnow(), 'name': name},
-        manipulate=False, # No need to add _id
-        callback=callback)
+    try:
+        # event() is expected to be very rare -- e.g., called from
+        # migrate_from_wordpress or wp_newCategory. If it becomes more common,
+        # this will need work.
+        try:
+            # Size is in bytes; event documents are rare and very small
+            yield motor.Op(
+                _db.create_collection, 'events', size=100 * 1024, capped=True)
+            logging.info(
+                'Created capped collection "events" in database "%s"',
+                _db.name)
+        except pymongo.errors.CollectionInvalid:
+            # Collection already exists
+            collection_options = yield motor.Op(_db.events.options)
+            if 'capped' not in collection_options:
+                logging.error(
+                    '%s.events exists and is not a capped collection,\n'
+                    'please drop the collection and start this app again.' %
+                    _db.name
+                )
+
+        result = yield motor.Op(_db.events.insert,
+            {'ts': datetime.datetime.utcnow(), 'name': name},
+            manipulate=False) # No need to add _id
+
+        if callback:
+            callback(result, None)
+    except Exception, e:
+        if callback:
+            callback(None, e)
 
 
 def cached(key, invalidate_event):
@@ -94,17 +127,26 @@ def cached(key, invalidate_event):
     return _cached
 
 
-def startup(db):
-    global _cursor
+def startup(db, last_event=None):
+    global _db, _cursor
+    _db = db
+    create_events_collection(_db)
     if not _cursor:
         _cursor = db.events.find({
-            'ts': {'$gte': datetime.datetime.utcnow()}
+            'ts': {'$gte': last_event or datetime.datetime.utcnow()}
         }).tail(_on_event, await_data=True)
 
 
 def _on_event(event, error):
+    global _cursor
     if error:
         logging.error('Tailing events collection: %s', error)
+
+        # Retry in a few seconds
+        _cursor = None
+        IOLoop.instance().add_timeout(
+            time.time() + 10,
+            functools.partial(startup, _db, datetime.datetime.utcnow()))
     elif event:
         for callback in _callbacks.get(event['name'], []):
             try:

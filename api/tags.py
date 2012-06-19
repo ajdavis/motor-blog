@@ -6,7 +6,6 @@ class Tags(object):
     @tornadorpc.async
     @auth
     def wp_getTags(self, blogid, user, password):
-        # TODO: cache
         self.wp_tags = set()
 
         # Mongo 2.1 could use aggregate()

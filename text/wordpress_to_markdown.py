@@ -1,3 +1,4 @@
+import datetime
 import logging # TODO: set requests' logging to 'warn' level
 import os
 import pickle
@@ -111,6 +112,7 @@ def replace_media_links(body, media_library, db, destination_url, source_base_ur
                     'content': bson.Binary(content),
                     'type': content_type,
                     '_id': url,
+                    'mod': datetime.datetime.utcnow(),
                 })
 
             body = body.replace(

@@ -20,7 +20,6 @@ def auth(fn):
 
     # For tornadorpc to think _auth has the same arguments as fn,
     # functools.wraps() isn't enough.
-    # TODO: this is fun, blog about it. Inspired by Mock.
     formatted_args = inspect.formatargspec(*argspec)
     fndef = 'lambda %s: _auth%s' % (
         formatted_args.lstrip('(').rstrip(')'), formatted_args)

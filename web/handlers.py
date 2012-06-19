@@ -1,14 +1,16 @@
 """Web frontend for motor-blog: actually show web pages to visitors
 """
+import datetime
 
 import tornado.web
 from tornado import gen
 from tornado.options import options as opts
 import motor
 import cache
+from werkzeug.contrib.atom import AtomFeed
 
 from models import Post, Category
-
+from text.link import absolute
 
 __all__ = (
     # Admin
@@ -17,7 +19,14 @@ __all__ = (
     # Web
     'HomeHandler', 'PostHandler', 'MediaHandler', 'AllPostsHandler',
     'CategoryHandler',
+
+    # Atom
+    'FeedHandler',
 )
+
+
+# E.g. for Last-Modified header
+HTTP_DATE_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 
 # TODO: document this as a means of refactoring
 @cache.cached(key='categories', invalidate_event='categories_changed')
@@ -34,6 +43,10 @@ def get_categories(db, callback):
 
 
 class MotorBlogHandler(tornado.web.RequestHandler):
+    def __init__(self, *args, **kwargs):
+        super(MotorBlogHandler, self).__init__(*args, **kwargs)
+        self.etag = None
+
     def _get_setting(self, setting_name):
         return self.application.settings[setting_name]
 
@@ -47,6 +60,25 @@ class MotorBlogHandler(tornado.web.RequestHandler):
 
     def get_login_url(self):
         return self.reverse_url('login')
+
+    def last_modified(self, posts):
+        if not posts:
+            return None
+
+        mod = max(post.mod for post in posts)
+        create = max(post.date_created for post in posts)
+        if mod and create:
+            return max(mod, create)
+        else:
+            return mod or create
+
+    def etag_from_posts(self, posts):
+        """Set ETag as newest mod-date of list of Posts"""
+        last_modified = self.last_modified(posts)
+        self.etag = str(last_modified)
+
+    def compute_etag(self):
+        return self.etag
 
 
 class HomeHandler(MotorBlogHandler):
@@ -65,6 +97,7 @@ class HomeHandler(MotorBlogHandler):
 
         posts = [Post(**postdoc) for postdoc in postdocs]
         categories = yield motor.Op(get_categories, self.settings['db'])
+        self.etag_from_posts(posts)
         self.render(
             'home.html',
             posts=posts, categories=categories, page_num=int(page_num))
@@ -85,6 +118,7 @@ class AllPostsHandler(MotorBlogHandler):
 
         posts = [Post(**postdoc) for postdoc in postdocs]
         categories = yield motor.Op(get_categories, self.settings['db'])
+        self.etag_from_posts(posts)
         self.render(
             'all-posts.html',
             posts=posts, categories=categories)
@@ -128,6 +162,7 @@ class PostHandler(MotorBlogHandler):
             prev, next = None, None
 
         categories = yield motor.Op(get_categories, self.settings['db'])
+        self.etag_from_posts([post])
         self.render(
             'single.html',
             post=post, prev=prev, next=next, categories=categories)
@@ -149,6 +184,7 @@ class CategoryHandler(MotorBlogHandler):
 
         posts = [Post(**postdoc) for postdoc in postdocs]
         categories = yield motor.Op(get_categories, self.settings['db'])
+        self.etag_from_posts(posts)
         self.render('category.html', posts=posts, categories=categories)
 
 
@@ -164,6 +200,7 @@ class MediaHandler(MotorBlogHandler):
             raise tornado.web.HTTPError(404)
 
         self.set_header('Content-Type', media['type'])
+        self.etag = media['mod'].strftime(HTTP_DATE_FMT)
         self.write(media['content'])
         self.finish()
 
@@ -223,6 +260,7 @@ class DraftsHandler(MotorBlogAdminHandler):
         ).sort([('_id', -1)]).to_list)
 
         drafts = [Post(**draftdoc) for draftdoc in draftdocs]
+        self.etag_from_posts(drafts)
         self.render('admin-templates/drafts.html', drafts=drafts)
 
 
@@ -245,6 +283,75 @@ class DraftHandler(MotorBlogHandler):
         post=Post(**postdoc)
 
         categories = yield motor.Op(get_categories, self.settings['db'])
+        self.etag_from_posts([post])
         self.render(
             'single.html',
             post=post, prev=None, next=None, categories=categories)
+
+
+class FeedHandler(MotorBlogHandler):
+    @tornado.web.asynchronous
+    @gen.engine
+    def get(self, category_slug=None):
+        if not category_slug:
+            category = None
+        else:
+            categories = yield motor.Op(get_categories, self.settings['db'])
+            for categorydoc in categories:
+                if categorydoc['slug'] == category_slug:
+                    break
+            else:
+                raise tornado.web.HTTPError(404)
+
+            category = Category(**categorydoc)
+
+        title = opts.blog_name
+        if category:
+            title = '%s - Posts about %s' % (title, category.name)
+
+        query = {'status': 'publish', 'type': 'post'}
+        if category_slug:
+            query['categories.slug'] = category_slug
+
+        postdocs = yield motor.Op(
+            self.settings['db'].posts.find(
+                query, {'summary': False, 'original': False},
+            ).sort([('_id', -1)])
+            .limit(20)
+            .to_list)
+
+        posts = [Post(**postdoc) for postdoc in postdocs]
+        author = {'name': opts.author_display_name, 'email': opts.author_email}
+
+        feed = AtomFeed(
+            title=title,
+            feed_url=absolute(self.reverse_url('feed')),
+            url=absolute(self.reverse_url('home')),
+            author=author,
+            updated=self.last_modified(posts),
+            # TODO: customizable icon, also a 'logo' kwarg
+            icon=absolute(self.reverse_url('theme-static', '/theme/static/square96.png')),
+            generator=('Motor-Blog', 'https://github.com/ajdavis/motor-blog', '0.1'),
+        )
+
+        for post in posts:
+            url = absolute(self.reverse_url('post', post.slug))
+            feed.add(
+                title=post.title,
+                content=post.body,
+                content_type='html',
+                summary=post.summary,
+                author=author,
+                url=url,
+                id=url,
+                published=post.date_created,
+                updated=post.mod)
+
+        self.etag_from_posts(posts)
+        last_modified = self.last_modified(posts)
+        if last_modified:
+            self.set_header('Last-Modified', last_modified.strftime(HTTP_DATE_FMT))
+        self.set_header('Content-Type', 'application/atom+xml; charset=UTF-8')
+        # TODO: last-modified header
+        self.write(unicode(feed))
+        self.finish()

@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    {# TODO: replace w/ theme_url or something #}
     <meta property="og:image" content="/{{ base_url }}/theme/static/square96.png"/>
     <link rel="shortcut icon" href="/{{ base_url }}/theme/static/favicon.gif" />
     <title>{% block title %}{{ setting('author_display_name') }}{% end %}</title>
     <link rel="stylesheet" type="text/css" media="all" href="/{{ base_url }}/theme/static/style.css" />
     <link rel="pingback" href="{{ reverse_url('api') }}" />
-    <link rel="alternate" type="application/rss+xml" title="{{ setting('blog_name') }} &raquo; Feed" href="{{ reverse_url('feed') }}" />
+    <link rel="alternate" type="application/rss+xml" title="{{ setting('blog_name') }} - Feed" href="http://feeds.feedburner.com/emptysquare" />
 
     <script type="text/javascript">
         var _gaq = _gaq || [];
@@ -51,9 +52,9 @@
                     {% end %}
                 </ul>
             </aside>
-        </div><!-- #secondary .widget-area -->
+        </div>
 
-    </div><!-- #main -->
+    </div>
 
     <footer id="colophon" role="contentinfo">
         <div id="site-generator">
@@ -61,7 +62,7 @@
             <span class="sep"> | </span>
             Design inspired by <a href="http://igstan.ro/">Ionut G. Stan</a>
         </div>
-    </footer><!-- #colophon -->
-</div><!-- #page -->
+    </footer>
+</div>
 </body>
 </html>

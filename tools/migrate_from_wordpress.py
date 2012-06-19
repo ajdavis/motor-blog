@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import logging # TODO: set requests' logging to 'warn' level
 import os
 import pickle
@@ -6,9 +7,11 @@ import time
 import xmlrpclib
 from urlparse import urlparse, urljoin
 
+import motor
 import pymongo
 
 import options
+from cache import create_events_collection
 from indexes import ensure_indexes
 from models import Category, Post
 from text.slugify import slugify
@@ -119,9 +122,12 @@ def main(args):
     print 'Base URL', source_base_url
 
     db = pymongo.Connection(safe=True).motorblog
+    motordb = motor.MotorConnection().open_sync().motorblog
     if args.wipe:
         print 'Wiping motorblog database'
         db.connection.drop_database('motorblog')
+        print 'Creating capped collection "events"'
+        create_events_collection(motordb)
         print 'Recreating indexes'
         ensure_indexes(db)
 
@@ -174,6 +180,10 @@ def main(args):
         print '\nFinished %s %ss' % (len(structs), type)
 
 
+    print 'Posting "categories_changed" event'
+    db.events.insert(
+        {'ts': datetime.datetime.utcnow(), 'name': 'categories_changed'},
+        manipulate=False) # No need to add _id
 
     print '\nFinished in %.2f seconds' % (time.time() - start)
 

@@ -12,7 +12,7 @@ class Categories(object):
     @tornadorpc.async
     @auth
     def wp_getCategories(self, blogid, user, password):
-        # TODO: cache
+        # Could cache this as we do on the web side, but not worth the risk
         wp_categories = []
 
         def got_category(category, error):
@@ -52,7 +52,7 @@ class Categories(object):
             if error:
                 raise error
 
-            cache.event(self.settings['db'], 'categories_changed')
+            cache.event('categories_changed')
             self.result(str(_id))
 
         category = Category.from_wordpress(struct)

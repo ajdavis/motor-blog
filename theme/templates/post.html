@@ -13,8 +13,14 @@
         {% if post.type == 'post' %}
             <div class="entry-meta">
                 <span class="sep">Posted on </span>
-                <a href="{{ reverse_url('post', post.slug) }}" title="{{ post.local_time_of_day }}" rel="bookmark">
-                    <time class="entry-date" datetime="{{ post.local_long_date }}" pubdate>{{ post.local_long_date }}</time>
+                <a href="{{ reverse_url('post', post.slug) }}"
+                   title="{{ post.local_time_of_day(handler.application) }}"
+                   rel="bookmark">
+                    <time class="entry-date"
+                          datetime="{{ post.local_long_date(handler.application) }}"
+                          pubdate>
+                        {{ post.local_long_date(handler.application) }}
+                    </time>
                 </a>
                 <span class="byline">
                     <span class="sep">
@@ -24,22 +30,21 @@
                         {{ setting('author_display_name') }}
                     </span>
                 </span>
-            </div><!-- .entry-meta -->
+            </div>
         {% end %}
-    </header><!-- .entry-header -->
+    </header>
 
     <div class="entry-content">
         {% raw post.body %}
-    </div><!-- .entry-content -->
+    </div>
 
     <footer class="entry-meta">
         {% if post.categories %}
             This entry was posted in
             {% for i, category in enumerate(post.categories) %}
                 <a href="{{ reverse_url('category', category.slug) }}" title="View all posts in {{ category.name }}" rel="category tag">
-                    {{ category.name }}
-                </a>{% if i < len(post.categories) - 1 %},{% end %}
+                    {{ category.name }}</a>{% if i < len(post.categories) - 1 %},{% end %}
             {% end %}
         {% end %}
-    </footer><!-- .entry-meta -->
+    </footer>
 </article>
