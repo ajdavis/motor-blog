@@ -1,7 +1,10 @@
 #!/bin/bash -e
-source ~emptysquare/.virtualenvs/motor_blog/bin/activate
+# Example supervisor start/stop script.
+
+# Assuming you placed a virtualenv here
+
 SUPERVISORD=`which supervisord`
-PIDFILE=$VIRTUAL_ENV/etc/supervisord.pid
+PIDFILE=$VIRTUAL_ENV/motor-blog/etc/supervisord.pid
 OPTS="-c $VIRTUAL_ENV/motor-blog/etc/supervisord.conf"
 . /lib/lsb/init-functions
 export PATH="${PATH:+$PATH:}/usr/local/bin:/usr/sbin:/sbin"
@@ -26,7 +29,7 @@ case "$1" in
         ;;
 
   *)
-        log_success_msg "Usage: /etc/init.d/supervisor
+        log_success_msg "Usage: supervisor
 {start|stop|reload|force-reload|restart}"
         exit 1
 esac

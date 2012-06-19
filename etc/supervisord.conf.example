@@ -1,13 +1,16 @@
+# Example supervisor configuration
+
 [inet_http_server]
 port = 9001
+# For simple HTTP authentication of the admin panel
 username = emptysquare
 password = Password
- 
+
 [supervisord]
-logfile=/var/log/supervisord/supervisord.log
-pidfile=/var/run/supervisord.pid
-user=root
-childlogdir=/var/log/supervisord
+logfile=%(here)s/supervisord.log
+pidfile=%(here)s/supervisord.pid
+user=emptysquare # Replace with your system's user
+childlogdir=%(here)s
 
 [supervisorctl]
 serverurl=http://localhost:9001
@@ -16,13 +19,26 @@ password = Password
 
 [rpcinterface:supervisor]
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
- 
+
 [program:motor_blog]
 numprocs=4
 numprocs_start=8000
 process_name=motor_blog-%(process_num)s
-command=%(here)s/../server.py --port %(process_num)s
-user=emptysquare
+directory=%(here)s/..
+command=%(here)s/../server.py --port=%(process_num)s
 autorestart=unexpected
+startretries=3
 redirect_stderr=true
 stdout_logfile=%(here)s/supervisor-%(process_num)s.log
+
+[program:mongod]
+
+# Replace with path to mongo installation on your system
+command=/home/emptysquare/mongo/bin/mongod --dbpath /home/emptysquare/data --logpath /home/emptysquare --oplogSize 200 --journal
+
+# Replace this too
+directory=/home/emptysquare
+
+autorestart=unexpected
+startretries=3
+redirect_stderr=true

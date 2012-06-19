@@ -127,7 +127,7 @@ def replace_internal_links(body, media_library, db, destination_url, source_base
 def html_to_markdown(body, media_library, db, destination_url, source_base_url):
     # Requires pandoc from http://johnmacfarlane.net/pandoc/
     p = subprocess.Popen(
-        ['/usr/local/bin/pandoc', '--from=html', '--to=markdown'],
+        ['pandoc', '--from=html', '--to=markdown'],
         stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     stdout, stderr = p.communicate(input=body.encode('utf-8'))
     return stdout.decode('utf-8')
