@@ -55,6 +55,10 @@ class Category(BlogDocument):
 
     to_metaweblog = to_wordpress
 
+    @property
+    def last_modified(self):
+        return self.date_created
+
 
 class EmbeddedCategory(Category, EmbeddedDocument):
     pass
@@ -205,3 +209,7 @@ class Post(BlogDocument):
     def local_time_of_day(self, application):
         dc = self.local_date_created(application)
         return '%s:%s %s' % (dc.hour % 12, dc.minute, dc.strftime('%p'))
+
+    @property
+    def last_modified(self):
+        return max(self.date_created, self.mod)
