@@ -57,6 +57,12 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         kwargs.setdefault('setting', self._get_setting)
         super(MotorBlogHandler, self).render(template_name, **kwargs)
 
+    def head(self, *args, **kwargs):
+        # We need to generate the full content for a HEAD request in order
+        # to calculate Content-Length. Tornado knows this is a HEAD and omits
+        # the content.
+        self.get(*args, **kwargs)
+
     def get_current_user(self):
         """Logged-in username or None"""
         return self.get_secure_cookie('auth')
@@ -251,28 +257,40 @@ class CategoryHandler(MotorBlogHandler):
 
 
 class MediaHandler(tornado.web.RequestHandler):
-    """Retrieve media object, like an image"""
+    """Retrieve media object, like an image
+
+       TODO: for now, since Motor doesn't support GridFS, we store the whole
+       object in one document. Get GridFS into Motor and use it here.
+    """
+    def compute_etag(self):
+        # Don't waste time md5summing the output, we'll rely on the
+        # Last-Modified header
+        # TODO: what's the cost?
+        return None
+
     @tornado.web.asynchronous
     @gen.engine
     def get(self, url):
-        # First get metadata so we can calculate Last-Modified
-        media = yield motor.Op(
-            self.settings['db'].media.find_one,
-            {'_id': url},
-            {'mod': True})
-
-        if not media:
-            raise tornado.web.HTTPError(404)
-
-        # TODO: refactor w/ check_last_modified
-        # If-Modified-Since header is only good to the second. Truncate
-        # our own mod-date to match its precision.
-        mod = models.utc_tz.localize(media['mod'].replace(microsecond=0))
-        self.set_header('Last-Modified', mod)
+        include_content = self.request.method != 'HEAD'
 
         # Adapted from StaticFileHandler
         ims_value = self.request.headers.get("If-Modified-Since")
         if ims_value is not None:
+            # First get metadata so we can calculate Last-Modified
+            media = yield motor.Op(
+                self.settings['db'].media.find_one,
+                {'_id': url},
+                {'mod': True})
+
+            if not media:
+                raise tornado.web.HTTPError(404)
+
+            # TODO: refactor w/ check_last_modified
+            # If-Modified-Since header is only good to the second. Truncate
+            # our own mod-date to match its precision.
+            mod = models.utc_tz.localize(media['mod'].replace(microsecond=0))
+            self.set_header('Last-Modified', mod)
+
             date_tuple = email.utils.parsedate(ims_value)
             if_since = models.utc_tz.localize(
                 datetime.datetime.fromtimestamp(time.mktime(date_tuple)))
@@ -283,14 +301,25 @@ class MediaHandler(tornado.web.RequestHandler):
                 self.finish()
                 return
 
-        # Now we need the whole thing
+        # Now we need the whole thing, at least for a GET
+        fields = None if include_content else {'content': False}
         media = yield motor.Op(
             self.settings['db'].media.find_one,
-            {'_id': url})
+            {'_id': url}, fields)
 
+        if not media:
+            raise tornado.web.HTTPError(404)
+
+        self.set_header('Last-Modified', media['mod'])
         self.set_header('Content-Type', media['type'])
-        self.write(media['content'])
+        self.set_header('Content-Length', media['length'])
+        if include_content:
+            self.write(media['content'])
         self.finish()
+
+    def head(self, *args, **kwargs):
+        # get() checks the request method and avoids writing the body for HEAD
+        self.get(*args, **kwargs)
 
 
 class FeedHandler(MotorBlogHandler):

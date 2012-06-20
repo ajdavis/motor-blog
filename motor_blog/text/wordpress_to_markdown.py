@@ -109,6 +109,7 @@ def replace_media_links(body, media_library, db, destination_url, source_base_ur
 
                 db.media.insert({
                     'content': bson.Binary(content),
+                    'length': len(content),
                     'type': content_type,
                     '_id': url,
                     'mod': datetime.datetime.utcnow(),

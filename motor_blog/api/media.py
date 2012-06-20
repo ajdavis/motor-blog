@@ -30,5 +30,5 @@ class Media(object):
 
         self.settings['db'].media.insert({
             'content': bson.Binary(content), 'type': media_type, '_id': mlink,
-            'mod': now,
+            'length': len(content), 'mod': now,
         }, callback=inserted)
