@@ -35,6 +35,8 @@
 
     {% if post.wordpress_id %}
         var disqus_identifier = '{{ post.wordpress_id }} http://emptysquare.net/blog/?p={{ post.wordpress_id }}';
+    {% else %}
+        var disqus_identifier = '{{ post.id }}';
     {% end %}
 
     (function() {
