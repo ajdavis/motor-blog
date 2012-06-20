@@ -152,6 +152,9 @@ def xmlcharrefreplace(html):
 
 
 def markup(text):
+    if not text:
+        return ''
+
     # cMarkdown seems to enjoy utf-8 rather than unicode
     html = markdown(text.encode('utf-8')).decode('utf-8')
     html = pygmentize(html)

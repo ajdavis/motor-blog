@@ -44,6 +44,7 @@ def get_categories(db, callback):
 
     callback(category_docs, None)
 
+
 class MotorBlogHandler(tornado.web.RequestHandler):
     def __init__(self, *args, **kwargs):
         super(MotorBlogHandler, self).__init__(*args, **kwargs)
@@ -140,11 +141,11 @@ class HomeHandler(MotorBlogHandler):
 class AllPostsHandler(MotorBlogHandler):
     def get_posts(self, callback):
         (self.settings['db'].posts.find(
-                {'status': 'publish', 'type': 'post'},
-                {'display': False, 'original': False},
+            {'status': 'publish', 'type': 'post'},
+            {'display': False, 'original': False},
         )
-         .sort([('_id', -1)])
-         .to_list(callback))
+        .sort([('_id', -1)])
+        .to_list(callback))
 
     @tornado.web.addslash
     @check_last_modified
@@ -191,20 +192,24 @@ class PostHandler(MotorBlogHandler):
         slug = slug.rstrip('/')
         posts = self.settings['db'].posts
         postdoc = yield motor.Op(posts.find_one,
-            {'slug': slug, 'status': 'publish', 'type': 'post'},
+            {'slug': slug, 'status': 'publish'},
             {'summary': False, 'original': False})
 
         if not postdoc:
             raise tornado.web.HTTPError(404)
 
-        fields = {'summary': False, 'body': False, 'original': False}
-        prevdoc = yield motor.Op(posts.find({
-            'status': 'publish', 'type': 'post', '_id': {'$lt': postdoc['_id']}
-        }, fields).sort([('_id', -1)]).limit(-1).next)
+        # Only posts have prev / next navigation, not pages
+        if postdoc['type'] == 'post':
+            fields = {'summary': False, 'body': False, 'original': False}
+            prevdoc = yield motor.Op(posts.find({
+                'status': 'publish', 'type': 'post', '_id': {'$lt': postdoc['_id']}
+            }, fields).sort([('_id', -1)]).limit(-1).next)
 
-        nextdoc = yield motor.Op(posts.find({
-            'status': 'publish', 'type': 'post', '_id': {'$gt': postdoc['_id']}
-        }, fields).sort([('_id', 1)]).limit(-1).next)
+            nextdoc = yield motor.Op(posts.find({
+                'status': 'publish', 'type': 'post', '_id': {'$gt': postdoc['_id']}
+            }, fields).sort([('_id', 1)]).limit(-1).next)
+        else:
+            prevdoc, nextdoc = None, None
 
         # Done
         callback([prevdoc, postdoc, nextdoc], None)
@@ -226,6 +231,8 @@ class CategoryHandler(MotorBlogHandler):
             'status': 'publish',
             'type': 'post',
             'categories.slug': slug,
+        }, {
+            'summary': False, 'original': False
         }).sort([('_id', -1)]).limit(10).to_list(callback)
 
     @tornado.web.addslash

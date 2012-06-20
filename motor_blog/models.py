@@ -71,6 +71,8 @@ class Post(BlogDocument):
     body = StringField(default='')
     # Input from MarsEdit or migrate_from_wordpress
     original = StringField(default='')
+    # Plain-text excerpt
+    summary = StringField(default='')
     author = StringField(default='')
     type = StringField(choices=('post', 'page'), default='post')
     status = StringField(choices=('publish', 'draft'), default='publish')
@@ -112,10 +114,13 @@ class Post(BlogDocument):
         else:
             mod = datetime.datetime.utcnow()
 
+        body = markup.markup(description)
+
         rv = cls(
             title=title,
             # Format for display
-            body=markup.markup(description),
+            body=body,
+            summary=summarize.summarize(body, 200),
             original=description,
             tags=tags,
             slug=slug,
@@ -179,19 +184,6 @@ class Post(BlogDocument):
         if 'id' in dct:
             dct['_id'] = dct.pop('id')
         return dct
-
-    @property
-    def summary(self):
-        # TODO: consider caching; depends whether this is frequently used
-        try:
-            summary, was_truncated = summarize.summarize(self.body, 200)
-            if was_truncated:
-                return summary + ' [ ... ]'
-            else:
-                return summary
-        except Exception, e:
-            logging.exception('truncating HTML for "%s"' % self.slug)
-            return '[ ... ]'
 
     def local_date_created(self, application):
         dc = self.date_created

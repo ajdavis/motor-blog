@@ -48,4 +48,10 @@ def summarize(html, n):
     """
     parser = HTMLSummary(n)
     parser.feed(html)
-    return parser.close(), parser.done
+    summary = parser.close()
+    if parser.done:
+        # Text was truncated
+        return summary + ' [ ... ]'
+    else:
+        return summary
+
