@@ -1,5 +1,6 @@
 import datetime
 import os
+import xmlrpclib
 
 import bson
 import tornadorpc
@@ -23,10 +24,10 @@ class Media(object):
 
         def inserted(_id, error):
             if error:
-                raise error
-
-            full_link = absolute(os.path.join(opts.base_url, 'media', mlink))
-            self.result({'file': name, 'url': full_link, 'type': media_type})
+                self.result(xmlrpclib.Fault(500, str(error)))
+            else:
+                full_link = absolute(os.path.join(opts.base_url, 'media', mlink))
+                self.result({'file': name, 'url': full_link, 'type': media_type})
 
         self.settings['db'].media.insert({
             'content': bson.Binary(content), 'type': media_type, '_id': mlink,

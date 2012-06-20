@@ -17,7 +17,7 @@ class Categories(object):
 
         def got_category(category, error):
             if error:
-                raise error
+                self.result(xmlrpclib.Fault(500, str(error)))
             elif category:
                 wp_categories.append(
                     Category(**category).to_wordpress(self.application))
@@ -33,7 +33,7 @@ class Categories(object):
     def mt_getPostCategories(self, postid, user, password):
         def got_post(post, error):
             if error:
-                raise error
+                self.result(xmlrpclib.Fault(500, str(error)))
             if not post:
                 self.result(xmlrpclib.Fault(404, "Not found"))
             else:
@@ -50,10 +50,10 @@ class Categories(object):
     def wp_newCategory(self, blogid, user, password, struct):
         def inserted_category(_id, error):
             if error:
-                raise error
-
-            cache.event('categories_changed')
-            self.result(str(_id))
+                self.result(xmlrpclib.Fault(500, str(error)))
+            else:
+                cache.event('categories_changed')
+                self.result(str(_id))
 
         category = Category.from_wordpress(struct)
         self.settings['db'].categories.insert(
@@ -68,9 +68,11 @@ class Categories(object):
 
         def set_post_categories(result, error):
             if error:
-                raise error
-
-            self.result(result['n'] == 1)
+                self.result(xmlrpclib.Fault(500, str(error)))
+            elif result['n'] != 1:
+                self.result(xmlrpclib.Fault(404, 'Not found'))
+            else:
+                self.result()
 
         self.settings['db'].posts.update(
             {'_id': ObjectId(postid)},

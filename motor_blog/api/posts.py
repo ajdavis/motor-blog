@@ -1,8 +1,10 @@
 """XML-RPC API for posts and pages
 """
+
 import xmlrpclib
 
 from bson.objectid import ObjectId
+import datetime
 import tornadorpc
 
 from motor_blog.api import auth
@@ -13,12 +15,12 @@ class Posts(object):
     def _recent(self, user, password, num_posts, type):
         def got_recent_posts(posts, error):
             if error:
-                raise error
-
-            self.result([
-                Post(**post).to_metaweblog(self.application)
-                for post in posts
-            ])
+                self.result(xmlrpclib.Fault(500, str(error)))
+            else:
+                self.result([
+                    Post(**post).to_metaweblog(self.application)
+                    for post in posts
+                ])
 
         cursor = self.settings['db'].posts.find({'type': type})
         cursor.sort([('_id', -1)]).limit(num_posts) # _id starts with timestamp
@@ -37,9 +39,9 @@ class Posts(object):
     def _new_post(self, user, password, struct, publish, type):
         def new_post_inserted(_id, error):
             if error:
-                raise error
-
-            self.result(str(_id))
+                self.result(xmlrpclib.Fault(500, str(error)))
+            else:
+                self.result(str(_id))
 
         new_post = Post.from_metaweblog(struct, type, publish=publish)
         self.settings['db'].posts.insert(
@@ -56,20 +58,6 @@ class Posts(object):
     def wp_newPage(self, blogid, user, password, struct, publish):
         self._new_post(user, password, struct, publish, 'page')
 
-    def _edit_post(self, postid, user, password, struct, publish, type):
-        # TODO: if link changes, add redirect from old
-        def edited_post(result, error):
-            if result['n'] != 1:
-                self.result(xmlrpclib.Fault(404, "Not found"))
-            else:
-                self.result(True)
-
-        new_post = Post.from_metaweblog(struct, type, publish=publish, is_edit=True)
-        self.settings['db'].posts.update(
-            {'_id': ObjectId(postid)},
-            {'$set': new_post.to_python()}, # set fields to new values
-            callback=edited_post)
-
     @tornadorpc.async
     @auth
     def metaWeblog_editPost(self, postid, user, password, struct, publish):
@@ -80,13 +68,64 @@ class Posts(object):
     def wp_editPage(self, blogid, postid, user, password, struct, publish):
         self._edit_post(postid, user, password, struct, publish, 'page')
 
+    def _edit_post(self, postid, user, password, struct, publish, type):
+        self.new_post = Post.from_metaweblog(
+            struct, type, publish=publish, is_edit=True)
+
+        self.settings['db'].posts.find_one({'_id': ObjectId(postid)},
+            callback=self._got_old_post)
+
+    def _got_old_post(self, result, error):
+        if error:
+            self.result(xmlrpclib.Fault(500, str(error)))
+        elif not result:
+            self.result(xmlrpclib.Fault(404, "Not found"))
+        else:
+            self.old_post = Post(**result)
+
+            self.settings['db'].posts.update(
+                {'_id': result['_id']},
+                {'$set': self.new_post.to_python()}, # set fields to new values
+                callback=self._edited_post)
+
+    def _edited_post(self, result, error):
+        if error:
+            self.result(xmlrpclib.Fault(500, str(error)))
+        elif result['n'] != 1:
+            self.result(xmlrpclib.Fault(404, "Not found"))
+        else:
+            # If link changes, add redirect from old
+            if (self.old_post.slug != self.new_post.slug
+                and self.old_post['status'] == 'publish'
+            ):
+                redirect_post = Post(
+                    redirect=self.new_post.slug,
+                    slug=self.old_post.slug,
+                    status='publish',
+                    type='redirect',
+                    mod=datetime.datetime.utcnow())
+
+                self.settings['db'].posts.insert(
+                    redirect_post.to_python(), callback=self._redirected)
+            else:
+                # Done
+                self.result(True)
+
+    def _redirected(self, result, error):
+        # Unfortunately, it's hard to roll back the edit in response to an
+        # error creating the redirect
+        if error:
+            self.result(xmlrpclib.Fault(500, str(error)))
+        else:
+            self.result(True)
+
     @tornadorpc.async
     @auth
     def metaWeblog_getPost(self, postid, user, password):
         def got_post(postdoc, error):
             if error:
-                raise error
-            if not postdoc:
+                self.result(xmlrpclib.Fault(500, str(error)))
+            elif not postdoc:
                 self.result(xmlrpclib.Fault(404, "Not found"))
             else:
                 post = Post(**postdoc)

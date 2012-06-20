@@ -2,8 +2,8 @@ import re
 from unicodedata import normalize
 
 
-# From http://flask.pocoo.org/snippets/5/, but don't replace dots and do
-# replace colons.
+# From http://flask.pocoo.org/snippets/5/, updated to mostly duplicate
+# Wordpress's slugs.
 _punct_re = re.compile(r'[\t !#$%&\()*\-/<=>?@\[\\\]^_`{|},:.+]+')
 
 def slugify(text, delim=u'-'):

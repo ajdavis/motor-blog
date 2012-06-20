@@ -75,12 +75,15 @@ class Post(BlogDocument):
     summary = StringField(default='')
     author = StringField(default='')
     type = StringField(choices=('post', 'page'), default='post')
-    status = StringField(choices=('publish', 'draft'), default='publish')
+    status = StringField(
+        choices=('publish', 'draft', 'redirect'), default='publish')
     tags = SortedListField(StringField())
     categories = SortedListField(EmbeddedDocumentField(EmbeddedCategory))
     slug = StringField(default='')
     wordpress_id = IntField() # legacy id from WordPress
     mod = DateTimeField()
+    # Post was moved, this is its new slug
+    redirect = StringField(default=None)
 
     def __init__(self, *args, **kwargs):
         super(Post, self).__init__(*args, **kwargs)
@@ -88,12 +91,15 @@ class Post(BlogDocument):
             self.mod = utc_tz.localize(self.mod)
 
     @classmethod
-    def from_metaweblog(cls, struct, post_type='post', publish=True, is_edit=False):
+    def from_metaweblog(
+        cls, struct, post_type='post', publish=True, is_edit=False
+    ):
         """Receive metaWeblog RPC struct and initialize a Post.
            Used both by migrate_from_wordpress and when receiving a new or
            edited post from MarsEdit.
         """
         title = struct.get('title', '')
+
         # We expect MarsEdit to set categories with mt_setPostCategories()
         assert 'categories' not in struct
 

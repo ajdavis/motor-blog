@@ -16,7 +16,6 @@ from motor_blog.models import Post, Category
 from motor_blog import cache, models
 from motor_blog.text.link import absolute
 
-# TODO: support HEAD
 
 __all__ = (
     # Web
@@ -27,8 +26,8 @@ __all__ = (
     'FeedHandler',
 )
 
+# TODO: cache-control headers
 
-# TODO: document this as a means of refactoring
 @cache.cached(key='categories', invalidate_event='categories_changed')
 @gen.engine
 def get_categories(db, callback):
@@ -97,12 +96,12 @@ def check_last_modified(get):
             Post(**doc) if doc else None
             for doc in postdocs]
 
-        mod = max(
-            thing.last_modified
-            for things in (posts, categories)
-            for thing in things if thing)
+        if posts or categories:
+            mod = max(
+                thing.last_modified
+                for things in (posts, categories)
+                for thing in things if thing)
 
-        if mod:
             # If-Modified-Since header is only good to the second. Truncate
             # our own mod-date to match its precision.
             mod = mod.replace(microsecond=0)
@@ -204,8 +203,15 @@ class PostHandler(MotorBlogHandler):
         if not postdoc:
             raise tornado.web.HTTPError(404)
 
+        if postdoc['type'] == 'redirect':
+            # This redirect marks where a real post or page used to be.
+            # Send the client there. Note we don't run the callback; we're
+            # done.
+            url = self.reverse_url('post', postdoc['redirect'])
+            self.redirect(url, permanent=True)
+
         # Only posts have prev / next navigation, not pages
-        if postdoc['type'] == 'post':
+        elif postdoc['type'] == 'post':
             fields = {'summary': False, 'body': False, 'original': False}
             prevdoc = yield motor.Op(posts.find({
                 'status': 'publish', 'type': 'post', '_id': {'$lt': postdoc['_id']}

@@ -1,3 +1,5 @@
+import xmlrpclib
+
 import tornadorpc
 from motor_blog.api import auth
 
@@ -11,7 +13,7 @@ class Tags(object):
         # Mongo 2.1 could use aggregate()
         def got_post(post, error):
             if error:
-                raise error
+                self.result(xmlrpclib.Fault(500, str(error)))
             elif post:
                 self.wp_tags = self.wp_tags.union(set(post.get('tags', [])))
             else:
