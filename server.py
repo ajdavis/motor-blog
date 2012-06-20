@@ -85,6 +85,7 @@ if __name__ == "__main__":
         # Web
         U(r"media/(?P<url>.+)", MediaHandler, name='media'),
         U(r"theme/static/(.+)", StaticFileHandler, {"path": static_path}, name='theme-static'),
+        U(r"category/(?P<slug>.+)/page/(?P<page_num>\d+)/?", CategoryHandler, name='category-page'),
         U(r"category/(?P<slug>.+)/?", CategoryHandler, name='category'),
         U(r"page/(?P<page_num>\d+)/?", HomeHandler, name='page'),
         U(r"all-posts/?", AllPostsHandler, name='all-posts'),

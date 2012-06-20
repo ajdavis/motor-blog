@@ -6,6 +6,25 @@
 <h1 class="page-title">Category: {{ this_category.name }}</h1>
 {% set title_link = True %}
 {% for post in posts %}
-        {% include "post.html" %}
+    {% include "post.html" %}
+{% end %}
+<nav id="nav-below">
+    <div class="nav-previous">
+        <a href="{{ reverse_url('category-page', this_category.slug, page_num + 1) }}">
+            <span class="meta-nav">&larr;</span> Older posts
+        </a>
+    </div>
+    {% if page_num > 0 %}
+        <div class="nav-next">
+            {% if page_num > 1 %}
+                {% set next_url = reverse_url('category-page', this_category.slug, page_num - 1) %}
+            {% else %}
+                {% set next_url = reverse_url('category', this_category.slug) %}
+            {% end %}
+            <a href="{{ next_url }}">
+                Newer posts <span class="meta-nav">&rarr;</span>
+            </a>
+        </div>
     {% end %}
+</nav>
 {% end %}

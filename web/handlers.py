@@ -232,6 +232,7 @@ class PostHandler(MotorBlogHandler):
 class CategoryHandler(MotorBlogHandler):
     """Page of posts for a category"""
     def get_posts(self, callback, slug, page_num=0):
+        page_num = int(page_num)
         slug = slug.rstrip('/')
         self.settings['db'].posts.find({
             'status': 'publish',
@@ -239,11 +240,12 @@ class CategoryHandler(MotorBlogHandler):
             'categories.slug': slug,
         }, {
             'summary': False, 'original': False
-        }).sort([('_id', -1)]).limit(10).to_list(callback)
+        }).sort([('_id', -1)]).skip(page_num * 10).limit(10).to_list(callback)
 
     @tornado.web.addslash
     @check_last_modified
     def get(self, slug, page_num=0):
+        page_num = int(page_num)
         slug = slug.rstrip('/')
         for this_category in self.categories:
             if this_category.slug == slug:
@@ -253,7 +255,7 @@ class CategoryHandler(MotorBlogHandler):
 
         self.render('category.html',
             posts=self.posts, categories=self.categories,
-            this_category=this_category)
+            this_category=this_category, page_num=page_num)
 
 
 class MediaHandler(tornado.web.RequestHandler):
