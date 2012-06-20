@@ -130,9 +130,8 @@ class Post(Document):
         # MarsEdit expects different names in the responses to different API
         # calls.
 
-        # self.type is 'post' or 'page', happens to correspond to handler names
         if self.status == 'publish':
-            url = absolute(application.reverse_url(self.type, self.slug))
+            url = absolute(application.reverse_url('post', self.slug))
         else:
             url = absolute(application.reverse_url('draft', self.slug))
 

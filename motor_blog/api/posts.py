@@ -95,9 +95,7 @@ class Posts(object):
         self.settings['db'].posts.find_one(
             {'_id': ObjectId(postid)}, callback=got_post)
 
-    @tornadorpc.async
-    @auth
-    def blogger_deletePost(self, appkey, postid, user, password, publish):
+    def _delete_post(self, user, password, postid):
         def post_deleted(result, error):
             if result['n'] != 1:
                 self.result(xmlrpclib.Fault(404, "Not found"))
@@ -107,3 +105,13 @@ class Posts(object):
         # TODO: a notion of 'trashed', not removed
         self.settings['db'].posts.remove(
             {'_id': ObjectId(postid)}, callback=post_deleted)
+
+    @tornadorpc.async
+    @auth
+    def blogger_deletePost(self, appkey, postid, user, password, publish):
+        self._delete_post(user, password, postid)
+
+    @tornadorpc.async
+    @auth
+    def wp_deletePage(self, blogid, user, password, postid):
+        self._delete_post(user, password, postid)
