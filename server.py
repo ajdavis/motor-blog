@@ -12,6 +12,7 @@ from motor_blog import indexes, cache, options
 
 from motor_blog.api.handlers import APIHandler, RSDHandler
 from web.handlers import *
+from web.admin import *
 
 # TODO: RPC over HTTPS
 # TODO: a static-url function to set long cache TTL on media URLs

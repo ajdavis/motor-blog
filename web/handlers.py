@@ -1,5 +1,6 @@
 """Web frontend for motor-blog: actually show web pages to visitors
 """
+import functools
 
 import tornado.web
 from tornado import gen
@@ -11,10 +12,9 @@ from motor_blog.models import Post, Category
 from motor_blog import cache
 from motor_blog.text.link import absolute
 
-__all__ = (
-    # Admin
-    'LoginHandler', 'LogoutHandler', 'DraftsHandler', 'DraftHandler',
+# TODO: support HEAD
 
+__all__ = (
     # Web
     'HomeHandler', 'PostHandler', 'MediaHandler', 'AllPostsHandler',
     'CategoryHandler',
@@ -33,17 +33,15 @@ HTTP_DATE_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 def get_categories(db, callback):
     # This odd control flow ensures we don't confuse exceptions thrown
     # by find() with exceptions thrown by the callback
-    categories = None
+    category_docs = None
     try:
         category_docs = yield motor.Op(
             db.categories.find().sort('name').to_list)
-
-        categories = [Category(**doc) for doc in category_docs]
     except Exception, e:
         callback(None, e)
         return
 
-    callback(categories, None)
+    callback(category_docs, None)
 
 class MotorBlogHandler(tornado.web.RequestHandler):
     def __init__(self, *args, **kwargs):
@@ -64,85 +62,146 @@ class MotorBlogHandler(tornado.web.RequestHandler):
     def get_login_url(self):
         return self.reverse_url('login')
 
-    def last_modified(self, posts):
-        if not posts:
-            return None
+    def get_categories(self, callback):
+        get_categories(self.settings['db'], callback=callback)
 
-        mod = max(post.mod for post in posts)
-        create = max(post.date_created for post in posts)
-        if mod and create:
-            return max(mod, create)
-        else:
-            return mod or create
-
-    def etag_from_posts(self, posts):
-        """Set ETag as newest mod-date of list of Posts"""
-        last_modified = self.last_modified(posts)
-        self.etag = str(last_modified)
+    def get_posts(self, *args, **kwargs):
+        raise NotImplementedError()
 
     def compute_etag(self):
+        # Set by check_etag decorator
         return self.etag
 
 
-class HomeHandler(MotorBlogHandler):
+# TODO: ample documentation
+def check_etag(get):
+    @functools.wraps(get)
     @tornado.web.asynchronous
     @gen.engine
-    @tornado.web.addslash
-    def get(self, page_num=0):
-        postdocs = yield motor.Op(
-            self.settings['db'].posts.find(
+    def _get(self, *args, **kwargs):
+        categorydocs = yield motor.Op(self.get_categories)
+        self.categories = categories = [Category(**doc) for doc in categorydocs]
+
+        postdocs = yield motor.Op(self.get_posts, *args, **kwargs)
+        self.posts = posts = [Post(**doc) for doc in postdocs]
+
+        mod = max(
+            max(
+                thing.date_created
+                for things in (posts, categories)
+                for thing in things
+            ),
+            max(post.mod for post in posts)
+        )
+
+        if not mod:
+            # No posts or categories
+            # TODO: if get() is not a generator?
+            for i in get(self, *args, **kwargs):
+                yield i
+        else:
+            last_modified = mod.strftime(HTTP_DATE_FMT)
+            etag = str(last_modified)
+            self.set_header('Last-Modified', last_modified)
+            self.etag = etag
+
+            inm = self.request.headers.get("If-None-Match")
+            if inm and inm.find(etag) != -1:
+                # No change since client's last request. Tornado will take care
+                # of the rest.
+                self.finish()
+
+            else:
+                # TODO: if get() is not a generator?
+                for i in get(self, *args, **kwargs):
+                    yield i
+
+    return _get
+
+
+class HomeHandler(MotorBlogHandler):
+    def get_posts(self, callback, page_num=0):
+        (self.settings['db'].posts.find(
                 {'status': 'publish', 'type': 'post'},
                 {'summary': False, 'original': False},
-            ).sort([('_id', -1)])
-            .skip(int(page_num) * 10)
-            .limit(10)
-            .to_list)
+        ).sort([('_id', -1)])
+        .skip(int(page_num) * 10)
+        .limit(10)
+        .to_list(callback))
 
-        posts = [Post(**postdoc) for postdoc in postdocs]
-        categories = yield motor.Op(get_categories, self.settings['db'])
-        self.etag_from_posts(posts)
-        self.render(
-            'home.html',
-            posts=posts, categories=categories, page_num=int(page_num))
+    @tornado.web.addslash
+    @check_etag
+    def get(self, page_num=0):
+        self.render('home.html',
+            posts=self.posts, categories=self.categories,
+            page_num=int(page_num))
 
 
 class AllPostsHandler(MotorBlogHandler):
-    @tornado.web.asynchronous
-    @gen.engine
-    @tornado.web.addslash
-    def get(self):
-        postdocs = yield motor.Op(
-            self.settings['db'].posts.find(
+    def get_posts(self, callback):
+        (self.settings['db'].posts.find(
                 {'status': 'publish', 'type': 'post'},
                 {'display': False, 'original': False},
-            )
-            .sort([('_id', -1)])
-            .to_list)
+        )
+         .sort([('_id', -1)])
+         .to_list(callback))
 
-        posts = [Post(**postdoc) for postdoc in postdocs]
-        categories = yield motor.Op(get_categories, self.settings['db'])
-        self.etag_from_posts(posts)
-        self.render(
-            'all-posts.html',
-            posts=posts, categories=categories)
+    @tornado.web.addslash
+    @check_etag
+    def get(self):
+        self.render('all-posts.html',
+            posts=self.posts, categories=self.categories)
+
+#class AllPostsHandler(MotorBlogHandler):
+#    @tornado.web.asynchronous
+#    @gen.engine
+#    @tornado.web.addslash
+#    def get(self):
+#        postdocs = yield motor.Op(
+#            self.settings['db'].posts.find(
+#                {'status': 'publish', 'type': 'post'},
+#                {'display': False, 'original': False},
+#            )
+#            .sort([('_id', -1)])
+#            .to_list)
+#
+#        posts = [Post(**postdoc) for postdoc in postdocs]
+#        categories = yield motor.Op(get_categories, self.settings['db'])
+#        categories = [Category(**doc) for doc in categories]
+#
+#        mod = max(
+#            max(
+#                thing.date_created
+#                    for things in (posts, categories)
+#                    for thing in things
+#            ),
+#            max(post.mod for post in posts)
+#        )
+#
+#        self.etag = str(mod)
+#        self.render(
+#            'all-posts.html',
+#            posts=posts, categories=categories)
 
 
 class PostHandler(MotorBlogHandler):
     """Show a single blog post or page"""
-    @tornado.web.asynchronous
-    @gen.engine
-    @tornado.web.addslash
-    def get(self, slug):
+    def get_posts(self, slug, callback):
+        # TODO: for strict accuracy, the next / prev posts factor in to Etag
+        # calculation
         slug = slug.rstrip('/')
-        postdoc = yield motor.Op(
-            self.settings['db'].posts.find_one,
-                {'slug': slug, 'status': 'publish'},
-                {'summary': False, 'original': False})
+        self.settings['db'].posts.find(
+            {'slug': slug, 'status': 'publish'},
+            {'summary': False, 'original': False}
+        ).limit(-1).to_list(callback)
 
-        if not postdoc:
+    @tornado.web.addslash
+    @check_etag
+    def get(self, slug):
+        if not self.posts:
             raise tornado.web.HTTPError(404)
 
-        post=Post(**postdoc)
+        post = self.posts[0]
 
         # Posts have previous / next navigation, but pages don't
         if post.type == 'post':
@@ -164,45 +223,42 @@ class PostHandler(MotorBlogHandler):
         else:
             prev, next = None, None
 
-        categories = yield motor.Op(get_categories, self.settings['db'])
-        self.etag_from_posts([post])
         self.render(
             'single.html',
-            post=post, prev=prev, next=next, categories=categories)
+            post=post, prev=prev, next=next, categories=self.categories)
 
 
 class CategoryHandler(MotorBlogHandler):
     """Page of posts for a category"""
-    @tornado.web.asynchronous
-    @gen.engine
+    def get_posts(self, callback, slug, page_num=0):
+        slug = slug.rstrip('/')
+        self.settings['db'].posts.find({
+            'status': 'publish',
+            'type': 'post',
+            'categories.slug': slug,
+        }).sort([('_id', -1)]).limit(10).to_list(callback)
+
     @tornado.web.addslash
+    @check_etag
     def get(self, slug, page_num=0):
         slug = slug.rstrip('/')
-        postdocs = yield motor.Op(
-            self.settings['db'].posts.find({
-                'status': 'publish',
-                'type': 'post',
-                'categories.slug': slug,
-            }).sort([('_id', -1)]).limit(10).to_list)
-
-        posts = [Post(**postdoc) for postdoc in postdocs]
-        categories = yield motor.Op(get_categories, self.settings['db'])
-        for this_category in categories:
+        for this_category in self.categories:
             if this_category.slug == slug:
                 break
         else:
-            raise HTTPError(404)
+            raise tornado.web.HTTPError(404)
 
-        self.etag_from_posts(posts)
         self.render('category.html',
-            posts=posts, categories=categories, this_category=this_category)
+            posts=self.posts, categories=self.categories,
+            this_category=this_category)
 
 
-class MediaHandler(MotorBlogHandler):
+class MediaHandler(tornado.web.RequestHandler):
     """Retrieve media object, like an image"""
     @tornado.web.asynchronous
     @gen.engine
     def get(self, url):
+        # TODO: great Etag and Last-Modified handling
         media = yield motor.Op(
             self.settings['db'].media.find_one, {'_id': url})
 
@@ -215,141 +271,65 @@ class MediaHandler(MotorBlogHandler):
         self.finish()
 
 
-class MotorBlogAdminHandler(MotorBlogHandler):
-    def get_template_path(self):
-        """Override theme template path
-        """
-        return None
-
-
-class LoginHandler(MotorBlogAdminHandler):
-    """Log in so you can see your unpublished drafts, and in the future possibly
-       other administrative functions
-    """
-    @tornado.web.addslash
-    def get(self):
-        if self.current_user:
-            self.redirect(self.reverse_url('drafts'))
-        else:
-            next_url = self.get_argument('next', None)
-            self.render('admin-templates/login.html',
-                error=None, next_url=next_url)
-
-    def post(self):
-        user = self.get_argument('user')
-        password = self.get_argument('password')
-        next_url = self.get_argument('next', None)
-        if user == opts.user and password == opts.password:
-            self.set_secure_cookie('auth', user)
-            self.redirect(next_url or self.reverse_url('drafts'))
-        else:
-            error = 'Incorrect username or password, check motor_blog.conf'
-            self.render('admin-templates/login.html',
-                error=error, next_url=next_url)
-
-
-class LogoutHandler(MotorBlogAdminHandler):
-    def post(self):
-        self.clear_all_cookies()
-        self.redirect(self.reverse_url('login'))
-
-
-class DraftsHandler(MotorBlogAdminHandler):
-    """When logged in, see list of drafts of posts
-    """
-    @tornado.web.asynchronous
-    @gen.engine
-    @tornado.web.addslash
-    @tornado.web.authenticated
-    def get(self):
-        # TODO: pagination
-        db = self.settings['db']
-        draftdocs = yield motor.Op(db.posts.find(
-            {'status': 'draft', 'type': 'post'},
-            {'original': False, 'body': False},
-        ).sort([('_id', -1)]).to_list)
-
-        drafts = [Post(**draftdoc) for draftdoc in draftdocs]
-        self.etag_from_posts(drafts)
-        self.render('admin-templates/drafts.html', drafts=drafts)
-
-
-class DraftHandler(MotorBlogHandler):
-    """Show a single draft post or page"""
-    @tornado.web.asynchronous
-    @gen.engine
-    @tornado.web.addslash
-    @tornado.web.authenticated
-    def get(self, slug):
-        slug = slug.rstrip('/')
-        postdoc = yield motor.Op(
-            self.settings['db'].posts.find_one,
-                {'slug': slug},
-                {'summary': False, 'original': False})
-
-        if not postdoc:
-            raise tornado.web.HTTPError(404)
-
-        post=Post(**postdoc)
-
-        categories = yield motor.Op(get_categories, self.settings['db'])
-        self.etag_from_posts([post])
-        self.render(
-            'single.html',
-            post=post, prev=None, next=None, categories=categories)
-
-
 class FeedHandler(MotorBlogHandler):
-    @tornado.web.asynchronous
-    @gen.engine
+    def get_posts(self, callback, slug=None):
+        query = {'status': 'publish', 'type': 'post'}
+
+        if slug:
+            slug = slug.rstrip('/')
+            query['categories.slug'] = slug
+
+        (self.settings['db'].posts.find(
+            query,
+            {'summary': False, 'original': False},
+        ).sort([('_id', -1)])
+        .limit(20)
+        .to_list(callback))
+
+    @check_etag
     def get(self, slug=None):
+        if slug:
+            slug = slug.rstrip('/')
+
         if not slug:
-            category = None
+            this_category = None
         else:
             # Get all the categories and search for one with the right slug,
             # instead of actually querying for the right category, since
             # get_categories() is cached.
-            categories = yield motor.Op(get_categories, self.settings['db'])
-            for category in categories:
-                if category.slug == slug:
+            slug = slug.rstrip('/')
+            for this_category in self.categories:
+                if this_category.slug == slug:
                     break
             else:
                 raise tornado.web.HTTPError(404)
 
         title = opts.blog_name
-        if category:
+
+        if this_category:
             title = '%s - Posts about %s' % (title, category.name)
 
-        query = {'status': 'publish', 'type': 'post'}
-        if slug:
-            query['categories.slug'] = slug
-
-        postdocs = yield motor.Op(
-            self.settings['db'].posts.find(
-                query, {'summary': False, 'original': False},
-            ).sort([('_id', -1)])
-            .limit(20)
-            .to_list)
-
-        posts = [Post(**postdoc) for postdoc in postdocs]
         author = {'name': opts.author_display_name, 'email': opts.author_email}
-        if category:
-            feed_url = absolute(self.reverse_url('category-feed', category.slug))
+        if this_category:
+            feed_url = absolute(
+                self.reverse_url('category-feed', this_category.slug))
         else:
             feed_url = absolute(self.reverse_url('feed'))
+
+        updated = max(max(p.mod, p.date_created) for p in self.posts)
 
         feed = AtomFeed(
             title=title,
             feed_url=feed_url,
             url=absolute(self.reverse_url('home')),
             author=author,
-            updated=self.last_modified(posts),
+            updated=updated,
             # TODO: customizable icon, also a 'logo' kwarg
             icon=absolute(self.reverse_url('theme-static', '/theme/static/square96.png')),
             generator=('Motor-Blog', 'https://github.com/ajdavis/motor-blog', '0.1'),
         )
 
-        for post in posts:
+        for post in self.posts:
             url = absolute(self.reverse_url('post', post.slug))
             feed.add(
                 title=post.title,
@@ -362,11 +342,6 @@ class FeedHandler(MotorBlogHandler):
                 published=post.date_created,
                 updated=post.mod)
 
-        self.etag_from_posts(posts)
-        last_modified = self.last_modified(posts)
-        if last_modified:
-            self.set_header('Last-Modified', last_modified.strftime(HTTP_DATE_FMT))
         self.set_header('Content-Type', 'application/atom+xml; charset=UTF-8')
-        # TODO: last-modified header
         self.write(unicode(feed))
         self.finish()

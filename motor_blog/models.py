@@ -15,11 +15,19 @@ from motor_blog.text import markup, summarize, slugify
 utc_tz = pytz.timezone('UTC')
 
 
-class Category(Document):
-    name = StringField()
-    slug = StringField()
+class BlogDocument(Document):
+    @property
+    def date_created(self):
+        """datetime when this post was created, timezone-aware in UTC"""
+        return self.id.generation_time
+
     class Meta:
         id_field = ObjectIdField
+
+
+class Category(BlogDocument):
+    name = StringField()
+    slug = StringField()
 
     @classmethod
     def _from_rpc(cls, struct, name):
@@ -52,7 +60,7 @@ class EmbeddedCategory(Category, EmbeddedDocument):
     pass
 
 
-class Post(Document):
+class Post(BlogDocument):
     """A post or a page"""
     title = StringField(default='')
     # Formatted for display
@@ -67,9 +75,6 @@ class Post(Document):
     slug = StringField(default='')
     wordpress_id = IntField() # legacy id from WordPress
     mod = DateTimeField()
-
-    class Meta:
-        id_field = ObjectIdField
 
     def __init__(self, *args, **kwargs):
         super(Post, self).__init__(*args, **kwargs)
@@ -170,11 +175,6 @@ class Post(Document):
         if 'id' in dct:
             dct['_id'] = dct.pop('id')
         return dct
-
-    @property
-    def date_created(self):
-        """datetime when this post was created, timezone-aware in UTC"""
-        return self.id.generation_time
 
     @property
     def summary(self):
