@@ -1,0 +1,21 @@
+{% extends "admin.html" %}
+
+{% block title %}{{ setting('blog_name') }} - Media{% end %}
+
+{% block content %}
+    <p><a href="{{ reverse_url('drafts') }}">Go to drafts page.</a></p>
+    {% if mediadocs %}
+        {% for media in mediadocs %}
+        <li>
+            <a class="title" href="{{ reverse_url('media', media['_id']) }}">{{ media['_id'] }}</a>
+            <span class="date">{{ media['mod'] }}</span>
+            <form action="{{ reverse_url('delete-media') }}" method="post">
+                <input type="hidden" name="media_id" value="{{ media['_id'] }}">
+                <input type="submit" value="remove">
+            </form>
+        </li>
+        {% end %}
+    {% else %}
+        <p>No media. Upload some by adding images to your posts in MarsEdit!</p>
+    {% end %}
+{% end %}

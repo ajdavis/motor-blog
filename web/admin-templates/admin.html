@@ -1,0 +1,11 @@
+<html>
+<head>
+    <title>{% block title %}{% end %}</title>
+</head>
+<body>
+<form id="logout" action="{{ reverse_url('logout') }}" method="post">
+    <input type="submit" id="logoutbtn" value="Log out">
+</form>
+{% block content %}{% end %}
+</body>
+</html>

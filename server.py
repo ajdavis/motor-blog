@@ -73,10 +73,12 @@ if __name__ == "__main__":
         U(r"/api", APIHandler, name='api'),
 
         # Admin
-        U(r"login/?", LoginHandler, name='login'),
-        U(r"logout/?", LogoutHandler, name='logout'),
-        U(r"drafts/?", DraftsHandler, name='drafts'),
-        U(r"draft/(?P<slug>.+)/?", DraftHandler, name='draft'),
+        U(r"admin/?", LoginHandler, name='login'),
+        U(r"admin/logout/?", LogoutHandler, name='logout'),
+        U(r"admin/drafts/?", DraftsHandler, name='drafts'),
+        U(r"admin/draft/(?P<slug>.+)/?", DraftHandler, name='draft'),
+        U(r"admin/media/?", MediaPageHandler, name='media-page'),
+        U(r"admin/media/delete", DeleteMediaHandler, name='delete-media'),
 
         # Atom
         U(r"feed/?", FeedHandler, name='feed'),
