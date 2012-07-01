@@ -213,13 +213,21 @@ class PostHandler(MotorBlogHandler):
         # Only posts have prev / next navigation, not pages
         elif postdoc['type'] == 'post':
             fields = {'summary': False, 'body': False, 'original': False}
-            prevdoc = yield motor.Op(posts.find({
-                'status': 'publish', 'type': 'post', '_id': {'$lt': postdoc['_id']}
-            }, fields).sort([('_id', -1)]).limit(-1).next)
+            posts.find({
+                'status': 'publish', 'type': 'post',
+                '_id': {'$lt': postdoc['_id']}
+            }, fields).sort([('_id', -1)]).limit(-1).next(
+                callback=(yield gen.Callback('prevdoc')))
 
-            nextdoc = yield motor.Op(posts.find({
-                'status': 'publish', 'type': 'post', '_id': {'$gt': postdoc['_id']}
-            }, fields).sort([('_id', 1)]).limit(-1).next)
+            posts.find({
+                'status': 'publish', 'type': 'post',
+                '_id': {'$gt': postdoc['_id']}
+            }, fields).sort([('_id', 1)]).limit(-1).next(
+                callback=(yield gen.Callback('nextdoc')))
+
+            # Overkill for this case, but in theory we reduce latency by
+            # querying for previous and next posts at once, and wait for both
+            prevdoc, nextdoc = yield motor.WaitAllOps(['prevdoc', 'nextdoc'])
         else:
             prevdoc, nextdoc = None, None
 
