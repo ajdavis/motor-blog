@@ -24,16 +24,6 @@ from motor_blog.text import HTMLPassThrough
 __all__ = ('markup', )
 
 
-class PlainHtmlFormatter(HtmlFormatter):
-    """pygments formatter that just outputs plain text"""
-    def wrap(self, source, outfile):
-        return self.__wrap(source)
-
-    def __wrap(self, source):
-        for i, t in source:
-            yield i, t
-
-
 class PreCodeFinder(HTMLPassThrough):
     """Find text within <pre><code></code></pre> and syntax-highlight it with
        pygments.
@@ -44,65 +34,67 @@ class PreCodeFinder(HTMLPassThrough):
 
     def parse_code_header(self, header):
         """Make a dictionary by parsing something like:
-               ::: lang="Python" highlight="8,12,13,20"
+               ::: lang="Python Traceback" highlight="8,12,13,20"
         """
         match = re.match(r':::\s+(.+)$', header)
         if not match:
             return {}
 
+        # Like lang="Python Traceback" highlight="8,12,13,20"
+        options_list = match.group(1)
+        match = re.match(r'\s*((\S+="[^"]+")(?:\s*))*', options_list)
+        if not match:
+            raise Exception("Can't parse options: %s" % options_list)
+
         # Python 2.7 dict literal
         return {
             key.strip(): value.strip('"\' ')
             for key, value in [
-                part.split('=') for part in match.group(1).split()
+                part.split('=') for part in match.groups()
             ]
         }
 
     def get_lexer(self, code, language):
-        if language:
+        try:
+            return get_lexer_by_name(language)
+        except pygments.util.ClassNotFound:
             try:
-                return get_lexer_by_name(language)
+                return get_lexer_by_name(language.lower())
             except pygments.util.ClassNotFound:
-                try:
-                    return get_lexer_by_name(language.lower())
-                except pygments.util.ClassNotFound:
-                    return guess_lexer(code)
-        else:
-            return guess_lexer(code)
+                raise Exception("Unknown language: %s" % language)
 
     def highlight(self, code, language, hl_lines):
-        lexer = self.get_lexer(code, language)
+        if language:
+            lexer = self.get_lexer(code, language)
+        else:
+            lexer = TextLexer()
+
+        # 'no_classes' forces all CSS styles to be inline, which works best for
+        # RSS feeds
         formatter = HtmlFormatter(
             style='default', noclasses=True, hl_lines=hl_lines,
             nowrap=True)
 
         return highlight(code, lexer, formatter)
 
-    def plain(self, code, hl_lines):
-        formatter = PlainHtmlFormatter()
-        lexer = TextLexer()
-        # TODO: make highlighting work for plain
-        return highlight(code, lexer, formatter)
-
     def handle_endtag(self, tag):
         if self.data:
+            # We've ended a <code> tag within <pre>.
             options, hl_lines = {}, []
             # parts of self.data will have \n in them
             data = ''.join(self.data)
 
-            # TODO: document the format we're parsing in README
+            lines = data.split('\n')
             if ':::' in self.data[0]:
-                lines = data.split('\n')
                 firstline, lines = lines[0], lines[1:]
                 options = self.parse_code_header(firstline)
-                if options.get('highlight'):
-                    # Highlighted lines within the code example
-                    hl_lines = options['highlight'].split(',')
 
-                code = '\n'.join(lines)
-                self.emit(self.highlight(code, options.get('lang'), hl_lines))
-            else:
-                self.emit(self.plain(data, hl_lines))
+            if options.get('highlight'):
+                # Highlighted lines within the code example
+                hl_lines = options['highlight'].split(',')
+
+            code = '\n'.join(lines)
+            self.emit(self.highlight(code, options.get('lang'), hl_lines))
             self.data = []
         HTMLPassThrough.handle_endtag(self, tag)
 

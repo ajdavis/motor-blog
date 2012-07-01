@@ -1,5 +1,6 @@
 """XML-RPC API for posts and pages
 """
+import logging
 
 import xmlrpclib
 
@@ -37,16 +38,20 @@ class Posts(object):
         self._recent(user, password, num_posts, 'page')
 
     def _new_post(self, user, password, struct, publish, type):
-        def new_post_inserted(_id, error):
-            if error:
-                self.result(xmlrpclib.Fault(500, str(error)))
-            else:
-                self.result(str(_id))
+        try:
+            new_post = Post.from_metaweblog(struct, type, publish=publish)
+            self.settings['db'].posts.insert(
+                new_post.to_python(),
+                callback=self._new_post_inserted)
+        except Exception as error:
+            logging.exception("Creating post")
+            self.result(xmlrpclib.Fault(500, str(error)))
 
-        new_post = Post.from_metaweblog(struct, type, publish=publish)
-        self.settings['db'].posts.insert(
-            new_post.to_python(),
-            callback=new_post_inserted)
+    def _new_post_inserted(self, _id, error):
+        if error:
+            self.result(xmlrpclib.Fault(500, str(error)))
+        else:
+            self.result(str(_id))
 
     @tornadorpc.async
     @auth
@@ -69,11 +74,15 @@ class Posts(object):
         self._edit_post(postid, user, password, struct, publish, 'page')
 
     def _edit_post(self, postid, user, password, struct, publish, type):
-        self.new_post = Post.from_metaweblog(
-            struct, type, publish=publish, is_edit=True)
+        try:
+            self.new_post = Post.from_metaweblog(
+                struct, type, publish=publish, is_edit=True)
 
-        self.settings['db'].posts.find_one({'_id': ObjectId(postid)},
-            callback=self._got_old_post)
+            self.settings['db'].posts.find_one({'_id': ObjectId(postid)},
+                callback=self._got_old_post)
+        except Exception as error:
+            logging.exception("Editing post")
+            self.result(xmlrpclib.Fault(500, str(error)))
 
     def _got_old_post(self, result, error):
         if error:
