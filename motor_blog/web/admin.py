@@ -5,7 +5,7 @@ from tornado.options import options as opts
 import motor
 
 from motor_blog.models import Post
-from web.handlers import MotorBlogHandler, get_categories
+from motor_blog.web.handlers import MotorBlogHandler, get_categories
 
 __all__ = (
     'LoginHandler', 'LogoutHandler', 'DraftsHandler', 'DraftHandler',
