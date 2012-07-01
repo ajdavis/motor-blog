@@ -4,7 +4,8 @@ from motor_blog.text import slugify
 
 
 def media_link(year, month, filename):
-    return '%04d/%02d/%s' % (year, month, slugify.slugify(filename))
+    base, extension = os.path.splitext(filename)
+    return '%04d/%02d/%s' % (year, month, slugify.slugify(base)) + extension
 
 def absolute(relative):
     debug = opts.debug
