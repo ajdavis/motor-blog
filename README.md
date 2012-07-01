@@ -73,9 +73,12 @@ its flags set to the defaults.
 Plain inline code is surrounded by backticks (``).
 Syntax-highlighted code is indented with four spaces, and the first line is like:
 
-        ::: lang="python" highlight="4,5,6"
+        ::: lang="py" highlight="4,5,6"
 
-... to specify the language syntax and which lines to highlight in yellow.
+... to specify the language syntax and which lines to highlight in yellow. The list of languages
+is whatever [Pygments](http://pygments.org/languages/) supports, including the following of
+interest to Python coders like me: `py`, `py3`, `pytb` and `py3tb` for tracebacks, and `pycon` for
+console sessions.
 
 # Customization
 
