@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block body-class %}archive tag{% end %}
+
+{% block content %}
+<h1 class="page-title">Tag: {{ this_tag }}</h1>
+{% set title_link = True %}
+{% for post in posts %}
+    {% include "post.html" %}
+{% end %}
+<nav id="nav-below">
+    <div class="nav-previous">
+        <a href="{{ reverse_url('tag-page', this_tag, page_num + 1) }}">
+            <span class="meta-nav">&larr;</span> Older posts
+        </a>
+    </div>
+    {% if page_num > 0 %}
+        <div class="nav-next">
+            {% if page_num > 1 %}
+                {% set next_url = reverse_url('tag-page', this_tag, page_num - 1) %}
+            {% else %}
+                {% set next_url = reverse_url('tag', this_tag) %}
+            {% end %}
+            <a href="{{ next_url }}">
+                Newer posts <span class="meta-nav">&rarr;</span>
+            </a>
+        </div>
+    {% end %}
+</nav>
+{% end %}

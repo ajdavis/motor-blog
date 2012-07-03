@@ -20,7 +20,7 @@ from motor_blog.text.link import absolute
 __all__ = (
     # Web
     'HomeHandler', 'PostHandler', 'MediaHandler', 'AllPostsHandler',
-    'CategoryHandler',
+    'CategoryHandler', 'TagHandler',
 
     # Atom
     'FeedHandler',
@@ -412,3 +412,25 @@ class FeedHandler(MotorBlogHandler):
         self.set_header('Content-Type', 'application/atom+xml; charset=UTF-8')
         self.write(unicode(feed))
         self.finish()
+
+class TagHandler(MotorBlogHandler):
+    """Page of posts for a category"""
+    def get_posts(self, callback, tag, page_num=0):
+        page_num = int(page_num)
+        tag = tag.rstrip('/')
+        self.settings['db'].posts.find({
+            'status': 'publish',
+            'type': 'post',
+            'tags': tag,
+        }, {
+            'summary': False, 'original': False
+        }).sort([('_id', -1)]).skip(page_num * 10).limit(10).to_list(callback)
+
+    @tornado.web.addslash
+    @check_last_modified
+    def get(self, tag, page_num=0):
+        page_num = int(page_num)
+        tag = tag.rstrip('/')
+        self.render('tag.html',
+            posts=self.posts, categories=self.categories,
+            this_tag=tag, page_num=page_num)

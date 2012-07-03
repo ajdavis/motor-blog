@@ -94,6 +94,8 @@ if __name__ == "__main__":
         U(r"category/(?P<slug>.+)/?", CategoryHandler, name='category'),
         U(r"page/(?P<page_num>\d+)/?", HomeHandler, name='page'),
         U(r"all-posts/?", AllPostsHandler, name='all-posts'),
+        U(r"tag/(?P<tag>.+)/page/(?P<page_num>\d+)/?", TagHandler, name='tag-page'),
+        U(r"tag/(?P<tag>.+)/?", TagHandler, name='tag'),
         U(r"(?P<slug>.+)/?", PostHandler, name='post'),
         U(r"/?", HomeHandler, name='home'),
 
