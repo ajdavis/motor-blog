@@ -414,7 +414,7 @@ class FeedHandler(MotorBlogHandler):
         self.finish()
 
 class TagHandler(MotorBlogHandler):
-    """Page of posts for a category"""
+    """Page of posts for a tag"""
     def get_posts(self, callback, tag, page_num=0):
         page_num = int(page_num)
         tag = tag.rstrip('/')
