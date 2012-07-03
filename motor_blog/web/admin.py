@@ -115,6 +115,7 @@ class MediaPageHandler(MotorBlogAdminHandler):
         self.render('admin-templates/media.html', mediadocs=mediadocs)
 
 
+# TODO: Javascript "are you sure?" popup on media page
 class DeleteMediaHandler(MotorBlogAdminHandler):
     @tornado.web.asynchronous
     @gen.engine

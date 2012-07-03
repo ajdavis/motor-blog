@@ -82,7 +82,7 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         return None
 
 
-# TODO: ample documentation
+# TODO: ample documentation, refactor
 def check_last_modified(get):
     @functools.wraps(get)
     @tornado.web.asynchronous
