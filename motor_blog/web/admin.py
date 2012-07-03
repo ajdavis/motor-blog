@@ -4,7 +4,7 @@ from tornado import gen
 from tornado.options import options as opts
 import motor
 
-from motor_blog.models import Post
+from motor_blog.models import Post, Category
 from motor_blog.web.handlers import MotorBlogHandler, get_categories
 
 __all__ = (
@@ -91,7 +91,8 @@ class DraftHandler(MotorBlogHandler):
 
         post=Post(**postdoc)
 
-        categories = yield motor.Op(get_categories, self.settings['db'])
+        categorydocs = yield motor.Op(get_categories, self.settings['db'])
+        categories = [Category(**doc) for doc in categorydocs]
         self.render(
             'single.html',
             post=post, prev=None, next=None, categories=categories)
