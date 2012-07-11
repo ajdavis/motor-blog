@@ -42,7 +42,7 @@ class PreCodeFinder(HTMLPassThrough):
 
         # Like lang="Python Traceback" highlight="8,12,13,20"
         options_list = match.group(1)
-        match = re.match(r'\s*((\S+="[^"]+")(?:\s*))*', options_list)
+        matches = re.findall(r'\w+="[^"]+"', options_list)
         if not match:
             raise Exception("Can't parse options: %s" % options_list)
 
@@ -50,7 +50,7 @@ class PreCodeFinder(HTMLPassThrough):
         return {
             key.strip(): value.strip('"\' ')
             for key, value in [
-                part.split('=') for part in match.groups()
+                part.split('=') for part in matches
             ]
         }
 
