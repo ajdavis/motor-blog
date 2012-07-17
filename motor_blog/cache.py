@@ -135,7 +135,7 @@ def startup(db, last_event=None):
     if not _cursor:
         _cursor = db.events.find({
             'ts': {'$gte': last_event or datetime.datetime.utcnow()}
-        }).tail(_on_event, await_data=True)
+        }).tail(_on_event)
 
 
 def _on_event(event, error):
