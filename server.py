@@ -8,19 +8,6 @@ import tornado.ioloop
 import tornado.web
 import tornado.options
 from tornado.web import StaticFileHandler
-from motor_blog import indexes, cache, options
-
-from motor_blog.api.handlers import APIHandler, RSDHandler
-from motor_blog.web.handlers import *
-from motor_blog.web.admin import *
-
-# TODO: RPC over HTTPS
-# TODO: a static-url function to set long cache TTL on media URLs
-# TODO: Nginx cache media
-# TODO: mobile theme, detect mobile and allow cookie to return to desktop
-# TODO: default theme, move emptysquare to separate themes dir
-# TODO: search?
-# TODO: sitemap.xml
 
 try:
     import motor
@@ -37,6 +24,20 @@ except ImportError:
 
     raise
 
+from motor_blog import indexes, cache, options
+
+from motor_blog.api.handlers import APIHandler, RSDHandler
+from motor_blog.web.handlers import *
+from motor_blog.web.admin import *
+
+# TODO: RPC over HTTPS
+# TODO: a static-url function to set long cache TTL on media URLs
+# TODO: Nginx cache media
+# TODO: mobile theme, detect mobile and allow cookie to return to desktop
+# TODO: default theme, move emptysquare to separate themes dir
+# TODO: search?
+# TODO: sitemap.xml
+
 if __name__ == "__main__":
     opts = options.options()
 
@@ -50,7 +51,7 @@ if __name__ == "__main__":
         logging.info('    done.')
 
     base_url = opts.base_url
-    
+
     class U(tornado.web.URLSpec):
         def __init__(self, pattern, *args, **kwargs):
             """Include base_url in pattern"""
