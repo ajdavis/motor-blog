@@ -28,7 +28,7 @@
     {% end %}
 </nav>
 
-{% if post.type == 'post' %}
+{% if post.type == 'post' and post.status == 'publish' %}
 <div id="disqus_thread"></div>
 <script type="text/javascript">
     var disqus_shortname = 'emptysquare';
