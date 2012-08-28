@@ -1,7 +1,7 @@
 # Example supervisor configuration
 
 [inet_http_server]
-port = 9001
+port = 127.0.0.1:9001
 # For simple HTTP authentication of the admin panel
 username = emptysquare
 password = Password
@@ -14,7 +14,7 @@ childlogdir=%(here)s
 
 [supervisorctl]
 serverurl=http://localhost:9001
-username = admin
+username = emptysquare
 password = Password
 
 [rpcinterface:supervisor]
