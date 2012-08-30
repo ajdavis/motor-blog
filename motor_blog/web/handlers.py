@@ -218,13 +218,13 @@ class PostHandler(MotorBlogHandler):
             posts.find({
                 'status': 'publish', 'type': 'post',
                 '_id': {'$lt': postdoc['_id']}
-            }, fields).sort([('_id', -1)]).limit(-1).next(
+            }, fields).sort([('_id', -1)]).limit(-1).next_object(
                 callback=(yield gen.Callback('prevdoc')))
 
             posts.find({
                 'status': 'publish', 'type': 'post',
                 '_id': {'$gt': postdoc['_id']}
-            }, fields).sort([('_id', 1)]).limit(-1).next(
+            }, fields).sort([('_id', 1)]).limit(-1).next_object(
                 callback=(yield gen.Callback('nextdoc')))
 
             # Overkill for this case, but in theory we reduce latency by
