@@ -94,6 +94,7 @@ class DraftHandler(MotorBlogHandler):
         if post.status == 'publish':
             # Not a draft any more
             self.redirect(self.reverse_url('post', slug))
+            return
 
         categorydocs = yield motor.Op(get_categories, self.settings['db'])
         categories = [Category(**doc) for doc in categorydocs]
