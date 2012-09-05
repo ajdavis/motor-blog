@@ -65,6 +65,9 @@ MarsEdit auto-detects the rest. You'll need to enter the username and password y
 In the "General" tab of your blog's settings, I suggest setting "Download the 1000 most recent posts on refresh,"
 since Motor-Blog can handle it.
 Under "Editing," set Preview Text Filter to "Markdown."
+When you're editing a post, do "View -> Slug Field" to set a custom slug as the final
+part of the post's URL.
+If you leave the slug empty, Motor-Blog slugifies the title.
 
 # Blogging
 
