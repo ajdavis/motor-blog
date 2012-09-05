@@ -111,7 +111,12 @@ class Post(BlogDocument):
         else:
             tags = None
 
-        slug = slugify.slugify(title)
+
+        slug = (
+            slugify.slugify(struct['wp_slug'])
+            if struct.get('wp_slug')
+            else slugify.slugify(title))
+
         description = struct.get('description', '')
         status = 'publish' if publish else 'draft'
         if 'date_modified_gmt' in struct:
