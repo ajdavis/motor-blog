@@ -1,6 +1,7 @@
 <html>
 <head>
     <title>{% block title %}{% end %}</title>
+    {% block extra-head %}{% end %}
 </head>
 <body>
 <form id="logout" action="{{ reverse_url('logout') }}" method="post">
