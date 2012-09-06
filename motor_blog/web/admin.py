@@ -5,7 +5,7 @@ from tornado.options import options as opts
 import motor
 
 from motor_blog.models import Post, Category
-from motor_blog.web.handlers import MotorBlogHandler, get_categories
+from motor_blog.web.handlers import MotorBlogHandler
 
 __all__ = (
     'LoginHandler', 'LogoutHandler', 'DraftsHandler', 'DraftHandler',
@@ -96,7 +96,7 @@ class DraftHandler(MotorBlogHandler):
             self.redirect(self.reverse_url('post', slug))
             return
 
-        categorydocs = yield motor.Op(get_categories, self.settings['db'])
+        categorydocs = yield motor.Op(self.get_categories)
         categories = [Category(**doc) for doc in categorydocs]
         self.render(
             'single.html',

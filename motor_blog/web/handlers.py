@@ -28,33 +28,21 @@ __all__ = (
 
 # TODO: cache-control headers
 
-@cache.cached(key='categories', invalidate_event='categories_changed')
-@gen.engine
-def get_categories(db, callback):
-    # This odd control flow ensures we don't confuse exceptions thrown
-    # by find() with exceptions thrown by the callback
-    category_docs = None
-    try:
-        category_docs = yield motor.Op(
-            db.categories.find().sort('name').to_list)
-    except Exception, e:
-        callback(None, e)
-        return
-
-    callback(category_docs, None)
-
-
 class MotorBlogHandler(tornado.web.RequestHandler):
-    def __init__(self, *args, **kwargs):
-        super(MotorBlogHandler, self).__init__(*args, **kwargs)
+    def initialize(self, **kwargs):
+        super(MotorBlogHandler, self).initialize(**kwargs)
         self.etag = None
+        self.categories = []
+        self.db = self.settings['db']
 
-    def _get_setting(self, setting_name):
-        return self.application.settings[setting_name]
+    def get_template_namespace(self):
+        ns = super(MotorBlogHandler, self).get_template_namespace()
 
-    def render(self, template_name, **kwargs):
-        kwargs.setdefault('setting', self._get_setting)
-        super(MotorBlogHandler, self).render(template_name, **kwargs)
+        def get_setting(setting_name):
+            return self.application.settings[setting_name]
+
+        ns.update({'setting': get_setting, 'categories': self.categories})
+        return ns
 
     def head(self, *args, **kwargs):
         # We need to generate the full content for a HEAD request in order
@@ -69,8 +57,21 @@ class MotorBlogHandler(tornado.web.RequestHandler):
     def get_login_url(self):
         return self.reverse_url('login')
 
+    @cache.cached(key='categories', invalidate_event='categories_changed')
+    @gen.engine
     def get_categories(self, callback):
-        get_categories(self.settings['db'], callback=callback)
+        # This odd control flow ensures we don't confuse exceptions thrown
+        # by find() with exceptions thrown by the callback
+        category_docs = None
+        try:
+            category_docs = yield motor.Op(
+                self.settings['db'].categories.find().sort('name').to_list)
+
+        except Exception, e:
+            callback(None, e)
+            return
+
+        callback(category_docs, None)
 
     def get_posts(self, *args, **kwargs):
         raise NotImplementedError()
@@ -414,6 +415,7 @@ class FeedHandler(MotorBlogHandler):
         self.set_header('Content-Type', 'application/atom+xml; charset=UTF-8')
         self.write(unicode(feed))
         self.finish()
+
 
 class TagHandler(MotorBlogHandler):
     """Page of posts for a tag"""
