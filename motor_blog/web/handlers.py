@@ -460,3 +460,6 @@ class SearchHandler(MotorBlogHandler):
         else:
             posts = []
         self.render('search.html', q=q, posts=posts)
+
+    def get(self):
+        self.redirect(self.reverse_url('home'))
