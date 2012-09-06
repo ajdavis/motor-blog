@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}
+Search | {{ setting('author_display_name') }}
+{% end %}
+
+{% block body-class %}search{% end %}
+
+{% block nav-header %}
+    {% include "nav.html" %}
+{% end %}
+
+{% block content %}
+    {% if not q %}
+        Go ahead and put a search term in the box next time before you hit 'search'.
+    {% else %}
+        <h1>Posts and pages with "{{ q }}":</h1>
+        {% if not posts %}
+            <p>No results.</p>
+            <p>
+                Motor-Blog's search function is really bad, maybe just look through the
+                <a href="{{ reverse_url('all-posts') }}">list of all posts</a>?
+            </p>
+        {% else %}
+            <ul>
+                {% for post in posts %}
+                    {% include "post-summary.html" %}
+                {% end %}
+            </ul>
+        {% end %}
+    {% end %}
+{% end %}

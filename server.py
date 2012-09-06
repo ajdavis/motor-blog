@@ -97,6 +97,8 @@ if __name__ == "__main__":
         U(r"all-posts/?", AllPostsHandler, name='all-posts'),
         U(r"tag/(?P<tag>.+)/page/(?P<page_num>\d+)/?", TagHandler, name='tag-page'),
         U(r"tag/(?P<tag>.+)/?", TagHandler, name='tag'),
+        U(r"search/", SearchHandler, name='search'),
+        # PostHandler's URL pattern must be last because slug could be anything
         U(r"(?P<slug>.+)/?", PostHandler, name='post'),
         U(r"/?", HomeHandler, name='home'),
 

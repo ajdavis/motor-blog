@@ -5,12 +5,8 @@
 {% block content %}
 <h1>All Posts</h1>
 <ul>
-{% for post in posts %}
-    <li>
-        <a class="title" href="{{ reverse_url('post', post.slug) }}">{{ post.title }} </a>
-        <span class="date">{{ post.local_short_date(handler.application) }}</span>
-        <span class="excerpt"><p>{% raw post.summary %}</p></span>
-    </li>
-{% end %}
+    {% for post in posts %}
+        {% include "post-summary.html" %}
+    {% end %}
 </ul>
 {% end %}

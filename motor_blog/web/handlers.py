@@ -5,6 +5,7 @@ import datetime
 import email.utils
 import functools
 import time
+import re
 
 import tornado.web
 from tornado import gen
@@ -20,7 +21,7 @@ from motor_blog.text.link import absolute
 __all__ = (
     # Web
     'HomeHandler', 'PostHandler', 'MediaHandler', 'AllPostsHandler',
-    'CategoryHandler', 'TagHandler',
+    'CategoryHandler', 'TagHandler', 'SearchHandler',
 
     # Atom
     'FeedHandler',
@@ -438,3 +439,24 @@ class TagHandler(MotorBlogHandler):
         self.render('tag.html',
             posts=self.posts, categories=self.categories,
             this_tag=tag, page_num=page_num)
+
+
+class SearchHandler(MotorBlogHandler):
+    @tornado.web.asynchronous
+    @gen.engine
+    def post(self):
+        # TODO: pagination
+        # TODO: this is hideously inefficient and inaccurate, wait for Mongo FTS
+        q = self.get_argument('q', None)
+        if q:
+            regex = re.compile('.*' + re.escape(q) + '.*', re.IGNORECASE)
+            cursor = self.settings['db'].posts.find(
+                {'status': 'publish', 'type': 'post', 'original': regex},
+                {'display': False, 'original': False},
+            ).sort([('_id', -1)])
+
+            postdocs = yield motor.Op(cursor.to_list)
+            posts = [Post(**doc) for doc in postdocs]
+        else:
+            posts = []
+        self.render('search.html', q=q, posts=posts)
