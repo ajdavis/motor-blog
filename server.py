@@ -104,6 +104,7 @@ if __name__ == "__main__":
         db=db,
         template_path=os.path.join(opts.theme, 'templates'),
         tz=pytz.timezone(opts.timezone),
+        gzip=True,
         **{k: v.value() for k, v in opts.items()}
     )
 
