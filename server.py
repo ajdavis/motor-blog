@@ -90,6 +90,7 @@ if __name__ == "__main__":
 
         # Web
         U(r"media/(?P<url>.+)", MediaHandler, name='media'),
+        U(r"tracking-pixel.gif", TrackingPixelHandler, name='tracking-pixel'),
         U(r"theme/static/(.+)", StaticFileHandler, {"path": static_path}, name='theme-static'),
         U(r"category/(?P<slug>.+)/page/(?P<page_num>\d+)/?", CategoryHandler, name='category-page'),
         U(r"category/(?P<slug>.+)/?", CategoryHandler, name='category'),

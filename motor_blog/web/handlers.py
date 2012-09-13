@@ -4,6 +4,7 @@
 import datetime
 import email.utils
 import functools
+import os
 import time
 import re
 
@@ -15,13 +16,13 @@ from werkzeug.contrib.atom import AtomFeed
 
 from motor_blog.models import Post, Category
 from motor_blog import cache, models
-from motor_blog.text.link import absolute
+from motor_blog.text.link import absolute, tracking_pixel_link
 
 
 __all__ = (
     # Web
     'HomeHandler', 'PostHandler', 'MediaHandler', 'AllPostsHandler',
-    'CategoryHandler', 'TagHandler', 'SearchHandler',
+    'CategoryHandler', 'TagHandler', 'SearchHandler', 'TrackingPixelHandler',
 
     # Atom
     'FeedHandler',
@@ -362,15 +363,15 @@ class FeedHandler(MotorBlogHandler):
         if slug:
             slug = slug.rstrip('/')
 
-        if not slug:
-            this_category = None
-        else:
+        this_category = None
+        if slug:
             # Get all the categories and search for one with the right slug,
             # instead of actually querying for the right category, since
             # get_categories() is cached.
             slug = slug.rstrip('/')
-            for this_category in self.categories:
-                if this_category.slug == slug:
+            for category in self.categories:
+                if category.slug == slug:
+                    this_category = category
                     break
             else:
                 raise tornado.web.HTTPError(404)
@@ -402,9 +403,13 @@ class FeedHandler(MotorBlogHandler):
 
         for post in self.posts:
             url = absolute(self.reverse_url('post', post.slug))
+            body = post.body + \
+               '<img src="%s" width="1px" height="1px">' % tracking_pixel_link(
+                   'rss', post, this_category, self)
+
             feed.add(
                 title=post.title,
-                content=post.body,
+                content=body,
                 content_type='html',
                 summary=post.summary,
                 author=author,
@@ -416,6 +421,16 @@ class FeedHandler(MotorBlogHandler):
         self.set_header('Content-Type', 'application/atom+xml; charset=UTF-8')
         self.write(unicode(feed))
         self.finish()
+
+
+gif = open(os.path.normpath(
+    os.path.join(os.path.dirname(__file__), '1px.gif')), 'rb').read()
+
+
+class TrackingPixelHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.set_header('Content-Type', 'image/gif')
+        self.write(gif)
 
 
 class TagHandler(MotorBlogHandler):
