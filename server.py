@@ -8,6 +8,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.options
 from tornado.web import StaticFileHandler
+from tornado import httpserver
 
 try:
     import motor
@@ -111,6 +112,7 @@ if __name__ == "__main__":
         **{k: v.value() for k, v in opts.items()}
     )
 
-    application.listen(opts.port)
-    logging.info('Listening on http://%s:%s' % (opts.host, opts.port))
+    http_server = httpserver.HTTPServer(application, xheaders=True)
+    http_server.listen(opts.port)
+    logging.info('Listening on port %s' % opts.port)
     tornado.ioloop.IOLoop.instance().start()

@@ -17,6 +17,8 @@ server {
     # server_name emptysquare.net;                                                                                                                                                                        
 
     location /blog {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
         proxy_pass http://motor_blog;
     }
 }
