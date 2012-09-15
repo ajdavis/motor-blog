@@ -2,7 +2,7 @@
 
 import os
 from random import randint
-from urllib import urlencode
+from urllib import urlencode, quote
 import time
 
 import tornado.web
@@ -63,16 +63,20 @@ def google_analytics_request_url(
         category_name=category_name,
         medium=medium)
 
-    return utm_gif_location + "?" + urlencode(dict(
-        utmwv='5.3.5', # I hope this is right
-        utmn=str(randint(0, 0x7fffffff)),
-        utmhn=opts.host,
-        utme=format_custom_variables(custom_variables),
-        utmp=post_slug,
-        utmdt=title,
-        utmac=opts.google_analytics_id,
-        utmip=remote_addr,
-    ))
+    # Can't use urlencode because Google actually expects the custom variables
+    # string unencoded, e.g. "8(k*k1)9(v*v1)", not "8%28k%2Ak1%299%28v%2Av1%29"
+    return utm_gif_location + "?" + '&'.join(
+        '%s=%s' % (k, v)
+        for k, v in dict(
+            utmwv='5.3.5', # I hope this is right
+            utmn=str(randint(0, 0x7fffffff)),
+            utmhn=quote(opts.host),
+            utme=format_custom_variables(custom_variables),
+            utmp=quote(post_slug),
+            utmdt=quote(title),
+            utmac=opts.google_analytics_id,
+            utmip=remote_addr,
+    ).items())
 
 
 class TrackingPixelHandler(tornado.web.RequestHandler):
@@ -98,5 +102,8 @@ class TrackingPixelHandler(tornado.web.RequestHandler):
 
         st = time.time()
         client = AsyncHTTPClient()
-        yield gen.Task(client.fetch, url)
-        logging.info('Fetched %s %.2fms' % (url, 1000 * (time.time() - st)))
+        response = yield gen.Task(client.fetch, url)
+        body = ''
+        if 200 != response.code:
+            body = '\n' + repr(response.body)
+        logging.info('Fetched %s %.2fms %s%s' % (url, 1000 * (time.time() - st), response.code, body))
