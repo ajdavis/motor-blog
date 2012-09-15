@@ -28,6 +28,7 @@ except ImportError:
 from motor_blog import indexes, cache, options
 
 from motor_blog.api.handlers import APIHandler, RSDHandler
+from motor_blog.web.lytics import TrackingPixelHandler
 from motor_blog.web.handlers import *
 from motor_blog.web.admin import *
 

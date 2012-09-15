@@ -4,7 +4,6 @@
 import datetime
 import email.utils
 import functools
-import os
 import time
 import re
 
@@ -16,13 +15,14 @@ from werkzeug.contrib.atom import AtomFeed
 
 from motor_blog.models import Post, Category
 from motor_blog import cache, models
-from motor_blog.text.link import absolute, tracking_pixel_link
+from motor_blog.text.link import absolute
+from motor_blog.web.lytics import tracking_pixel_url
 
 
 __all__ = (
     # Web
     'HomeHandler', 'PostHandler', 'MediaHandler', 'AllPostsHandler',
-    'CategoryHandler', 'TagHandler', 'SearchHandler', 'TrackingPixelHandler',
+    'CategoryHandler', 'TagHandler', 'SearchHandler',
 
     # Atom
     'FeedHandler',
@@ -343,6 +343,7 @@ class MediaHandler(tornado.web.RequestHandler):
         self.get(*args, **kwargs)
 
 
+# TODO: move to feed.py
 class FeedHandler(MotorBlogHandler):
     def get_posts(self, callback, slug=None):
         query = {'status': 'publish', 'type': 'post'}
@@ -404,7 +405,7 @@ class FeedHandler(MotorBlogHandler):
         for post in self.posts:
             url = absolute(self.reverse_url('post', post.slug))
             body = post.body + \
-               '<img src="%s" width="1px" height="1px">' % tracking_pixel_link(
+               '<img src="%s" width="1px" height="1px">' % tracking_pixel_url(
                    'rss', post, this_category, self)
 
             feed.add(
@@ -421,16 +422,6 @@ class FeedHandler(MotorBlogHandler):
         self.set_header('Content-Type', 'application/atom+xml; charset=UTF-8')
         self.write(unicode(feed))
         self.finish()
-
-
-gif = open(os.path.normpath(
-    os.path.join(os.path.dirname(__file__), '1px.gif')), 'rb').read()
-
-
-class TrackingPixelHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.set_header('Content-Type', 'image/gif')
-        self.write(gif)
 
 
 class TagHandler(MotorBlogHandler):

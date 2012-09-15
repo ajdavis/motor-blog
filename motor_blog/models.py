@@ -1,11 +1,11 @@
 import datetime
-import logging
 
 from bson.objectid import ObjectId
 from dictshield.document import Document, EmbeddedDocument
 from dictshield.fields import StringField, IntField, DateTimeField
 from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
 from dictshield.fields.mongo import ObjectIdField
+from tornado.options import options as opts
 
 from motor_blog.text.link import absolute
 
@@ -216,3 +216,7 @@ class Post(BlogDocument):
     @property
     def last_modified(self):
         return max(self.date_created, self.mod)
+
+    @property
+    def full_title(self):
+        return '%s | %s' % (self.title, opts.author_display_name)
