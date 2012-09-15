@@ -451,13 +451,25 @@ class SearchHandler(MotorBlogHandler):
     @tornado.web.asynchronous
     @gen.engine
     def post(self):
+        # TODO: refactor with check_last_modified(), this is gross
+        #   we need an async version of RequestHandler.prepare()
+        categorydocs = yield motor.Op(self.get_categories)
+        self.categories = categories = [Category(**doc) for doc in categorydocs]
+
         # TODO: pagination
         # TODO: this is hideously inefficient and inaccurate, wait for Mongo FTS
         q = self.get_argument('q', None)
         if q:
-            regex = re.compile('.*' + re.escape(q) + '.*', re.IGNORECASE)
-            cursor = self.settings['db'].posts.find(
-                {'status': 'publish', 'type': 'post', 'original': regex},
+            words = [w.strip() for w in q.split() if w.strip()]
+            regexes = [
+                re.compile('.*' + re.escape(w) + '.*', re.IGNORECASE)
+                for w in words]
+
+            cursor = self.settings['db'].posts.find({
+                    'status': 'publish', 'type': 'post',
+                    '$or': [{'original': regex} for regex in regexes]
+                },
+                # We only need the summary field
                 {'display': False, 'original': False},
             ).sort([('_id', -1)])
 
