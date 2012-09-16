@@ -72,7 +72,7 @@ class Categories(object):
             elif result['n'] != 1:
                 self.result(xmlrpclib.Fault(404, 'Not found'))
             else:
-                self.result()
+                self.result('')
 
         self.settings['db'].posts.update(
             {'_id': ObjectId(postid)},
