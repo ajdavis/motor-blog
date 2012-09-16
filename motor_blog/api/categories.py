@@ -9,6 +9,9 @@ from motor_blog.models import Post, Category, EmbeddedCategory
 
 
 class Categories(object):
+    """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
+       related to categories
+    """
     @tornadorpc.async
     @auth
     def wp_getCategories(self, blogid, user, password):

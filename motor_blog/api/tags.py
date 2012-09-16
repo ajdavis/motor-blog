@@ -5,6 +5,9 @@ from motor_blog.api import auth
 
 
 class Tags(object):
+    """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
+       related to tags
+    """
     @tornadorpc.async
     @auth
     def wp_getTags(self, blogid, user, password):

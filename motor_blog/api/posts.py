@@ -13,6 +13,9 @@ from motor_blog.models import Post
 
 
 class Posts(object):
+    """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
+       related to blog posts and pages
+    """
     def _recent(self, user, password, num_posts, type):
         def got_recent_posts(posts, error):
             if error:

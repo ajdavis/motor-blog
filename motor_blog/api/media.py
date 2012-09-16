@@ -11,6 +11,9 @@ from motor_blog.text.link import media_link, absolute
 
 
 class Media(object):
+    """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
+       related to images and potentially other media
+    """
     @tornadorpc.async
     @auth
     def metaWeblog_newMediaObject(self, blogid, user, password, struct):
