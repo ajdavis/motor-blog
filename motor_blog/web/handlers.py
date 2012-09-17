@@ -417,7 +417,11 @@ class FeedHandler(MotorBlogHandler):
                 url=url,
                 id=url,
                 published=post.date_created,
-                updated=post.mod)
+                # Don't update 'updated' - it seems to make Planet Python re-post my updated items,
+                #    which is spammy.
+                #updated=post.mod,
+                updated=post.date_created,
+            )
 
         self.set_header('Content-Type', 'application/atom+xml; charset=UTF-8')
         self.write(unicode(feed))
