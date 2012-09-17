@@ -52,7 +52,7 @@ def format_event(category, action, label):
 
 # TODO: use category_name?
 def ga_track_event_url(
-    remote_addr, path, title, category_name
+    remote_addr, referrer, path, title, category_name
 ):
     """
     Format a Google Analytics tracking-GIF request.
@@ -66,14 +66,24 @@ def ga_track_event_url(
     return utm_gif_location + "?" + '&'.join(
         '%s=%s' % (k, v)
         for k, v in dict(
+            # First the parts I'm sure I need
+            utmt='event',
             utmwv='5.3.5', # I hope this is right
             utmn=str(randint(0, 0x7fffffff)),
             utmhn=q(opts.host),
             utme=format_event('rss', 'view', title),
-            utmp=q(path),
+            utmp=path, # *not* quoted, based on how ga.js behaves
             utmdt=q(title),
             utmac=opts.google_analytics_id,
             utmip=remote_addr,
+            utmr=referrer,
+
+            # Next the parts I'm putting in speculatively to see if they
+            # fix my problem where I'm not seeing any events tracked in GA.
+            # "A random number used to link Analytics GIF requests with AdSense."
+            #utmhid=str(randint(0, 0x7fffffff)),
+            # "Referral, complete URL."
+            #umtr='-',
     ).items())
 
 
@@ -89,11 +99,13 @@ class TrackingPixelHandler(tornado.web.RequestHandler):
         # a tracking pixel from Google to put this event into Google Analytics.
         slug = self.get_argument('slug', None)
         path = self.reverse_url('post', slug) if slug else 'unknown'
+        referrer = self.request.headers.get('referer', '-') # (sic)
 
         # The URL we are serving was formatted by tracking_pixel_url(), parse
         # out the CGI arguments that it inserted.
         url = ga_track_event_url(
             remote_addr=self.request.remote_ip,
+            referrer=referrer,
             path=path,
             title=self.get_argument('title', 'unknown'),
             category_name=self.get_argument('category_name', 'unknown'),
@@ -105,4 +117,5 @@ class TrackingPixelHandler(tornado.web.RequestHandler):
         body = ''
         if 200 != response.code:
             body = '\n' + repr(response.body)
-        logging.info('Fetched %s %.2fms %s%s' % (url, 1000 * (time.time() - st), response.code, body))
+        logging.info('Fetched %s %.2fms %s %s%s' % (
+            url, 1000 * (time.time() - st), referrer, response.code, body))
