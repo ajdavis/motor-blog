@@ -67,3 +67,13 @@ def ga_track_event_url(
             # "Referral, complete URL."
             #umtr='-',
     ).items())
+
+
+class TrackingPixelHandler(tornado.web.RequestHandler):
+    """Left over from previous attempt at RSS analytics - just serve a pixel
+       so old RSS posts that still include old pixel don't return 404
+    """
+    def get(self):
+        self.set_header('Content-Type', 'image/gif')
+        self.write(gif)
+        self.finish()
