@@ -16,7 +16,7 @@ from werkzeug.contrib.atom import AtomFeed
 from motor_blog.models import Post, Category
 from motor_blog import cache, models
 from motor_blog.text.link import absolute
-from motor_blog.web.lytics import tracking_pixel_url
+from motor_blog.web.lytics import ga_track_event_url
 
 
 __all__ = (
@@ -389,7 +389,10 @@ class FeedHandler(MotorBlogHandler):
         else:
             feed_url = absolute(self.reverse_url('feed'))
 
-        updated = max(max(p.mod, p.date_created) for p in self.posts)
+        if self.posts:
+            updated = max(max(p.mod, p.date_created) for p in self.posts)
+        else:
+            updated = datetime.datetime.now(tz=self.application.settings['tz'])
 
         feed = AtomFeed(
             title=title,
@@ -404,9 +407,14 @@ class FeedHandler(MotorBlogHandler):
 
         for post in self.posts:
             url = absolute(self.reverse_url('post', post.slug))
+
+            # a tracking pixel from Google to put this event into Google Analytics.
             body = post.body + \
-               '<img src="%s" width="1px" height="1px">' % tracking_pixel_url(
-                   'rss', post, this_category, self)
+                '<img src="%s" width="1px" height="1px">' % ga_track_event_url(
+                path=url,
+                title=post.title,
+                category_name=this_category.name if this_category else 'unknown',
+            )
 
             feed.add(
                 title=post.title,

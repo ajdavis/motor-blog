@@ -28,22 +28,6 @@ def q(s):
     return quote(s, safe='')
 
 
-def tracking_pixel_url(medium, post, category, handler):
-    """
-    A link to a tracking pixel on *this* Motor-Blog server, e.g.
-    http://emptysquare.net/blog/tracking-pixel.gif?<...params...>
-    """
-    tracker_pixel_args = dict(
-        medium=medium,
-        slug=post.slug,
-        title=post.full_title,
-        category_name=category.name if category else None)
-
-    return '%s?%s' % (
-        absolute(handler.reverse_url('tracking-pixel')),
-        urlencode(tracker_pixel_args))
-
-
 def format_event(category, action, label):
     """Format event-tracking data for the 'utme' parameter
     """
@@ -52,7 +36,7 @@ def format_event(category, action, label):
 
 # TODO: use category_name?
 def ga_track_event_url(
-    remote_addr, referrer, path, title, category_name
+    path, title, category_name
 ):
     """
     Format a Google Analytics tracking-GIF request.
@@ -75,8 +59,6 @@ def ga_track_event_url(
             utmp=path, # *not* quoted, based on how ga.js behaves
             utmdt=q(title),
             utmac=opts.google_analytics_id,
-            utmip=remote_addr,
-            utmr=referrer,
 
             # Next the parts I'm putting in speculatively to see if they
             # fix my problem where I'm not seeing any events tracked in GA.
@@ -85,37 +67,3 @@ def ga_track_event_url(
             # "Referral, complete URL."
             #umtr='-',
     ).items())
-
-
-class TrackingPixelHandler(tornado.web.RequestHandler):
-    @tornado.web.asynchronous
-    @gen.engine
-    def get(self):
-        self.set_header('Content-Type', 'image/gif')
-        self.write(gif)
-        self.finish()
-
-        # We've responded to client's request for our tracking pixel, now fetch
-        # a tracking pixel from Google to put this event into Google Analytics.
-        slug = self.get_argument('slug', None)
-        path = self.reverse_url('post', slug) if slug else 'unknown'
-        referrer = self.request.headers.get('referer', '-') # (sic)
-
-        # The URL we are serving was formatted by tracking_pixel_url(), parse
-        # out the CGI arguments that it inserted.
-        url = ga_track_event_url(
-            remote_addr=self.request.remote_ip,
-            referrer=referrer,
-            path=path,
-            title=self.get_argument('title', 'unknown'),
-            category_name=self.get_argument('category_name', 'unknown'),
-        )
-
-        st = time.time()
-        client = AsyncHTTPClient()
-        response = yield gen.Task(client.fetch, url)
-        body = ''
-        if 200 != response.code:
-            body = '\n' + repr(response.body)
-        logging.info('Fetched %s %.2fms %s %s%s' % (
-            url, 1000 * (time.time() - st), referrer, response.code, body))
