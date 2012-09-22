@@ -407,18 +407,9 @@ class FeedHandler(MotorBlogHandler):
 
         for post in self.posts:
             url = absolute(self.reverse_url('post', post.slug))
-
-            # a tracking pixel from Google to put this event into Google Analytics.
-            body = post.body + \
-                '<img src="%s" width="1px" height="1px">' % ga_track_event_url(
-                path=url,
-                title=post.title,
-                category_name=this_category.name if this_category else 'unknown',
-            )
-
             feed.add(
                 title=post.title,
-                content=body,
+                content=post.body,
                 content_type='html',
                 summary=post.summary,
                 author=author,
