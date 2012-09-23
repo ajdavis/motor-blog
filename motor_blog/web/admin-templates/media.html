@@ -19,6 +19,7 @@
         {% for media in mediadocs %}
         <li>
             <a class="title" href="{{ reverse_url('media', media['_id']) }}">{{ media['_id'] }}</a>
+            <span class="size">{{ int(media['length'] / 1000) }}k</span>
             <span class="date">{{ media['mod'] }}</span>
             <form action="{{ reverse_url('delete-media') }}" method="post" class="remove-media">
                 <input type="hidden" name="media_id" value="{{ media['_id'] }}">
