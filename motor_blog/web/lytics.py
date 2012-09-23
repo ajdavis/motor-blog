@@ -36,37 +36,45 @@ def format_event(category, action, label):
 
 # TODO: use category_name?
 def ga_track_event_url(
-    path, title, category_name
+    path, title, category_name, referer,
 ):
     """
     Format a Google Analytics tracking-GIF request.
     https://developers.google.com/analytics/resources/articles/gaTrackingTroubleshooting#gifParameters
+
+    http://www.vdgraaf.info/wp-content/uploads/urchin-image.txt
     """
-    utm_gif_location = "http://www.google-analytics.com/__utm.gif"
+    utmac = opts.google_analytics_id
+    utmhn = opts.host
+    utmn = str(randint(0, 0x7fffffff))
+    cookie = str(randint(0, 0x7fffffff))
+    random = str(randint(1000000000,2147483647))
+    today = str(int(time.time()))
+    referer = referer
+    uservar = '-' # enter your own user defined variable
+    utmp = path
+    
+    utm_gif_location = (
+        'http://www.google-analytics.com/__utm.gif?utmwv=1&utmn=' + utmn +
+        '&utmsr=-&utmsc=-&utmul=-&utmje=0&utmfl=-&utmdt=-&utmhn=' + utmhn +
+        '&utmr=' + referer +
+        '&utmp=' + utmp +
+        '&utmac=' + utmac +
+        '&utmcc=__utma%3D' + cookie +
+        '.' + random +
+        '.' + today +
+        '.' + today +
+        '.' + today +
+        '.2%3B%2B__utmb%3D' + cookie +
+        '%3B%2B__utmc%3D' + cookie +
+        '%3B%2B__utmz%3D' + cookie +
+        '.' + today +
+        '.2.2.utmccn%3D(direct)%7Cutmcsr%3D(direct)%7Cutmcmd%3D(none)%3B%2B__utmv%3D' + cookie +
+        '.' + uservar +
+        '%3B'
+    )
 
-    # Can't use urlencode to format these parameters, because Google actually
-    # expects tracking events to be left unescaped like
-    # "5(category*action*label)".
-    return utm_gif_location + "?" + '&'.join(
-        '%s=%s' % (k, v)
-        for k, v in dict(
-            # First the parts I'm sure I need
-            utmt='event',
-            utmwv='5.3.5', # I hope this is right
-            utmn=str(randint(0, 0x7fffffff)),
-            utmhn=q(opts.host),
-            utme=format_event('rss', 'view', title),
-            utmp=path, # *not* quoted, based on how ga.js behaves
-            utmdt=q(title),
-            utmac=opts.google_analytics_id,
-
-            # Next the parts I'm putting in speculatively to see if they
-            # fix my problem where I'm not seeing any events tracked in GA.
-            # "A random number used to link Analytics GIF requests with AdSense."
-            #utmhid=str(randint(0, 0x7fffffff)),
-            # "Referral, complete URL."
-            #umtr='-',
-    ).items())
+    return utm_gif_location
 
 
 class TrackingPixelHandler(tornado.web.RequestHandler):

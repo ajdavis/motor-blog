@@ -394,6 +394,8 @@ class FeedHandler(MotorBlogHandler):
         else:
             updated = datetime.datetime.now(tz=self.application.settings['tz'])
 
+        referer = self.request.headers.get('referer', '-') # (sic)
+
         feed = AtomFeed(
             title=title,
             feed_url=feed_url,
@@ -407,9 +409,16 @@ class FeedHandler(MotorBlogHandler):
 
         for post in self.posts:
             url = absolute(self.reverse_url('post', post.slug))
+            body = post.body + '<img src="%s" width="1px" height="1px">' % ga_track_event_url(
+                path=url,
+                title=post.title,
+                category_name=this_category.name if this_category else 'unknown',
+                referer=referer
+            )
+
             feed.add(
                 title=post.title,
-                content=post.body,
+                content=body,
                 content_type='html',
                 summary=post.summary,
                 author=author,
