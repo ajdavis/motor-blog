@@ -1,4 +1,3 @@
-import logging
 import tornado.web
 from tornado import gen
 from tornado.options import options as opts
