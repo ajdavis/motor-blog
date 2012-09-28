@@ -216,7 +216,7 @@ class Post(BlogDocument):
 
     def local_time_of_day(self, application):
         dc = self.local_date_created(application)
-        return '%s:%s %s' % (dc.hour % 12, dc.minute, dc.strftime('%p'))
+        return '%d:%02d %s' % (dc.hour % 12, dc.minute, dc.strftime('%p'))
 
     @property
     def last_modified(self):
