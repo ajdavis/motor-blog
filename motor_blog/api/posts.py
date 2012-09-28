@@ -43,6 +43,9 @@ class Posts(object):
     def _new_post(self, user, password, struct, publish, type):
         try:
             new_post = Post.from_metaweblog(struct, type, publish=publish)
+            if new_post.status == 'publish':
+                new_post.pub_date = datetime.datetime.utcnow()
+
             self.settings['db'].posts.insert(
                 new_post.to_python(),
                 callback=self._new_post_inserted)
@@ -94,6 +97,9 @@ class Posts(object):
             self.result(xmlrpclib.Fault(404, "Not found"))
         else:
             self.old_post = Post(**result)
+
+            if not self.old_post.pub_date and self.new_post.status == 'publish':
+                self.new_post.pub_date = datetime.datetime.utcnow()
 
             self.settings['db'].posts.update(
                 {'_id': result['_id']},

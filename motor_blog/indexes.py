@@ -1,11 +1,25 @@
-def ensure_indexes(db):
-    db.categories.ensure_index([('name', 1)], unique=True)
-    db.categories.ensure_index([('slug', 1)], unique=True)
+import logging
 
-    db.posts.ensure_index([('type', 1), ('_id', -1)])
-    db.posts.ensure_index([('type', 1), ('status', 1), ('_id', -1)])
-    db.posts.ensure_index([('type', 1), ('status', 1), ('categories.name', 1), ('_id', -1)])
-    db.posts.ensure_index([('slug', 1)], unique=True)
-    db.posts.ensure_index([('tags', 1)])
 
-    db.media.ensure_index([('mod', -1)])
+def ensure_indexes(sync_db, drop=False):
+    if drop:
+        logging.info('Dropping indexes...')
+        sync_db.posts.drop_indexes()
+        sync_db.categories.drop_indexes()
+        sync_db.media.drop_indexes()
+        sync_db.events.drop_indexes()
+
+    logging.info('Ensuring indexes...')
+
+    sync_db.categories.ensure_index([('name', 1)], unique=True)
+
+    sync_db.posts.ensure_index([('type', 1), ('_id', -1)])
+    sync_db.posts.ensure_index([('status', 1), ('type', 1), ('pub_date', -1)])
+    sync_db.posts.ensure_index([('status', 1), ('type', 1), ('categories.name', 1), ('pub_date', -1)])
+    sync_db.posts.ensure_index([('status', 1), ('type', 1), ('tags', 1), ('pub_date', -1)])
+    sync_db.posts.ensure_index([('slug', 1)], unique=True)
+    sync_db.posts.ensure_index([('tags', 1), ('pub_date', -1)])
+
+    sync_db.media.ensure_index([('mod', -1)])
+
+    logging.info('    done.')

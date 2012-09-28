@@ -133,7 +133,7 @@ class HomeHandler(MotorBlogHandler):
         (self.settings['db'].posts.find(
             {'status': 'publish', 'type': 'post'},
             {'summary': False, 'original': False},
-        ).sort([('_id', -1)])
+        ).sort([('pub_date', -1)])
         .skip(int(page_num) * 10)
         .limit(10)
         .to_list(callback))
@@ -152,7 +152,7 @@ class AllPostsHandler(MotorBlogHandler):
             {'status': 'publish', 'type': 'post'},
             {'display': False, 'original': False},
         )
-        .sort([('_id', -1)])
+        .sort([('pub_date', -1)])
         .to_list(callback))
 
     @tornado.web.addslash
@@ -172,7 +172,7 @@ class AllPostsHandler(MotorBlogHandler):
 #                {'status': 'publish', 'type': 'post'},
 #                {'display': False, 'original': False},
 #            )
-#            .sort([('_id', -1)])
+#            .sort([('pub_date', -1)])
 #            .to_list)
 #
 #        posts = [Post(**postdoc) for postdoc in postdocs]
@@ -220,14 +220,14 @@ class PostHandler(MotorBlogHandler):
             #   they were created; make a real publish-date and use that
             posts.find({
                 'status': 'publish', 'type': 'post',
-                '_id': {'$lt': postdoc['_id']}
-            }, fields).sort([('_id', -1)]).limit(-1).next_object(
+                'pub_date': {'$lt': postdoc['pub_date']}
+            }, fields).sort([('pub_date', -1)]).limit(-1).next_object(
                 callback=(yield gen.Callback('prevdoc')))
 
             posts.find({
                 'status': 'publish', 'type': 'post',
-                '_id': {'$gt': postdoc['_id']}
-            }, fields).sort([('_id', 1)]).limit(-1).next_object(
+                'pub_date': {'$gt': postdoc['pub_date']}
+            }, fields).sort([('pub_date', 1)]).limit(-1).next_object(
                 callback=(yield gen.Callback('nextdoc')))
 
             # Overkill for this case, but in theory we reduce latency by
@@ -259,7 +259,8 @@ class CategoryHandler(MotorBlogHandler):
             'categories.slug': slug,
         }, {
             'summary': False, 'original': False
-        }).sort([('_id', -1)]).skip(page_num * 10).limit(10).to_list(callback)
+        }).sort([('pub_date', -1)]
+        ).skip(page_num * 10).limit(10).to_list(callback)
 
     @tornado.web.addslash
     @check_last_modified
@@ -355,7 +356,7 @@ class FeedHandler(MotorBlogHandler):
         (self.settings['db'].posts.find(
             query,
             {'summary': False, 'original': False},
-        ).sort([('_id', -1)])
+        ).sort([('pub_date', -1)])
         .limit(20)
         .to_list(callback))
 
@@ -447,7 +448,7 @@ class TagHandler(MotorBlogHandler):
             'tags': tag,
         }, {
             'summary': False, 'original': False
-        }).sort([('_id', -1)]).skip(page_num * 10).limit(10).to_list(callback)
+        }).sort([('pub_date', -1)]).skip(page_num * 10).limit(10).to_list(callback)
 
     @tornado.web.addslash
     @check_last_modified
@@ -483,7 +484,7 @@ class SearchHandler(MotorBlogHandler):
                 },
                 # We only need the summary field
                 {'display': False, 'original': False},
-            ).sort([('_id', -1)])
+            ).sort([('pub_date', -1)])
 
             postdocs = yield motor.Op(cursor.to_list)
             posts = [Post(**doc) for doc in postdocs]

@@ -10,6 +10,8 @@ def options():
         "Turn on autoreload, log to stderr only"))
     tornado.options.define('ensure_indexes', default=False, type=bool, help=(
         "Ensure collection indexes before starting"))
+    tornado.options.define('rebuild_indexes', default=False, type=bool, help=(
+        "Drop all indexes and recreate before starting"))
     tornado.options.define('logdir', type=str, default='log', help=(
         "Location of logging (if debug mode is off)"))
 

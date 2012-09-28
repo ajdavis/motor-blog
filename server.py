@@ -45,10 +45,10 @@ if __name__ == "__main__":
     db = motor.MotorConnection().open_sync().motorblog
     cache.startup(db)
 
-    if opts.ensure_indexes:
-        logging.info('Ensuring indexes...')
-        indexes.ensure_indexes(db)
-        logging.info('    done.')
+    if opts.rebuild_indexes or opts.ensure_indexes:
+        indexes.ensure_indexes(
+            db.connection.sync_connection().motorblog,
+            opts.rebuild_indexes)
 
     base_url = opts.base_url
 

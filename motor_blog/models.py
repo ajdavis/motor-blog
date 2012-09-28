@@ -81,6 +81,7 @@ class Post(BlogDocument):
     categories = SortedListField(EmbeddedDocumentField(EmbeddedCategory))
     slug = StringField(default='')
     wordpress_id = IntField() # legacy id from WordPress
+    pub_date = DateTimeField()
     mod = DateTimeField()
     # Post was moved, this is its new slug
     redirect = StringField(default=None)
@@ -195,6 +196,10 @@ class Post(BlogDocument):
         if 'id' in dct:
             dct['_id'] = dct.pop('id')
         return dct
+
+    @property
+    def date_created(self):
+        return utc_tz.localize(self.pub_date) if self.pub_date else super(Post, self).date_created
 
     def local_date_created(self, application):
         dc = self.date_created
