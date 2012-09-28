@@ -113,5 +113,7 @@ if __name__ == "__main__":
 
     http_server = httpserver.HTTPServer(application, xheaders=True)
     http_server.listen(opts.port)
-    logging.info('Listening on port %s' % opts.port)
+    msg = 'Listening on port %s' % opts.port
+    print msg
+    logging.info(msg)
     tornado.ioloop.IOLoop.instance().start()
