@@ -36,8 +36,6 @@ from motor_blog.web.admin import *
 # TODO: a static-url function to set long cache TTL on media URLs
 # TODO: Nginx cache media
 # TODO: mobile theme, detect mobile and allow cookie to return to desktop
-# TODO: default theme, move emptysquare to separate themes dir
-# TODO: search?
 # TODO: sitemap.xml
 
 if __name__ == "__main__":
