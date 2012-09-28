@@ -105,7 +105,12 @@ console sessions.
         * wordpress_to_markdown.py: convert from the WordPress's particular HTML to markdown, for migrate_from_wordpress.py
         * abbrev.py: convert from HTML to truncated plain text for all-posts page
     * tools/:
-        * migrate\_from\_wordpress.py: Tool for migrating from my old Wordpress blog to Motor-Blog
+        * migrate\_from\_wordpress.py: Tool for migrating from my old Wordpress blog to Motor-Blog.
+          I wrote this tool when Motor didn't support GridFS, so it puts all media
+          from Wordpress into single documents in the "media" collection, which
+          brings us to...
+        * migrate\_media\_to\_gridfs.py: Tool to migrate media from a single
+          document per image in the "media" collection to GridFS.
     * cache.py: Cache results from MongoDB, invalidate when events are emitted
     * indexes.py: Index definitions for server.py --ensure_indexes
     * options.py: Configuration parsing

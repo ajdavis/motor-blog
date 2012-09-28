@@ -6,7 +6,6 @@ def ensure_indexes(sync_db, drop=False):
         logging.info('Dropping indexes...')
         sync_db.posts.drop_indexes()
         sync_db.categories.drop_indexes()
-        sync_db.media.drop_indexes()
         sync_db.events.drop_indexes()
 
     logging.info('Ensuring indexes...')
@@ -19,7 +18,5 @@ def ensure_indexes(sync_db, drop=False):
     sync_db.posts.ensure_index([('status', 1), ('type', 1), ('tags', 1), ('pub_date', -1)])
     sync_db.posts.ensure_index([('slug', 1)], unique=True)
     sync_db.posts.ensure_index([('tags', 1), ('pub_date', -1)])
-
-    sync_db.media.ensure_index([('mod', -1)])
 
     logging.info('    done.')

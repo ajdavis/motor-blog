@@ -25,6 +25,8 @@ except ImportError:
 
     raise
 
+from motor.web import GridFSHandler
+
 from motor_blog import indexes, cache, options
 
 from motor_blog.api.handlers import APIHandler, RSDHandler
@@ -89,7 +91,7 @@ if __name__ == "__main__":
         U(r"category/(?P<slug>.+)/feed/?", FeedHandler, name='category-feed'),
 
         # Web
-        U(r"media/(?P<url>.+)", MediaHandler, name='media'),
+        U(r"media/(.+)", GridFSHandler, {"database": db}, name='media'),
         U(r"tracking-pixel.gif", TrackingPixelHandler, name='tracking-pixel'),
         U(r"theme/static/(.+)", StaticFileHandler, {"path": static_path}, name='theme-static'),
         U(r"category/(?P<slug>.+)/page/(?P<page_num>\d+)/?", CategoryHandler, name='category-page'),

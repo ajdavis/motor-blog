@@ -2,6 +2,7 @@ import logging
 import tornado.web
 from tornado import gen
 from tornado.options import options as opts
+from bson import ObjectId
 import motor
 
 from motor_blog.models import Post, Category
@@ -112,8 +113,8 @@ class MediaPageHandler(MotorBlogAdminHandler):
     def get(self, page_num=0):
         page_num = int(page_num)
         mediadocs = yield motor.Op(
-            self.settings['db'].media.find({}, {'content': False})
-            .sort([('mod', -1)])
+            self.settings['db'].fs.files.find()
+            .sort([('uploadDate', -1)])
             .skip(page_num * 40)
             .limit(40)
             .to_list)
@@ -130,15 +131,6 @@ class DeleteMediaHandler(MotorBlogAdminHandler):
             raise tornado.web.HTTPError(401)
 
         media_id = self.get_argument('media_id')
-        result = yield motor.Op(
-            self.settings['db'].media.remove, {'_id': media_id})
-
-        n = result.get('n', 0)
-        if n == 0:
-            raise tornado.web.HTTPError(404)
-        elif n == 1:
-            self.redirect(self.reverse_url('media-page'))
-        else:
-            logging.error("Response %s to deleting media with _id %s",
-                result, repr(media_id))
-            raise tornado.web.HTTPError(500)
+        fs = yield motor.Op(motor.MotorGridFS(self.settings['db']).open)
+        yield motor.Op(fs.delete, ObjectId(media_id))
+        self.redirect(self.reverse_url('media-page'))

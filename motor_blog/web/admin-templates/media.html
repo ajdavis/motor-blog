@@ -16,17 +16,31 @@
 {% block content %}
     <p><a href="{{ reverse_url('drafts') }}">Go to drafts page.</a></p>
     {% if mediadocs %}
+        <p>
+            Note that if you ever update a file, all versions appear here.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Size</th>
+                    <th>Uploaded</th>
+                </tr>
+            </thead>
         {% for media in mediadocs %}
-        <li>
-            <a class="title" href="{{ reverse_url('media', media['_id']) }}">{{ media['_id'] }}</a>
-            <span class="size">{{ int(media['length'] / 1000) }}k</span>
-            <span class="date">{{ media['mod'] }}</span>
+        <tr>
+            <td><a class="title" href="{{ reverse_url('media', media['filename']) }}">{{ media['filename'] }}</a></td>
+            <td class="size">{{ int(media['length'] / 1024) }} k</td>
+            <td class="date">{{ handler._convert_header_value(media['uploadDate']) }}</td>
+            <td>
             <form action="{{ reverse_url('delete-media') }}" method="post" class="remove-media">
                 <input type="hidden" name="media_id" value="{{ media['_id'] }}">
                 <input type="submit" value="remove">
             </form>
-        </li>
+            </td>
+        </tr>
         {% end %}
+        </table>
     {% else %}
         <p>No media. Upload some by adding images to your posts in MarsEdit!</p>
     {% end %}
