@@ -19,4 +19,6 @@ def ensure_indexes(sync_db, drop=False):
     sync_db.posts.ensure_index([('slug', 1)], unique=True)
     sync_db.posts.ensure_index([('tags', 1), ('pub_date', -1)])
 
+    sync_db.fs.files.ensure_index([('uploadDate', 1)])
+
     logging.info('    done.')
