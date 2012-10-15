@@ -68,7 +68,7 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         category_docs = None
         try:
             category_docs = yield motor.Op(
-                self.settings['db'].categories.find().sort('name').to_list)
+                self.db.categories.find().sort('name').to_list)
 
         except Exception, e:
             callback(None, e)
@@ -131,7 +131,7 @@ def check_last_modified(get):
 
 class HomeHandler(MotorBlogHandler):
     def get_posts(self, callback, page_num=0):
-        (self.settings['db'].posts.find(
+        (self.db.posts.find(
             {'status': 'publish', 'type': 'post'},
             {'summary': False, 'original': False},
         ).sort([('pub_date', -1)])
@@ -149,7 +149,7 @@ class HomeHandler(MotorBlogHandler):
 
 class AllPostsHandler(MotorBlogHandler):
     def get_posts(self, callback):
-        (self.settings['db'].posts.find(
+        (self.db.posts.find(
             {'status': 'publish', 'type': 'post'},
             {'display': False, 'original': False},
         )
@@ -169,7 +169,7 @@ class AllPostsHandler(MotorBlogHandler):
 #    @tornado.web.addslash
 #    def get(self):
 #        postdocs = yield motor.Op(
-#            self.settings['db'].posts.find(
+#            self.db.posts.find(
 #                {'status': 'publish', 'type': 'post'},
 #                {'display': False, 'original': False},
 #            )
@@ -177,7 +177,7 @@ class AllPostsHandler(MotorBlogHandler):
 #            .to_list)
 #
 #        posts = [Post(**postdoc) for postdoc in postdocs]
-#        categories = yield motor.Op(get_categories, self.settings['db'])
+#        categories = yield motor.Op(get_categories, self.db)
 #        categories = [Category(**doc) for doc in categories]
 #
 #        mod = max(
@@ -199,7 +199,7 @@ class PostHandler(MotorBlogHandler):
     @gen.engine
     def get_posts(self, slug, callback):
         slug = slug.rstrip('/')
-        posts = self.settings['db'].posts
+        posts = self.db.posts
         postdoc = yield motor.Op(posts.find_one,
             {'slug': slug, 'status': 'publish'},
             {'summary': False, 'original': False})
@@ -254,7 +254,7 @@ class CategoryHandler(MotorBlogHandler):
     def get_posts(self, callback, slug, page_num=0):
         page_num = int(page_num)
         slug = slug.rstrip('/')
-        self.settings['db'].posts.find({
+        self.db.posts.find({
             'status': 'publish',
             'type': 'post',
             'categories.slug': slug,
@@ -288,7 +288,7 @@ class FeedHandler(MotorBlogHandler):
             slug = slug.rstrip('/')
             query['categories.slug'] = slug
 
-        (self.settings['db'].posts.find(
+        (self.db.posts.find(
             query,
             {'summary': False, 'original': False},
         ).sort([('pub_date', -1)])
@@ -377,7 +377,7 @@ class TagHandler(MotorBlogHandler):
     def get_posts(self, callback, tag, page_num=0):
         page_num = int(page_num)
         tag = tag.rstrip('/')
-        self.settings['db'].posts.find({
+        self.db.posts.find({
             'status': 'publish',
             'type': 'post',
             'tags': tag,
@@ -413,7 +413,7 @@ class SearchHandler(MotorBlogHandler):
                 re.compile('.*' + re.escape(w) + '.*', re.IGNORECASE)
                 for w in words]
 
-            cursor = self.settings['db'].posts.find({
+            cursor = self.db.posts.find({
                     'status': 'publish', 'type': 'post',
                     '$or': [{'original': regex} for regex in regexes]
                 },
