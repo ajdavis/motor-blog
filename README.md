@@ -49,7 +49,7 @@ Copy motor\_blog.conf.example to motor\_blog.conf, edit it as desired. Start the
 
     python server.py --debug
 
-Visit http://localhost:8888/
+Visit http://localhost:8888/blog
 
 ## Production Deployment
 
