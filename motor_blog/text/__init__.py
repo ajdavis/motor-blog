@@ -18,7 +18,8 @@ class HTMLPassThrough(HTMLParser):
         return ''.join(self.out)
 
     def handle_endtag(self, tag):
-        assert self.stack and self.stack[-1] == tag
+        assert self.stack, "Unmatched closing tag %s" % tag
+        assert self.stack[-1] == tag, "Unmatched closing tag %s, expected %s" % (tag, self.stack[-1])
         self.stack.pop()
         self.out.append('</%s>' % tag)
 
