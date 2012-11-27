@@ -137,7 +137,7 @@ class HomeHandler(MotorBlogHandler):
         ).sort([('pub_date', -1)])
         .skip(int(page_num) * 10)
         .limit(10)
-        .to_list(callback))
+        .to_list(callback=callback))
 
     @tornado.web.addslash
     @check_last_modified
@@ -154,7 +154,7 @@ class AllPostsHandler(MotorBlogHandler):
             {'display': False, 'original': False},
         )
         .sort([('pub_date', -1)])
-        .to_list(callback))
+        .to_list(callback=callback))
 
     @tornado.web.addslash
     @check_last_modified
@@ -220,16 +220,22 @@ class PostHandler(MotorBlogHandler):
             fields = {'summary': False, 'body': False, 'original': False}
             # TODO: this will break if drafts are published out of the order
             #   they were created; make a real publish-date and use that
-            posts.find({
-                'status': 'publish', 'type': 'post',
-                'pub_date': {'$lt': postdoc['pub_date']}
-            }, fields).sort([('pub_date', -1)]).limit(-1).next_object(
+            posts.find_one(
+                {
+                    'status': 'publish', 'type': 'post',
+                    'pub_date': {'$lt': postdoc['pub_date']}
+                },
+                fields,
+                sort=[('pub_date', -1)],
                 callback=(yield gen.Callback('prevdoc')))
 
-            posts.find({
-                'status': 'publish', 'type': 'post',
-                'pub_date': {'$gt': postdoc['pub_date']}
-            }, fields).sort([('pub_date', 1)]).limit(-1).next_object(
+            posts.find_one(
+                {
+                    'status': 'publish', 'type': 'post',
+                    'pub_date': {'$gt': postdoc['pub_date']}
+                },
+                fields,
+                sort=[('pub_date', 1)],
                 callback=(yield gen.Callback('nextdoc')))
 
             # Overkill for this case, but in theory we reduce latency by
@@ -262,7 +268,7 @@ class CategoryHandler(MotorBlogHandler):
         }, {
             'summary': False, 'original': False
         }).sort([('pub_date', -1)]
-        ).skip(page_num * 10).limit(10).to_list(callback)
+        ).skip(page_num * 10).limit(10).to_list(callback=callback)
 
     @tornado.web.addslash
     @check_last_modified
@@ -294,7 +300,7 @@ class FeedHandler(MotorBlogHandler):
             {'summary': False, 'original': False},
         ).sort([('pub_date', -1)])
         .limit(20)
-        .to_list(callback))
+        .to_list(callback=callback))
 
     @check_last_modified
     def get(self, slug=None):
@@ -384,7 +390,7 @@ class TagHandler(MotorBlogHandler):
             'tags': tag,
         }, {
             'summary': False, 'original': False
-        }).sort([('pub_date', -1)]).skip(page_num * 10).limit(10).to_list(callback)
+        }).sort([('pub_date', -1)]).skip(page_num * 10).limit(10).to_list(callback=callback)
 
     @tornado.web.addslash
     @check_last_modified
