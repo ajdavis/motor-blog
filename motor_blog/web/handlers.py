@@ -211,6 +211,7 @@ class PostHandler(MotorBlogHandler):
             # This redirect marks where a real post or page used to be.
             # Send the client there. Note we don't run the callback; we're
             # done.
+            # TODO: actually, we *do* run the callback, is that correct?
             url = self.reverse_url('post', postdoc['redirect'])
             self.redirect(url, permanent=True)
 
