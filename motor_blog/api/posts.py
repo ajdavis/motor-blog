@@ -40,9 +40,9 @@ class Posts(object):
     def wp_getPages(self, blogid, user, password, num_posts):
         self._recent(user, password, num_posts, 'page')
 
-    def _new_post(self, user, password, struct, publish, type):
+    def _new_post(self, user, password, struct, type):
         try:
-            new_post = Post.from_metaweblog(struct, type, publish=publish)
+            new_post = Post.from_metaweblog(struct, type)
             if new_post.status == 'publish':
                 new_post.pub_date = datetime.datetime.utcnow()
 
@@ -62,27 +62,30 @@ class Posts(object):
     @tornadorpc.async
     @auth
     def metaWeblog_newPost(self, blogid, user, password, struct, publish):
-        self._new_post(user, password, struct, publish, 'post')
+        self._new_post(user, password, struct, 'post')
 
     @tornadorpc.async
     @auth
     def wp_newPage(self, blogid, user, password, struct, publish):
-        self._new_post(user, password, struct, publish, 'page')
+        # As of MarsEdit 3.5.7 or so, the 'publish' parameter is wrong and
+        # the post status is actually in struct['post_status']
+        self._new_post(user, password, struct, 'page')
 
     @tornadorpc.async
     @auth
     def metaWeblog_editPost(self, postid, user, password, struct, publish):
-        self._edit_post(postid, user, password, struct, publish, 'post')
+        # As of MarsEdit 3.5.7 or so, the 'publish' parameter is wrong and
+        # the post status is actually in struct['post_status']
+        self._edit_post(postid, user, password, struct, 'post')
 
     @tornadorpc.async
     @auth
     def wp_editPage(self, blogid, postid, user, password, struct, publish):
-        self._edit_post(postid, user, password, struct, publish, 'page')
+        self._edit_post(postid, user, password, struct, 'page')
 
-    def _edit_post(self, postid, user, password, struct, publish, type):
+    def _edit_post(self, postid, user, password, struct, type):
         try:
-            self.new_post = Post.from_metaweblog(
-                struct, type, publish=publish, is_edit=True)
+            self.new_post = Post.from_metaweblog(struct, type, is_edit=True)
 
             self.settings['db'].posts.find_one({'_id': ObjectId(postid)},
                 callback=self._got_old_post)
