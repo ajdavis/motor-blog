@@ -93,7 +93,7 @@ class Post(BlogDocument):
 
     @classmethod
     def from_metaweblog(
-        cls, struct, post_type='post', publish=True, is_edit=False
+        cls, struct, post_type='post', is_edit=False
     ):
         """Receive metaWeblog RPC struct and initialize a Post.
            Used both by migrate_from_wordpress and when receiving a new or
@@ -119,7 +119,7 @@ class Post(BlogDocument):
             else slugify.slugify(title))
 
         description = struct.get('description', '')
-        status = 'publish' if publish else 'draft'
+        status = struct.get('post_status', 'publish')
         if 'date_modified_gmt' in struct:
             tup = struct['date_modified_gmt'].timetuple()
             mod = utc_tz.localize(datetime.datetime(*tup[0:6]))
