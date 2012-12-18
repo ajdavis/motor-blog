@@ -4,7 +4,6 @@
 
 {% block content %}
 <h1 class="page-title">Tag: {{ this_tag }}</h1>
-{% set title_link = True %}
 {% for post in posts %}
     {% include "post.html" %}
 {% end %}

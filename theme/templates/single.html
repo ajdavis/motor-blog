@@ -6,8 +6,27 @@
 {% block body-class %}single-post{% end %}
 
 {% block content %}
-{% set title_link = False %}
 {% include "post.html" %}
+
+{% if post.type == 'post' %}
+<footer class="entry-meta">
+    {% if post.categories %}
+        Categories:
+        {% for i, category in enumerate(post.categories) %}
+            <a href="{{ reverse_url('category', category.slug) }}" title="View all posts in {{ category.name }}" rel="category tag">
+                {{ category.name }}</a>{% if i < len(post.categories) - 1 %},{% end %}
+        {% end %}
+    {% end %}
+    {% if post.categories and post.tags %}<br>{% end %}
+    {% if post.tags %}
+        Tags:
+        {% for i, tag in enumerate(post.tags) %}
+            <a href="{{ reverse_url('tag', tag) }}" title="View all posts tagged {{ tag }}" rel="category tag">
+                {{ tag }}</a>{% if i < len(post.tags) - 1 %},{% end %}
+        {% end %}
+    {% end %}
+</footer>
+{% end %}
 
 <nav id="nav-below">
     {% if prev %}
