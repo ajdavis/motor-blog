@@ -35,13 +35,11 @@
         </div><!-- #primary -->
 
         <div id="secondary" class="widget-area" role="complementary">
-            <div class="widget widget_square">
-            </div>
+            <a id="logo" href="{{ reverse_url('home') }}">
+                <img src="/{{ base_url }}/theme/static/square96.png" height="96px" width="96px">
+            </a>
             <aside class="widget widget_categories">
                 <ul>
-                    <li class="menu-item menu-item-home">
-                        <a href="{{ reverse_url('home') }}">Home</a>
-                    </li>
                     {% for category in categories %}
                     <li class="cat-item">
                         <a href="{{ reverse_url('category', category.slug) }}" title="View all posts filed under {{ category.name }}">

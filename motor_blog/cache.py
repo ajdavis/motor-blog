@@ -24,7 +24,7 @@ def create_events_collection(db):
     """Pass in MotorDatabase, create capped collection synchronously at
        startup
     """
-    sync_cx = db.connection.sync_connection()
+    sync_cx = db.connection.sync_client()
     sync_db = sync_cx[db.name]
     try:
         # Size is in bytes; event documents are rare and very small

@@ -6,7 +6,7 @@
 body {
     background: url("/blog/theme/static/paisley-4.png") no-repeat fixed 100% 100% white;
     font-family: Museo,Palatino,Georgia,Serif;
-    font-size: 100%;
+    font-size: 110%;
 }
 
 /* =Structure
@@ -42,7 +42,7 @@ body.search #primary {
     left: 25px;
     padding: 18px 0;
     position: fixed;
-    top: 5px;
+    top: 20px;
     width: 180px;
 }
 
@@ -168,7 +168,9 @@ a {
 }
 
 h1 {
-	font-size: 220%;
+	font-size: 160%;
+    color: #606060;
+    margin: 25px 0 17px 0;
 }
 
 pre {
@@ -181,21 +183,34 @@ pre {
     line-height: 1.1em;
 }
 
-/* Hide nav controls on most pages */
-#access { display: none; }
-body.home #access, body.search #access { display: block; }
+/* Make inline code spans closer in size to normal Museo text */
+code {
+    font-size: 115%;
+}
 
-h1.entry-title {
+pre code {
+    font-size: 110%;
+}
+
+div.entry-content {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+h1.entry-title, h1.entry-title a {
 	margin: 15px 0 5px 0;
+    text-decoration: none;
+    color: #202020;
+    font-size: 140%;
 }
 
-div.entry-meta {
-	margin-bottom: 25px;
+.entry-meta {
+	margin: 15px 0;
 }
 
-.entry-meta a, .entry-title a {
+.entry-meta a {
 	text-decoration: none;
-	color: #808080;
+	color: #404040;
 }
 .entry-meta a:hover, .entry-title a:hover {
 	text-decoration: underline;
@@ -206,15 +221,12 @@ div.entry-meta {
 	clear: both;
 	display: block;
 	color: #808080;
-	font-size: 70%;
+	/*font-size: 70%;*/
 }
 
 #content nav {
 	display: block;
 	overflow: hidden;
-}
-#content nav#nav-above .nav-previous, #content nav#nav-above .nav-next {
-	display: none;
 }
 
 #content nav .nav-previous {
@@ -268,45 +280,6 @@ div.entry-meta {
 	text-align: center;
 }
 
-/* Aside Posts */
-.format-aside .entry-header {
-	display: none;
-}
-.single .format-aside .entry-header {
-	display: block;
-}
-.format-aside .entry-content,
-.format-aside .entry-summary {
-	padding-top: 1em;
-}
-.single .format-aside .entry-content,
-.single .format-aside .entry-summary {
-	padding-top: 0;
-}
-
-/* Gallery Posts */
-.format-gallery .gallery-thumb {
-	float: left;
-	margin: 0 1em 0 0;
-}
-
-/* Image Posts */
-.format-image .entry-header {
-	display: none;
-}
-.single .format-image .entry-header {
-	display: block;
-}
-.format-image .entry-content,
-.format-image .entry-summary {
-	padding-top: 1em;
-}
-.single .format-image .entry-content,
-.single .format-image .entry-summary {
-	padding-top: 0;
-}
-
-
 /* =Images
 -------------------------------------------------------------- */
 
@@ -315,26 +288,6 @@ a img {
 }
 p img {
 	margin-bottom: 0.5em; /* a small bottom margin prevents content floating under images */
-}
-/*
-Resize images to fit the main content area.
-- Applies only to images uploaded via WordPress by targeting size-* classes.
-- Other images will be left alone. Use "size-auto" class to apply to other images.
-*/
-img.size-auto,
-img.size-full,
-img.size-large,
-img.size-medium,
-.attachment img,
-.widget-area img {
-	max-width: 100%; /* When images are too wide for containing element, force them to fit. */
-	height: auto; /* Override height to match resized width for correct aspect ratio. */
-}
-img.alignleft {
-	margin-right: 1em;
-}
-img.alignright {
-	margin-left: 1em;
 }
 .wp-caption {
 	padding: .5em;
@@ -373,8 +326,7 @@ img.alignright {
 	text-decoration: underline;
 }
 li.cat-item, li.menu-item {
-    list-style-type: square;
-    margin-left:13px;
+    list-style-type: none;
     color: #808080;
 }
 li.menu-item-search {
@@ -408,14 +360,8 @@ li.menu-item-search {
 	top:1px;
 }
 
-/* Start off with only the image background (the square)
-   on the first widget visible; clicking on it will reveal
-   the rest with jQuery.slideDown() in emptysquare_blog.js */
-#secondary div.widget_square {
-	background-image:url("/blog/theme/static/square96.png");
-	background-repeat:no-repeat;
-	padding-top: 104px; /* Room for the background image */
-    margin: 13px 0 0 37px;
+#logo  {
+    margin-left: 37px;
 }
 
 #secondary aside.widget_nav_menu {
@@ -426,6 +372,6 @@ li.menu-item-search {
 -------------------------------------------------------------- */
 
 #colophon {
-    padding: 1em 0 0;
+    padding: 1em 0.2em 0;
     z-index: 2;
 }

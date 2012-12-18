@@ -44,12 +44,12 @@ if __name__ == "__main__":
     opts = options.options()
 
     # TODO: Mongo connection options
-    db = motor.MotorConnection().open_sync().motorblog
+    db = motor.MotorClient().open_sync().motorblog
     cache.startup(db)
 
     if opts.rebuild_indexes or opts.ensure_indexes:
         indexes.ensure_indexes(
-            db.connection.sync_connection().motorblog,
+            db.connection.sync_client().motorblog,
             opts.rebuild_indexes)
 
     base_url = opts.base_url

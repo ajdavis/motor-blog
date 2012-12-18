@@ -212,7 +212,7 @@ class Post(BlogDocument):
 
     def local_long_date(self, application):
         dc = self.local_date_created(application)
-        return '%s %s, %s' % (dc.strftime('%B'), dc.day, dc.year)
+        return '%s %s, %s' % (dc.strftime('%b'), dc.day, dc.year)
 
     def local_time_of_day(self, application):
         dc = self.local_date_created(application)
