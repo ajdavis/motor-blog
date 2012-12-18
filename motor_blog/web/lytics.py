@@ -2,36 +2,13 @@
 
 import os
 from random import randint
-from urllib import urlencode, quote
 import time
 
 import tornado.web
-from tornado import gen
-from tornado.httpclient import AsyncHTTPClient
-from tornado.options import options as opts, logging
-
-from motor_blog.text.link import absolute
+from tornado.options import options as opts
 
 
 __all__ = ['TrackingPixelHandler']
-
-
-# Contents of a 1-pixel clear gif, served to client as tracking pixel
-gif = open(os.path.normpath(
-    os.path.join(os.path.dirname(__file__), '1px.gif')), 'rb').read()
-
-
-def q(s):
-    """Parameters quoted for a Google Analytics request need the slash escaped,
-       too
-    """
-    return quote(s, safe='')
-
-
-def format_event(category, action, label):
-    """Format event-tracking data for the 'utme' parameter
-    """
-    return '5(%s*%s*%s)' % (q(category), q(action), q(label))
 
 
 # TODO: use category_name?
@@ -75,6 +52,11 @@ def ga_track_event_url(
     )
 
     return utm_gif_location
+
+
+# Contents of a 1-pixel clear gif, served to client as tracking pixel
+gif = open(os.path.normpath(
+    os.path.join(os.path.dirname(__file__), '1px.gif')), 'rb').read()
 
 
 class TrackingPixelHandler(tornado.web.RequestHandler):
