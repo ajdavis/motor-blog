@@ -2,13 +2,9 @@
 
 {% block body-class %}home{% end %}
 
-{% block nav-header %}
-    {% include "nav.html" %}
-{% end %}
-
 {% block content %}
 {% for post in posts %}
-    {% include "post.html" %}
+    {% include "post-summary.html" %}
 {% end %}
 
 <nav id="nav-below">
