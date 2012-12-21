@@ -26,8 +26,9 @@
 
 <body class="{% block body-class %}{% end %}">
 <div id="page">
-    {% block nav-header %}{% end %}
     <div id="main">
+        {% include "switch-mobile.html" %}
+        {% block nav-header %}{% end %}
         <div id="primary">
             <div id="content" role="main">
                 {% block content %}{% end %}

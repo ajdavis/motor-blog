@@ -12,6 +12,17 @@ body {
 /* =Structure
 -------------------------------------------------------------- */
 
+#switch-mobile {
+    clear: both;
+    font-size: 24px;
+    margin: 36px 0 0 200px;
+}
+#switch-mobile a {
+    text-decoration: none;
+}
+#main {
+    clear: both;
+}
 #page {
 	display: block;
 	margin: 1em;
