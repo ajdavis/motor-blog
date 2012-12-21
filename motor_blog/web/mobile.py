@@ -89,5 +89,5 @@ class NoMobileHandler(MobileMixin, tornado.web.RequestHandler):
         self.set_desktop()
         self.redirect('%s://%s%s' % (
             self.request.protocol,
-            lremove('m.', self.request.host),
+            lremove(self.settings['mobile_subdomain'], self.request.host),
             next_uri))
