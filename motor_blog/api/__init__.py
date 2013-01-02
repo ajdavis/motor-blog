@@ -1,7 +1,27 @@
 import functools
 import inspect
 import xmlrpclib
+
+import tornadorpc
+from tornado import stack_context, gen
 from tornado.options import options as opts
+
+
+def superwraps(wrapped):
+    """Replaces wrapper's arg spec with wrapped function's.
+    For when functools.wraps() just isn't enough.
+    """
+    def wrap(wrapper):
+        argspec = inspect.getargspec(wrapped)
+        formatted_args = inspect.formatargspec(*argspec)
+        fndef = 'lambda %s: wrapper%s' % (
+            formatted_args.lstrip('(').rstrip(')'), formatted_args)
+
+        fake_fn = eval(fndef, {'wrapper': wrapper})
+        return fake_fn
+        return functools.wraps(wrapper)(fake_fn)
+
+    return wrap
 
 
 def auth(fn):
@@ -18,11 +38,29 @@ def auth(fn):
         else:
             return fn(*args, **kwargs)
 
-    # For tornadorpc to think _auth has the same arguments as fn,
-    # functools.wraps() isn't enough.
-    formatted_args = inspect.formatargspec(*argspec)
-    fndef = 'lambda %s: _auth%s' % (
-        formatted_args.lstrip('(').rstrip(')'), formatted_args)
+    return superwraps(fn)(_auth)
 
-    fake_fn = eval(fndef, {'_auth': _auth})
-    return functools.wraps(fn)(fake_fn)
+
+def fault(f):
+    @superwraps(f)
+    def _f(self, *args, **kwargs):
+        def fault_exception_handler(type, value, traceback):
+            self.result(xmlrpclib.Fault(500, str(value)))
+            return False # Propagate the exception up
+
+        with stack_context.ExceptionStackContext(fault_exception_handler):
+            f(self, *args, **kwargs)
+
+    return _f
+
+
+def engine(f):
+    """Like gen.engine, but copy method signature
+    """
+    return superwraps(f)(gen.engine(f))
+
+
+def rpc(f):
+    """Decorate a function with tornadorpc.async, auth, and fault.
+    """
+    return tornadorpc.async(auth(fault(f)))

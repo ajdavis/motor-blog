@@ -175,6 +175,7 @@ class Post(BlogDocument):
             'postid': str(self.id),
             'id': str(self.id),
             'status': self.status,
+            'wp_slug': self.slug,
         }
 
         if self.type == 'post':
