@@ -9,7 +9,7 @@ Blog platform based on Tornado, MongoDB, and Motor. To be used with MarsEdit.
 * [Tornado](http://www.tornadoweb.org/)
 * [Motor](http://emptysquare.net/motor/), my experimental asynchronous MongoDB driver for Tornado
 * [Greenlet](http://pypi.python.org/pypi/greenlet)
-* Other packages in `motor_blog.reqs`
+* Other packages in `requirements.txt`
 
 # Features
 
@@ -27,7 +27,7 @@ Blog platform based on Tornado, MongoDB, and Motor. To be used with MarsEdit.
 
 * Install MongoDB and run it on the default port on the same machine as Motor-Blog
 
-* `pip install -r motor_blog.reqs`
+* `pip install -r requirements.txt`
 
 * To migrate from a prior WordPress blog with migrate\_from\_wordpress.py you'll
   need [Pandoc](http://johnmacfarlane.net/pandoc/)
