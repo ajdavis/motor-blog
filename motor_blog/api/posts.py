@@ -16,7 +16,7 @@ class Posts(object):
        related to blog posts and pages
     """
     @gen.engine
-    def _recent(self, user, password, num_posts, type):
+    def _recent(self, num_posts, type):
         cursor = self.settings['db'].posts.find({'type': type})
         cursor.sort([('_id', -1)]).limit(num_posts) # _id starts with timestamp
         posts = yield motor.Op(cursor.to_list)
@@ -26,11 +26,11 @@ class Posts(object):
 
     @rpc
     def metaWeblog_getRecentPosts(self, blogid, user, password, num_posts):
-        self._recent(user, password, num_posts, 'post')
+        self._recent(num_posts, 'post')
 
     @rpc
     def wp_getPages(self, blogid, user, password, num_posts):
-        self._recent(user, password, num_posts, 'page')
+        self._recent(num_posts, 'page')
 
     @engine
     def _new_post(self, user, password, struct, type):
@@ -54,7 +54,7 @@ class Posts(object):
         self._new_post(user, password, struct, 'page')
 
     @engine
-    def _edit_post(self, postid, user, password, struct, type):
+    def _edit_post(self, postid, struct, type):
         new_post = Post.from_metaweblog(struct, type, is_edit=True)
         db = self.settings['db']
 
@@ -96,14 +96,14 @@ class Posts(object):
     def metaWeblog_editPost(self, postid, user, password, struct, publish):
         # As of MarsEdit 3.5.7 or so, the 'publish' parameter is wrong and
         # the post status is actually in struct['post_status']
-        self._edit_post(postid, user, password, struct, 'post')
+        self._edit_post(postid, struct, 'post')
 
     @rpc
     def wp_editPage(self, blogid, postid, user, password, struct, publish):
-        self._edit_post(postid, user, password, struct, 'page')
+        self._edit_post(postid, struct, 'page')
 
     @engine
-    def _get_post(self, postid, user, password):
+    def _get_post(self, postid):
         postdoc = yield motor.Op(self.settings['db'].posts.find_one,
             {'_id': ObjectId(postid)})
 
@@ -115,10 +115,10 @@ class Posts(object):
 
     @rpc
     def metaWeblog_getPost(self, postid, user, password):
-        self._get_post(postid, user, password)
+        self._get_post(postid)
 
     @engine
-    def _delete_post(self, user, password, postid):
+    def _delete_post(self, postid):
         # TODO: a notion of 'trashed', not removed
         result = yield motor.Op(self.settings['db'].posts.remove,
             {'_id': ObjectId(postid)})
@@ -130,8 +130,8 @@ class Posts(object):
 
     @rpc
     def blogger_deletePost(self, appkey, postid, user, password, publish):
-        self._delete_post(user, password, postid)
+        self._delete_post(postid)
 
     @rpc
     def wp_deletePage(self, blogid, user, password, postid):
-        self._delete_post(user, password, postid)
+        self._delete_post(postid)

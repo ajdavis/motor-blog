@@ -10,14 +10,9 @@ class Tags(object):
     @rpc
     @engine
     def wp_getTags(self, blogid, user, password):
-        tags = set()
+        tags = yield motor.Op(
+            self.settings['db'].posts.find().distinct, 'tags')
 
-        # TODO: use aggregate()
-        for post in (yield motor.Op(
-            self.settings['db'].posts.find({}, {'tags': 1}).to_list)):
-            tags = tags.union(set(post.get('tags', [])))
-
-        # Done
         self.result([
             {'name': tag, 'tag_id': tag}
             for tag in sorted(list(tags))])
