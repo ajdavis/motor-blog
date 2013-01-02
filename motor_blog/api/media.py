@@ -3,11 +3,9 @@ import os
 
 import bson
 import motor
-import tornadorpc
-from tornado import gen
 from tornado.options import options as opts
 
-from motor_blog.api import auth, fault
+from motor_blog.api import engine, rpc
 from motor_blog.text.link import media_link, absolute
 
 
@@ -15,7 +13,7 @@ class Media(object):
     """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
        related to images and potentially other media
     """
-    @gen.engine
+    @engine
     def _new_media_object(self, blogid, user, password, struct):
         name = struct['name']
         content = struct['bits'].data # xmlrpclib created a 'Binary' object
@@ -37,8 +35,6 @@ class Media(object):
         self.result({
             'file': name, 'url': full_link, 'type': media_type})
 
-    @tornadorpc.async
-    @auth
-    @fault
+    @rpc
     def metaWeblog_newMediaObject(self, blogid, user, password, struct):
         self._new_media_object(blogid, user, password, struct)

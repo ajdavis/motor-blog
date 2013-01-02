@@ -3,12 +3,11 @@
 import datetime
 import xmlrpclib
 
-import tornadorpc
 import motor
 from tornado import gen
 from bson.objectid import ObjectId
 
-from motor_blog.api import auth, fault
+from motor_blog.api import engine, rpc
 from motor_blog.models import Post
 
 
@@ -25,19 +24,15 @@ class Posts(object):
             Post(**post).to_metaweblog(self.application)
             for post in posts])
 
-    @tornadorpc.async
-    @auth
-    @fault
+    @rpc
     def metaWeblog_getRecentPosts(self, blogid, user, password, num_posts):
         self._recent(user, password, num_posts, 'post')
 
-    @tornadorpc.async
-    @auth
-    @fault
+    @rpc
     def wp_getPages(self, blogid, user, password, num_posts):
         self._recent(user, password, num_posts, 'page')
 
-    @gen.engine
+    @engine
     def _new_post(self, user, password, struct, type):
         new_post = Post.from_metaweblog(struct, type)
         if new_post.status == 'publish':
@@ -48,21 +43,17 @@ class Posts(object):
 
         self.result(str(_id))
 
-    @tornadorpc.async
-    @auth
-    @fault
+    @rpc
     def metaWeblog_newPost(self, blogid, user, password, struct, publish):
         self._new_post(user, password, struct, 'post')
 
-    @tornadorpc.async
-    @auth
-    @fault
+    @rpc
     def wp_newPage(self, blogid, user, password, struct, publish):
         # As of MarsEdit 3.5.7 or so, the 'publish' parameter is wrong and
         # the post status is actually in struct['post_status']
         self._new_post(user, password, struct, 'page')
 
-    @gen.engine
+    @engine
     def _edit_post(self, postid, user, password, struct, type):
         new_post = Post.from_metaweblog(struct, type, is_edit=True)
         db = self.settings['db']
@@ -101,21 +92,17 @@ class Posts(object):
                 # Done
                 self.result(True)
 
-    @tornadorpc.async
-    @auth
-    @fault
+    @rpc
     def metaWeblog_editPost(self, postid, user, password, struct, publish):
         # As of MarsEdit 3.5.7 or so, the 'publish' parameter is wrong and
         # the post status is actually in struct['post_status']
         self._edit_post(postid, user, password, struct, 'post')
 
-    @tornadorpc.async
-    @auth
-    @fault
+    @rpc
     def wp_editPage(self, blogid, postid, user, password, struct, publish):
         self._edit_post(postid, user, password, struct, 'page')
 
-    @gen.engine
+    @engine
     def _get_post(self, postid, user, password):
         postdoc = yield motor.Op(self.settings['db'].posts.find_one,
             {'_id': ObjectId(postid)})
@@ -126,13 +113,11 @@ class Posts(object):
             post = Post(**postdoc)
             self.result(post.to_metaweblog(self.application))
 
-    @tornadorpc.async
-    @auth
-    @fault
+    @rpc
     def metaWeblog_getPost(self, postid, user, password):
         self._get_post(postid, user, password)
 
-    @gen.engine
+    @engine
     def _delete_post(self, user, password, postid):
         # TODO: a notion of 'trashed', not removed
         result = yield motor.Op(self.settings['db'].posts.remove,
@@ -143,13 +128,10 @@ class Posts(object):
         else:
             self.result(True)
 
-    @tornadorpc.async
-    @auth
-    @fault
+    @rpc
     def blogger_deletePost(self, appkey, postid, user, password, publish):
         self._delete_post(user, password, postid)
 
-    @tornadorpc.async
-    @auth
+    @rpc
     def wp_deletePage(self, blogid, user, password, postid):
         self._delete_post(user, password, postid)

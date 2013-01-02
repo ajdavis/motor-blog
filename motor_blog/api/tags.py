@@ -1,16 +1,15 @@
 import motor
-import tornadorpc
-from tornado import gen
 
-from motor_blog.api import auth, fault
+from motor_blog.api import engine, rpc
 
 
 class Tags(object):
     """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
        related to tags
     """
-    @gen.engine
-    def _get_tags(self, blogid, user, password):
+    @rpc
+    @engine
+    def wp_getTags(self, blogid, user, password):
         tags = set()
 
         # TODO: use aggregate()
@@ -22,9 +21,3 @@ class Tags(object):
         self.result([
             {'name': tag, 'tag_id': tag}
             for tag in sorted(list(tags))])
-
-    @tornadorpc.async
-    @auth
-    @fault
-    def wp_getTags(self, blogid, user, password):
-        self._get_tags(blogid, user, password)

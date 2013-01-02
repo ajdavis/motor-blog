@@ -1,7 +1,9 @@
 import functools
 import inspect
 import xmlrpclib
-from tornado import stack_context
+
+import tornadorpc
+from tornado import stack_context, gen
 from tornado.options import options as opts
 
 
@@ -50,3 +52,15 @@ def fault(f):
             f(self, *args, **kwargs)
 
     return _f
+
+
+def engine(f):
+    """Like gen.engine, but copy method signature
+    """
+    return superwraps(f)(gen.engine(f))
+
+
+def rpc(f):
+    """Decorate a function with tornadorpc.async, auth, and fault.
+    """
+    return tornadorpc.async(auth(fault(f)))
