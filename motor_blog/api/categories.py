@@ -12,8 +12,9 @@ class Categories(object):
     """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
        related to categories
     """
+    @rpc
     @engine
-    def _get_categories(self, blogid, user, password):
+    def wp_getCategories(self, blogid, user, password):
         # Could cache this as we do on the web side, but not worth the risk
         db = self.settings['db']
         categories = yield motor.Op(
@@ -23,11 +24,8 @@ class Categories(object):
             Category(**c).to_wordpress(self.application) for c in categories])
 
     @rpc
-    def wp_getCategories(self, blogid, user, password):
-        self._get_categories(blogid, user, password)
-
     @engine
-    def _get_post_categories(self, postid, user, password):
+    def mt_getPostCategories(self, postid, user, password):
         post = yield motor.Op(self.settings['db'].posts.find_one,
             {'_id': ObjectId(postid)})
 
@@ -39,11 +37,8 @@ class Categories(object):
                 for cat in Post(**post).categories])
 
     @rpc
-    def mt_getPostCategories(self, postid, user, password):
-        self._get_post_categories(postid, user, password)
-
     @engine
-    def _new_category(self, blogid, user, password, struct):
+    def wp_newCategory(self, blogid, user, password, struct):
         category = Category.from_wordpress(struct)
         _id = yield motor.Op(self.settings['db'].categories.insert,
             category.to_python())
@@ -52,11 +47,8 @@ class Categories(object):
         self.result(str(_id))
 
     @rpc
-    def wp_newCategory(self, blogid, user, password, struct):
-        self._new_category(blogid, user, password, struct)
-
     @engine
-    def _set_post_categories(self, postid, user, password, categories):
+    def mt_setPostCategories(self, postid, user, password, categories):
         embedded_cats = [
             EmbeddedCategory.from_metaweblog(cat).to_python()
             for cat in categories]
@@ -69,8 +61,3 @@ class Categories(object):
             self.result(xmlrpclib.Fault(404, 'Not found'))
         else:
             self.result('')
-
-    @rpc
-    def mt_setPostCategories(self, postid, user, password, categories):
-        self._set_post_categories(postid, user, password, categories)
-

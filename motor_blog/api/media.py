@@ -13,8 +13,9 @@ class Media(object):
     """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
        related to images and potentially other media
     """
+    @rpc
     @engine
-    def _new_media_object(self, blogid, user, password, struct):
+    def metaWeblog_newMediaObject(self, blogid, user, password, struct):
         name = struct['name']
         content = struct['bits'].data # xmlrpclib created a 'Binary' object
         media_type = struct['type']
@@ -34,7 +35,3 @@ class Media(object):
         
         self.result({
             'file': name, 'url': full_link, 'type': media_type})
-
-    @rpc
-    def metaWeblog_newMediaObject(self, blogid, user, password, struct):
-        self._new_media_object(blogid, user, password, struct)
