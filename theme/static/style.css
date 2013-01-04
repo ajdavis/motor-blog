@@ -5,8 +5,19 @@
 
 body {
     background: url("/blog/theme/static/paisley-4.png") no-repeat fixed 100% 100% white;
+    background-size: 550px 550px;
     font-family: Museo,Palatino,Georgia,Serif;
     font-size: 110%;
+}
+
+@media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
+only screen and (min--moz-device-pixel-ratio: 1.5),
+only screen and (-o-min-device-pixel-ratio: 3/2),
+only screen and (min-device-pixel-ratio: 1.5),
+only screen and (min-resolution: 2dppx) {
+    body {
+        background-image: url("/blog/theme/static/paisley-4@2x.png");
+    }
 }
 
 /* =Structure
