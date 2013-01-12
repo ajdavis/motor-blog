@@ -49,7 +49,7 @@
                     </li>
                     {% end %}
                     <li class="menu-item menu-item-search">
-                        <form class="search-form" action="{{ reverse_url('search') }}" method="post">
+                        <form class="search-form" action="{{ reverse_url('search') }}" method="get">
                             {% try %}
                                 {% set query = q %}
                             {% except NameError %}
