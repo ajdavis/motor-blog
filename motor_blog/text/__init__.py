@@ -56,7 +56,8 @@ class HTMLToWords(HTMLParser):
 
     def handle_data(self, data):
         for word in whitespace.split(data):
-            self.emit(word)
+            if word.strip():
+                self.emit(word.strip())
 
     def handle_entityref(self, name):
         self.emit('&%s;' % name)
