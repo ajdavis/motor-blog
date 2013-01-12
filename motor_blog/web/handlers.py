@@ -410,7 +410,7 @@ class SearchHandler(MotorBlogHandler):
         # TODO: refactor with check_last_modified(), this is gross
         #   we need an async version of RequestHandler.prepare()
         categorydocs = yield motor.Op(self.get_categories)
-        self.categories = categories = [Category(**doc) for doc in categorydocs]
+        self.categories = [Category(**doc) for doc in categorydocs]
 
         # TODO: pagination
         # TODO: this is hideously inefficient and inaccurate, wait for Mongo FTS
