@@ -10,7 +10,8 @@ from tornado.options import options as opts
 from motor_blog.text.link import absolute
 
 import pytz
-from motor_blog.text import markup, summarize, slugify, remove_image_sizes
+from motor_blog.text import (
+    markup, summarize, slugify, remove_image_sizes, plain)
 
 utc_tz = pytz.timezone('UTC')
 
@@ -71,6 +72,8 @@ class Post(BlogDocument):
     body = StringField(default='')
     # Input from MarsEdit or migrate_from_wordpress
     original = StringField(default='')
+    # Plain text
+    plain = StringField(default='')
     # Plain-text excerpt
     summary = StringField(default='')
     author = StringField(default='')
@@ -133,6 +136,7 @@ class Post(BlogDocument):
             title=title,
             # Format for display
             body=body,
+            plain=plain.plain(body),
             summary=summarize.summarize(body, 200),
             original=description,
             tags=tags,
