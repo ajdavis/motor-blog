@@ -81,17 +81,6 @@ ul.menu {
 	margin-bottom: 10px;
 }
 
-#colophon {
-	position: fixed;	
-	bottom: 0;
-	height: 25px;
-	width: 21em;
-	left: 0;
-	background-color: white;
-	font-size: 70%;
-	color: #808080;
-}
-
 /* Increase the size of the content area for templates without sidebars */
 .full-width #content,
 .image-attachment #content,
@@ -388,12 +377,4 @@ li.menu-item-search {
 
 #secondary aside.widget_nav_menu {
     display: block;
-}
-
-/* =Footer
--------------------------------------------------------------- */
-
-#colophon {
-    padding: 1em 0.2em 0;
-    z-index: 2;
 }
