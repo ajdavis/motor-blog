@@ -5,7 +5,6 @@ import datetime
 import email.utils
 import functools
 import time
-import re
 
 import tornado.web
 from tornado import gen
@@ -412,25 +411,16 @@ class SearchHandler(MotorBlogHandler):
         categorydocs = yield motor.Op(self.get_categories)
         self.categories = [Category(**doc) for doc in categorydocs]
 
-        # TODO: pagination
-        # TODO: this is hideously inefficient and inaccurate, wait for Mongo FTS
         q = self.get_argument('q', None)
         if q:
-            words = [w.strip() for w in q.split() if w.strip()]
-            regexes = [
-                re.compile('.*' + re.escape(w) + '.*', re.IGNORECASE)
-                for w in words]
+            response = yield motor.Op(self.db.command, 'text', 'posts',
+                search=q,
+                filter={'status': 'publish', 'type': 'post'},
+                projection={
+                    'display': False, 'original': False, 'plain': False},
+                limit=50)
 
-            cursor = self.db.posts.find({
-                    'status': 'publish', 'type': 'post',
-                    '$or': [{'original': regex} for regex in regexes]
-                },
-                # We only need the summary field
-                {'display': False, 'original': False},
-            ).sort([('pub_date', -1)])
-
-            postdocs = yield motor.Op(cursor.to_list)
-            posts = [Post(**doc) for doc in postdocs]
+            posts = [Post(**result['obj']) for result in response['results']]
         else:
             posts = []
         self.render('search.html', q=q, posts=posts)

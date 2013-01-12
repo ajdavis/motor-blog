@@ -1,3 +1,4 @@
+import re
 from HTMLParser import HTMLParser
 
 
@@ -38,3 +39,30 @@ class HTMLPassThrough(HTMLParser):
 
     def handle_charref(self, name):
         return self.handle_entityref('#' + name)
+
+
+whitespace = re.compile('(\w+)')
+
+
+class HTMLToWords(HTMLParser):
+    """Strip tags
+    """
+    def __init__(self, *args, **kwargs):
+        HTMLParser.__init__(self, *args, **kwargs)
+        self.out = []
+
+    def emit(self, thing):
+        self.out.append(thing)
+
+    def handle_data(self, data):
+        for word in whitespace.split(data):
+            self.emit(word)
+
+    def handle_entityref(self, name):
+        self.emit('&%s;' % name)
+
+    def handle_charref(self, name):
+        return self.handle_entityref('#' + name)
+
+    def words(self):
+        return self.out
