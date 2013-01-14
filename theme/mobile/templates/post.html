@@ -2,7 +2,7 @@
     <header class="entry-header">
         <h1 class="entry-title">
             <a href="{{ reverse_url('post', post.slug) }}">
-                {{ post.title }}
+                {% raw post.title %}
             </a>
         </h1>
 
