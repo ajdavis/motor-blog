@@ -1,4 +1,4 @@
-from motor_blog.text import HTMLToWords
+from motor_blog.text import HTMLStripTags
 
 __all__ = ('plain', )
 
@@ -6,6 +6,6 @@ __all__ = ('plain', )
 def plain(html):
     """Returns plain text
     """
-    parser = HTMLToWords()
+    parser = HTMLStripTags()
     parser.feed(html)
-    return ' '.join(parser.words())
+    return parser.value()
