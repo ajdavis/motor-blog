@@ -1,6 +1,6 @@
 {% set href = reverse_url('post', post.slug) %}
 <li class="post-summary">
-    <p><a class="title" href="{{ href }}">{{ post.title }}</a></p>
+    <p><a class="title" href="{{ href }}">{% raw post.title %}</a></p>
     <p class="date"><a href="{{ href }}">{{ post.local_long_date(handler.application) }}</a></p>
-    <p class="excerpt"><a href="{{ href }}">{{ post.summary }}</a></p>
+    <p class="excerpt"><a href="{{ href }}">{% raw post.summary %}</a></p>
 </li>

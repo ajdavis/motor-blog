@@ -8,7 +8,7 @@
         {% for post in drafts %}
             <li>
                 {# TODO: refactor w/ all-posts #}
-                <a class="title" href="{{ reverse_url('draft', post.slug) }}">{{ post.title }} </a>
+                <a class="title" href="{{ reverse_url('draft', post.slug) }}">{% raw post.title %} </a>
                 <span class="date">{{ post.local_short_date(handler.application) }}</span>
                 <span class="excerpt"><p>{% raw post.summary %}</p></span>
             </li>

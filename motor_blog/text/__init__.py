@@ -41,29 +41,46 @@ class HTMLPassThrough(HTMLParser):
         return self.handle_entityref('#' + name)
 
 
-whitespace = re.compile('(\w+)')
+whitespace = re.compile('\s+')
 
 
-class HTMLToWords(HTMLParser):
+class HTMLStripTags(HTMLParser):
     """Strip tags
     """
     def __init__(self, *args, **kwargs):
         HTMLParser.__init__(self, *args, **kwargs)
-        self.out = []
-
-    def emit(self, thing):
-        self.out.append(thing)
+        self.out = ""
 
     def handle_data(self, data):
-        for word in whitespace.split(data):
-            if word.strip():
-                self.emit(word.strip())
+        self.out += data
 
     def handle_entityref(self, name):
-        self.emit('&%s;' % name)
+        self.out += '&%s;' % name
 
     def handle_charref(self, name):
         return self.handle_entityref('#' + name)
 
-    def words(self):
-        return self.out
+    def value(self):
+        # Collapse whitespace
+        return whitespace.sub(' ', self.out).strip()
+
+
+class HTMLStripTags(HTMLParser):
+    """Strip tags
+    """
+    def __init__(self, *args, **kwargs):
+        HTMLParser.__init__(self, *args, **kwargs)
+        self.out = ""
+
+    def handle_data(self, data):
+        self.out += data
+
+    def handle_entityref(self, name):
+        self.out += '&%s;' % name
+
+    def handle_charref(self, name):
+        return self.handle_entityref('#' + name)
+
+    def value(self):
+        # Collapse whitespace
+        return whitespace.sub(' ', self.out).strip()

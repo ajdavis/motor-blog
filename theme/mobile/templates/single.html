@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}
-{{ post.title }} | {{ setting('author_display_name') }}
+{% raw post.title %} | {{ setting('author_display_name') }}
 {% end %}
 
 {% block body-class %}single-post{% end %}

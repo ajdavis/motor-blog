@@ -1,4 +1,6 @@
-from motor_blog.text import HTMLToWords
+from motor_blog.text import whitespace
+from motor_blog.text.plain import plain
+
 
 __all__ = ('summarize', )
 
@@ -6,16 +8,15 @@ __all__ = ('summarize', )
 def summarize(html, n):
     """Returns plain-text summary
     """
-    parser = HTMLToWords()
-    parser.feed(html)
     summary = []
     length = 0
-    for word in parser.words():
-        if length + len(word) < n:
-            summary.append(word)
-            length += len(word)
-        else:
-            break
+    for word in whitespace.split(plain(html)):
+        if word:
+            if length + len(word) < n:
+                summary.append(word)
+                length += len(word)
+            else:
+                break
     else:
         # Not truncated
         return ' '.join(summary)
