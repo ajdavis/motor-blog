@@ -39,7 +39,7 @@ only screen and (min-resolution: 2dppx) {
 	margin: 1em;
 }	
 #primary {
-  width: 660px;
+  width: 600px;
   padding-right: 5px;
   margin: 32px 0 70px 200px;
   background: white;
@@ -206,10 +206,11 @@ pre code {
 div.entry-content {
     text-align: justify;
     text-justify: inter-word;
+    margin-bottom: 35px;
 }
 
 h1.entry-title, h1.entry-title a {
-	margin: 15px 0 5px 0;
+    margin: 15px 0 5px 0;
     text-decoration: none;
     color: #202020;
     font-size: 140%;
