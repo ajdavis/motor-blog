@@ -7,6 +7,7 @@
     <link rel="shortcut icon" href="/{{ base_url }}/theme/static/favicon.gif" />
     <title>{% block title %}{{ setting('author_display_name') }}{% end %}</title>
     <link rel="stylesheet" type="text/css" media="all" href="/{{ base_url }}/theme/static/style.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="/{{ base_url }}/theme/static/common.css" />
     <link rel="pingback" href="{{ reverse_url('api') }}" />
     <link rel="alternate" type="application/rss+xml" title="{{ setting('blog_name') }} - Feed" href="http://feeds.feedburner.com/emptysquare" />
 
@@ -57,7 +58,7 @@
                             {% end %}
 
                             <input type="text" id="search-input" name="q" class="search-text-input" value="{{ query }}">
-                            <input type="submit" id="search-submit" value="search" class="search-submit-input">
+                            <input type="submit" id="search-submit" value="search" class="button search-button">
                         </form>
                     </li>
                 </ul>

@@ -55,6 +55,10 @@ pre code {
     padding: 10px 0 0;
 }
 
+#nomobile a {
+    padding: 5px 10px;
+}
+
 #header h1 a, #nomobile a {
     font-weight: bold;
     text-decoration: none;
