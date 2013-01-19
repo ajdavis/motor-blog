@@ -63,24 +63,3 @@ class HTMLStripTags(HTMLParser):
     def value(self):
         # Collapse whitespace
         return whitespace.sub(' ', self.out).strip()
-
-
-class HTMLStripTags(HTMLParser):
-    """Strip tags
-    """
-    def __init__(self, *args, **kwargs):
-        HTMLParser.__init__(self, *args, **kwargs)
-        self.out = ""
-
-    def handle_data(self, data):
-        self.out += data
-
-    def handle_entityref(self, name):
-        self.out += '&%s;' % name
-
-    def handle_charref(self, name):
-        return self.handle_entityref('#' + name)
-
-    def value(self):
-        # Collapse whitespace
-        return whitespace.sub(' ', self.out).strip()
