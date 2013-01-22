@@ -21,6 +21,8 @@ Blog platform based on Tornado, MongoDB, and Motor. To be used with MarsEdit.
 * Comments: Motor-Blog does not support comments natively, I recommend a
   third-party Javascript comments API like [Disqus](http://disqus.com).
 
+* Retina Ready: See [image-handling](#image-handling) below.
+
 * Customization: Appearance is completely customizable.
 
 # Installation
@@ -64,7 +66,8 @@ Give it a name and the URL of your Motor-Blog's home page.
 MarsEdit auto-detects the rest. You'll need to enter the username and password you put in motor_blog.conf.
 In the "General" tab of your blog's settings, I suggest setting "Download the 1000 most recent posts on refresh,"
 since Motor-Blog can handle it.
-Under "Editing," set Preview Text Filter to "Markdown."
+Under "Editing," set Preview Text Filter to "Markdown",
+and Image Size "Defaults To Full Size".
 When you're editing a post, do "View -> Slug Field" to set a custom slug as the final
 part of the post's URL.
 If you leave the slug empty, Motor-Blog slugifies the title.
@@ -82,6 +85,24 @@ Syntax-highlighted code is indented with four spaces, and the first line is like
 is whatever [Pygments](http://pygments.org/languages/) supports, including the following of
 interest to Python coders like me: `py`, `py3`, `pytb` and `py3tb` for tracebacks, and `pycon` for
 console sessions.
+
+## <a id="image-handling"></a>Image Handling
+
+Motor-Blog tries to show images beautifully on every device.
+
+When you upload an image, Motor-Blog resizes the image to 600px wide and centers it.
+If your theme has columns of some width other than 600px, override `maxwidth`
+in `motor_blog.conf`.
+Motor-Blog strips the `width` and `height` attributes from
+`\<img\>` tags so images can be resized responsively on mobile screens.
+
+## Retina display support
+
+To support visitors with Retina displays, upload your images at double resolution and named like
+`<filename>@2x.<extension>`, for example `image@2x.jpg`.
+Motor-Blog replaces such images with regular images but stores the retina image for later.
+The default theme includes `retina.js`, which replaces regular images with double-res
+images on retina devices.
 
 # Customization
 

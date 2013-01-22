@@ -51,6 +51,8 @@ def options():
         "Directory name of your theme files"))
     tornado.options.define('timezone', type=str, default='America/New_York', help=(
         "Directory name of your theme files"))
+    tornado.options.define('maxwidth', type=int, default=600,
+        help="Maximum width of images for non-retina displays")
 
     # Parse config file, then command line, so command line switches take
     # precedence

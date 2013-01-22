@@ -9,3 +9,4 @@ dictshield
 cMarkdown
 beautifulsoup4
 requests
+PIL
