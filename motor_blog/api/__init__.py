@@ -46,7 +46,7 @@ def fault(f):
     def _f(self, *args, **kwargs):
         def fault_exception_handler(type, value, traceback):
             self.result(xmlrpclib.Fault(500, str(value)))
-            return False # Propagate the exception up
+            return True # Swallow exception
 
         with stack_context.ExceptionStackContext(fault_exception_handler):
             f(self, *args, **kwargs)
