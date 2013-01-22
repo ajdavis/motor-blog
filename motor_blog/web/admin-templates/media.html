@@ -11,6 +11,16 @@
             });
         });
     </script>
+    <style type="text/css">
+        .media-table, .media-table th, .media-table td {
+            border: 1px solid #666666;
+            border-collapse: collapse;
+            padding: 5px 10px;
+        }
+        .media-table th {
+            background-color: #dedede;
+        }
+</style>
 {% end %}
 
 {% block content %}
@@ -19,18 +29,21 @@
         <p>
             Note that if you ever update a file, all versions appear here.
         </p>
-        <table>
+        <table class="media-table">
             <thead>
                 <tr>
                     <th>Title</th>
-                    <th>Size</th>
+                    <th>Bytes</th>
+                    <th>Dimensions</th>
                     <th>Uploaded</th>
+                    <th></th>
                 </tr>
             </thead>
         {% for media in mediadocs %}
         <tr>
             <td><a class="title" href="{{ reverse_url('media', media['filename']) }}">{{ media['filename'] }}</a></td>
             <td class="size">{{ int(media['length'] / 1024) }} k</td>
+            <td class="size">{{ media.get('width') }} x {{ media.get('height') }}</td>
             <td class="date">{{ handler._convert_header_value(media['uploadDate']) }}</td>
             <td>
             <form action="{{ reverse_url('delete-media') }}" method="post" class="remove-media">
