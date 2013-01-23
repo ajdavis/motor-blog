@@ -4,6 +4,7 @@ base_url = 'blog'
 user = 'admin'
 password = 'foobar'
 blog_name = author_display_name = 'A. Jesse Jiryu Davis'
+description = "A. Jesse Jiryu Davis's blog on Python, Tornado, MongoDB, Zen, and photography"
 google_analytics_id = 'UA-1234578-1' # Replace with your own
 theme = 'theme'
 log_file_prefix = 'log/motor-blog.log'

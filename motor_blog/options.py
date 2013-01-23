@@ -34,6 +34,8 @@ def options():
         "Author name to display in posts and titles"))
     tornado.options.define('author_email', type=str, help=(
         "Author email to display in feed"))
+    tornado.options.define('description', type=str, help=(
+        "Site description"))
     tornado.options.define('google_analytics_id', type=str, help=(
         "Like 'UA-123456-1'"))
 

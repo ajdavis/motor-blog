@@ -20,6 +20,8 @@
         })();
     </script>
     <link rel="EditURI" type="application/rsd+xml" title="RSD" href="{{ reverse_url('rsd') }}" />
+    <meta name="description" content="{% block meta_description %}{{ setting('description') }}{% end %}" />
+    <meta name="author" content="{{ setting('author_display_name') }}" />
     <meta name="generator" content="Motor-Blog" />
 </head>
 

@@ -3,6 +3,8 @@
 {{ post.title }} | {{ setting('author_display_name') }}
 {% end %}
 
+{% block meta_description %}{{ post.meta_description or setting('description') }}{% end %}
+
 {% block body-class %}single-post{% end %}
 
 {% block content %}

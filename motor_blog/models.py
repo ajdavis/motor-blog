@@ -80,6 +80,7 @@ class Post(BlogDocument):
     type = StringField(choices=('post', 'page'), default='post')
     status = StringField(
         choices=('publish', 'draft', 'redirect'), default='publish')
+    meta_description = StringField(default='')
     tags = SortedListField(StringField())
     categories = SortedListField(EmbeddedDocumentField(EmbeddedCategory))
     slug = StringField(default='')
@@ -104,6 +105,12 @@ class Post(BlogDocument):
         """
         title = struct.get('title', '')
 
+        custom_fields = {
+            field['key']: field['value']
+            for field in struct.get('custom_fields', [])}
+
+        meta_description = custom_fields.get('description', '')
+
         # We expect MarsEdit to set categories with mt_setPostCategories()
         assert 'categories' not in struct
 
@@ -114,7 +121,6 @@ class Post(BlogDocument):
             ]
         else:
             tags = None
-
 
         slug = (
             slugify.slugify(struct['wp_slug'])
@@ -139,6 +145,7 @@ class Post(BlogDocument):
             plain=plain.plain(body),
             summary=summarize.summarize(body, 200),
             original=description,
+            meta_description=meta_description,
             tags=tags,
             slug=slug,
             type=post_type,
