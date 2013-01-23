@@ -71,7 +71,7 @@ and Image Size "Defaults To Full Size".
 Under "Custom Fields," add a "description" field. This lets you set the
 meta-description field for each post, which search engines show as the excerpt:
 
-![MarsEdit custom field setup](https://raw.github.com/ajdavis/motor-blog/master/doc/_static/marsedit-description-custom-field.png)
+![MarsEdit custom field setup](https://raw.github.com/ajdavis/motor-blog/master/docs/_static/marsedit-description-custom-field.png)
 
 When you're editing a post, do "View -> Slug Field" to set a custom slug as the final
 part of the post's URL.
