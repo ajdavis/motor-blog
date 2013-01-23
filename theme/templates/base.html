@@ -2,13 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
     {# TODO: replace w/ theme_url or something #}
     <link rel="shortcut icon" href="/{{ base_url }}/theme/static/favicon.gif" />
     <title>{% block title %}{{ setting('author_display_name') }}{% end %}</title>
     <link rel="stylesheet" type="text/css" media="all" href="/{{ base_url }}/theme/static/style.css" />
     <link rel="stylesheet" type="text/css" media="all" href="/{{ base_url }}/theme/static/common.css" />
-    <link rel="pingback" href="{{ reverse_url('api') }}" />
     <link rel="alternate" type="application/rss+xml" title="{{ setting('blog_name') }} - Feed" href="http://feeds.feedburner.com/emptysquare" />
 
     <script type="text/javascript">
@@ -26,47 +24,39 @@
 </head>
 
 <body class="{% block body-class %}{% end %}">
-<div id="page">
-    <div id="main">
-        {% include "switch-mobile.html" %}
-        {% block nav-header %}{% end %}
-        <div id="primary">
-            <div id="content" role="main">
-                {% block content %}{% end %}
-            </div><!-- #content -->
-        </div><!-- #primary -->
-
-        <div id="secondary" class="widget-area" role="complementary">
-            <a id="logo" href="{{ reverse_url('home') }}">
-                <img src="/{{ base_url }}/theme/static/square96.png" height="96px" width="96px">
-            </a>
-            <aside class="widget widget_categories">
-                <ul>
-                    {% for category in categories %}
-                    <li class="cat-item">
-                        <a href="{{ reverse_url('category', category.slug) }}" title="View all posts filed under {{ category.name }}">
-                            {{ category.name }}
-                        </a>
-                    </li>
+    {% include "switch-mobile.html" %}
+    <div class="sidebar" role="complementary">
+        <a class="logo" href="{{ reverse_url('home') }}">
+            <img src="/{{ base_url }}/theme/static/square96.png" height="96px" width="96px">
+        </a>
+        <ul class="sidebar-list">
+            {% for category in categories %}
+            <li>
+                <a href="{{ reverse_url('category', category.slug) }}" title="View all posts filed under {{ category.name }}">
+                    {{ category.name }}
+                </a>
+            </li>
+            {% end %}
+            <li class="search-item">
+                <form class="search-form" action="{{ reverse_url('search') }}" method="get">
+                    {% try %}
+                        {% set query = (q or '') %}
+                    {% except NameError %}
+                        {% set query = '' %}
                     {% end %}
-                    <li class="menu-item menu-item-search">
-                        <form class="search-form" action="{{ reverse_url('search') }}" method="get">
-                            {% try %}
-                                {% set query = (q or '') %}
-                            {% except NameError %}
-                                {% set query = '' %}
-                            {% end %}
 
-                            <input type="text" id="search-input" name="q" class="search-text-input" value="{{ query }}">
-                            <input type="submit" id="search-submit" value="search" class="button search-button">
-                        </form>
-                    </li>
-                </ul>
-            </aside>
-        </div>
-
+                    <input type="text" id="search-input" name="q" class="search-text-input" value="{{ query }}">
+                    <input type="submit" id="search-submit" value="search" class="button search-button">
+                </form>
+            </li>
+        </ul>
     </div>
-</div>
-<script type="text/javascript" src="/{{ base_url }}/theme/static/retina.js"></script>
+
+    <div class="main" role="main">
+        {% block nav-header %}{% end %}
+        {% block content %}{% end %}
+    </div>
+
+    <script type="text/javascript" src="/{{ base_url }}/theme/static/retina.js"></script>
 </body>
 </html>

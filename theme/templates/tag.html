@@ -3,7 +3,7 @@
 {% block body-class %}archive tag{% end %}
 
 {% block content %}
-<h1 class="page-title">Tag: {{ this_tag }}</h1>
+<h1 class="title page-title">Tag: {{ this_tag }}</h1>
 {% for post in posts %}
     {% include "post.html" %}
 {% end %}

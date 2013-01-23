@@ -8,6 +8,7 @@ body {
     background-size: 550px 550px;
     font-family: Museo,Palatino,Georgia,Serif;
     font-size: 110%;
+    margin: 0;
 }
 
 @media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
@@ -22,171 +23,62 @@ only screen and (min-resolution: 2dppx) {
 
 /* =Structure
 -------------------------------------------------------------- */
-
-#switch-mobile {
+.switch-mobile {
     clear: both;
     font-size: 36px;
     width: 600px;
     margin: 36px 0 0 200px;
 }
-#switch-mobile a {
+.switch-mobile a {
     text-decoration: none;
     text-align: center;
     width: 584px;
 }
-#main {
-    clear: both;
-}
-#page {
-	display: block;
-	margin: 1em;
-}	
-#primary {
+.main {
   width: 600px;
-  padding-right: 5px;
-  margin: 32px 0 70px 200px;
-  background: white;
+  margin-left: 238px;
   clear: both;
 }
-
-body.single #primary {
-	margin-top: 0;
-}
-
-body.home #primary, body.search #primary {
-  border-top: 1px dotted #333333;
-  padding-top: 5px;
-}
-body.search #primary {
+.search .main {
     padding-top: 25px;
 }
-#content {
-  
-}
-#main .widget-area {
-    left: 25px;
-    padding: 18px 0;
+.sidebar {
     position: fixed;
-    top: 20px;
+    left: 25px;
+    top: 18px;
     width: 180px;
 }
 
-.widget_nav_menu h1 {
-	display: none;
+.nav {
+    clear: both;
+    border-bottom: 1px dotted #333333;
 }
-
-.widget_search, .widget_text {
-    padding-left:38px;
-}
-
-ul.menu {
-	list-style-type: none;
-	margin-bottom: 10px;
-}
-
-/* Increase the size of the content area for templates without sidebars */
-.full-width #content,
-.image-attachment #content,
-.error404 #content {
-	margin: 0;
-}
-
-/* Alignment */
-.alignleft {
-	display: inline;
-	float: left;
-}
-.alignright {
-	display: inline;
-	float: right;
-}
-.aligncenter {
-	clear: both;
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-
-/* =Header
--------------------------------------------------------------- */
-
-#site-title {
-	display:none;
-	font-size: 2em;
-	font-weight: bold;
-	margin: .67em 0;
-}
-#site-description {
-	display:none;
-	font-size: 1em;
-	font-weight: normal;
-	margin: 0 0 1em;
-}
-#access {
-    background: none repeat scroll 0 0 white;
-    margin: 0 0 30px 200px;
-    padding-right: 5px;
-    width: 660px;
-}
-#access ul {
+.nav-list {
     list-style: none outside none;
-    margin: 0;
-    padding-left: 0;
+    padding: 0 0 14px 0;
+    margin: 14px 0;
 }
-#access li {
+.nav-list li {
     float: left;
-    position: relative;
 }
-#access a {
-    display: block;
-    line-height: 2em;
-    padding: 0 2em 0 0;
+.nav-list a {
+    padding: 0 44px 0 0;
     text-decoration: none;
     color: #808080;
 }
-#access ul ul {
-    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
-    display: none;
-    float: left;
-    left: 0;
-    position: absolute;
-    top: 2em;
-    z-index: 99999;
+.title {
+    font-size: 200%;
 }
-#access ul ul ul {
-    left: 100%;
-    top: 0;
-}
-#access ul ul a {
-    background: none repeat scroll 0 0 #DEDEDE;
-    height: auto;
-    line-height: 1em;
-    padding: 0.5em 0.5em 0.5em 1em;
-    width: 10em;
-}
-#access li:hover > a, #access ul ul *:hover > a {
-    text-decoration: underline;
-}
-#access ul ul a:hover {
-    text-decoration: underline;
-}
-#access ul li:hover > ul {
-    display: block;
-}
-
 /* =Content
 -------------------------------------------------------------- */
 a {
 	color: #2060A0;
 }
-
 h1 {
-	font-size: 160%;
+	font-size: 140%;
     color: #606060;
-    margin: 25px 0 17px 0;
+    margin: 14px 0;
 }
-
 pre {
     padding: .4em;
     padding-left: .8em;
@@ -196,167 +88,70 @@ pre {
     overflow: auto;
     line-height: 1.1em;
 }
-
 /* Make inline code spans closer in size to normal Museo text */
 code {
     font-size: 115%;
 }
-
 pre code {
     font-size: 110%;
 }
-
 div.entry-content {
     text-align: justify;
     text-justify: inter-word;
     margin-bottom: 35px;
 }
-
-h1.entry-title, h1.entry-title a {
-    margin: 15px 0 5px 0;
+h1.entry-title a {
     text-decoration: none;
     color: #202020;
-    font-size: 140%;
 }
-
 .entry-meta {
 	margin: 15px 0;
 }
-
 .entry-meta a {
 	text-decoration: none;
 	color: #404040;
 }
-.entry-meta a:hover, .entry-title a:hover {
+.entry-title a:hover {
 	text-decoration: underline;
-}
-.sticky {
 }
 .entry-meta {
 	clear: both;
 	display: block;
 	color: #808080;
-	/*font-size: 70%;*/
 }
-
-#content nav {
-	display: block;
-	overflow: hidden;
-}
-
-#content nav .nav-previous {
-	float: left;
-	width: 50%;
-}
-
-#content nav .nav-previous a, #content nav .nav-next a {
-	text-decoration: none;
-	color: #808080;
-}
-
-#content nav .nav-previous a:hover {
-	text-decoration: underline;
-	color: #808080;
-}
-
-#content nav .nav-next {
-	float: right;
-	text-align: right;
-	width: 50%;
-}
-.page-link {
-	clear: both;
-	margin: 0 0 1em;
-}
-.page .edit-link {
-	clear: both;
-	display: block;
-}
-/* Image Attachments */
-.image-attachment div.entry-meta {
-	float: left;
-}
-.image-attachment nav {
-	float: right;
-	margin: 0 0 1em 0;
-}
-.image-attachment .entry-content {
-	clear: both;
-}
-.image-attachment .entry-content .entry-attachment {
-	background: #eee;
-	margin: 0 0 1em;
-	padding: 1em;
-	text-align: center;
-}
-.image-attachment .entry-content .attachment {
-	display: block;
-	margin: 0 auto;
-	text-align: center;
-}
-
-/* =Images
--------------------------------------------------------------- */
-
-a img {
-	border: none;
-}
-p img {
-	margin-bottom: 0.5em; /* a small bottom margin prevents content floating under images */
-}
-.wp-caption {
-	padding: .5em;
-	text-align: center;
-}
-.wp-caption img {
-	margin: .25em;
-}
-.wp-caption .wp-caption-text {
-	margin: .5em;
-}
-.gallery-caption {
-}
-.wp-smiley {
-	margin: 0;
-}
-
 
 /* =Widgets
 -------------------------------------------------------------- */
-
-.widget {
-	display: block;
-}
-.widget_categories ul {
+.sidebar-list {
     padding: 0 38px;
     margin: 0;
+    list-style-type: none;
 }
-.widget_categories a {
+.sidebar-list a {
 	color: #808080;
 	text-decoration: none;
 	text-transform:lowercase;
 	font-size: 80%;
 }
-.widget_categories a:hover {
+.sidebar-list a:hover {
 	text-decoration: underline;
 }
-li.cat-item, li.menu-item {
+.search-item {
     list-style-type: none;
-    color: #808080;
-}
-li.menu-item-search {
-    list-style-type: none;
-    margin-top: 10px;
-    margin-left: -1px;
+    margin: 8px -1px;
 }
 .search-text-input, .search-button {
     width: 96px; /* Same width as logo png */
 }
-
-#logo  {
+.logo  {
     margin-left: 37px;
 }
 
-#secondary aside.widget_nav_menu {
-    display: block;
+/* =Images
+-------------------------------------------------------------- */
+a img {
+	border: none;
+}
+p img {
+	margin-bottom: 0.5em; /* a small bottom margin prevents content floating under images */
 }
