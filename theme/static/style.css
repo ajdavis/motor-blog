@@ -39,9 +39,6 @@ only screen and (min-resolution: 2dppx) {
   margin-left: 238px;
   clear: both;
 }
-.search .main {
-    padding-top: 25px;
-}
 .sidebar {
     position: fixed;
     left: 25px;
@@ -66,18 +63,36 @@ only screen and (min-resolution: 2dppx) {
     text-decoration: none;
     color: #808080;
 }
+.big-list {
+    list-style: none outside none;                                                              
+    padding: 0;
+}
 .title {
     font-size: 200%;
+}
+.summary-title {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    font-size: 120%;
+}
+.summary-title:hover {
+    text-decoration: underline;
 }
 /* =Content
 -------------------------------------------------------------- */
 a {
-	color: #2060A0;
+    color: #2060A0;
 }
 h1 {
-	font-size: 140%;
+    font-size: 140%;
     color: #606060;
     margin: 14px 0;
+}
+hr {
+    border: 0;
+    height: 1px;
+    background: #333;
 }
 pre {
     padding: .4em;
