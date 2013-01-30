@@ -103,6 +103,11 @@ pre {
     overflow: auto;
     line-height: 1.1em;
 }
+
+.main {
+    background-color: white;
+}
+
 /* Make inline code spans closer in size to normal Museo text */
 code {
     font-size: 115%;
