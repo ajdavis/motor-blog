@@ -17,8 +17,7 @@ except ImportError:
         "Can't import motor.\n\n"
         " Motor is an experimental async driver for"
         " MongoDB, get it by cloning\n"
-        " git://github.com/ajdavis/mongo-python-driver.git"
-        " and switching to branch 'motor',\n"
+	" git://github.com/mongodb/motor.git \n"
         " then put the mongo-python-driver directory"
         " on your PYTHONPATH\n\n"
         )
