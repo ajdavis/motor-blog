@@ -8,8 +8,6 @@ def options():
     # Debugging
     tornado.options.define('debug', default=False, type=bool, help=(
         "Turn on autoreload, log to stderr only"))
-    tornado.options.define('mobile', default=False, type=bool, help=(
-        "Assume all clients are mobile (for debugging"))
 
     # Startup
     tornado.options.define('ensure_indexes', default=False, type=bool, help=(
@@ -24,8 +22,6 @@ def options():
         "Server hostname"))
     tornado.options.define('port', default=8888, type=int, help=(
         "Server port"))
-    tornado.options.define('mobile_subdomain', default='m.', type=str, help=(
-        "Mobile subdomain"))
     tornado.options.define('blog_name', type=str, help=(
         "Display name for the site"))
     tornado.options.define('base_url', type=str, help=(

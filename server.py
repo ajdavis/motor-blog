@@ -31,13 +31,11 @@ from motor_blog import indexes, cache, options
 from motor_blog.api.handlers import APIHandler, RSDHandler
 from motor_blog.web.lytics import TrackingPixelHandler
 from motor_blog.web.handlers import *
-from motor_blog.web.mobile import *
 from motor_blog.web.admin import *
 
 # TODO: RPC over HTTPS
 # TODO: a static-url function to set long cache TTL on media URLs
 # TODO: Nginx cache media
-# TODO: mobile theme, detect mobile and allow cookie to return to desktop
 # TODO: sitemap.xml
 
 if __name__ == "__main__":
@@ -72,7 +70,6 @@ if __name__ == "__main__":
             return path, group_count
 
     static_path = os.path.join(opts.theme, 'static')
-    mobile_static_path = os.path.join(opts.theme, 'mobile', 'static')
 
     application = tornado.web.Application([
         # XML-RPC API
@@ -91,14 +88,10 @@ if __name__ == "__main__":
         U(r"feed/?", FeedHandler, name='feed'),
         U(r"category/(?P<slug>.+)/feed/?", FeedHandler, name='category-feed'),
 
-        # Mobile
-        U(r"nomobile/(?P<next_uri>.+)", NoMobileHandler, name='nomobile'),
-
         # Web
         U(r"media/(.+)", GridFSHandler, {"database": db}, name='media'),
         U(r"tracking-pixel.gif", TrackingPixelHandler, name='tracking-pixel'),
         U(r"theme/static/(.+)", StaticFileHandler, {"path": static_path}, name='theme-static'),
-        U(r"theme/mobile/static/(.+)", StaticFileHandler, {"path": mobile_static_path}, name='theme-mobile-static'),
         U(r"category/(?P<slug>.+)/page/(?P<page_num>\d+)/?", CategoryHandler, name='category-page'),
         U(r"category/(?P<slug>.+)/?", CategoryHandler, name='category'),
         U(r"page/(?P<page_num>\d+)/?", HomeHandler, name='page'),

@@ -16,7 +16,6 @@ from werkzeug.contrib.atom import AtomFeed
 from motor_blog.models import Post, Category
 from motor_blog import cache, models
 from motor_blog.text.link import absolute
-from motor_blog.web.mobile import MobileMixin
 from motor_blog.web.lytics import ga_track_event_url
 
 
@@ -31,10 +30,9 @@ __all__ = (
 
 # TODO: cache-control headers
 
-class MotorBlogHandler(MobileMixin, tornado.web.RequestHandler):
+class MotorBlogHandler(tornado.web.RequestHandler):
     def initialize(self, **kwargs):
         super(MotorBlogHandler, self).initialize(**kwargs)
-        self.etag = None
         self.categories = []
         self.db = self.settings['db']
 
