@@ -18,8 +18,7 @@ def superwraps(wrapped):
             formatted_args.lstrip('(').rstrip(')'), formatted_args)
 
         fake_fn = eval(fndef, {'wrapper': wrapper})
-        return fake_fn
-        return functools.wraps(wrapper)(fake_fn)
+        return functools.wraps(wrapped)(fake_fn)
 
     return wrap
 
