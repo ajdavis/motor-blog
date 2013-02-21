@@ -1,84 +1,3 @@
-body {
-    /*font-family: 'Source Sans Pro', sans-serif;*/
-    /*font-family: 'Lato', sans-serif;*/
-    /*font-family: 'Source Code Pro', sans-serif;*/
-    /*font-family: 'Raleway', sans-serif;*/
-    /*font-family: 'Open Sans', sans-serif;*/
-    font-family: 'kvwp', sans-serif;
-    background-color: $litebg;
-}
-
-aside ul {
-    @include bulletless;
-}
-
-#explore > ul > li {
-    display: inline;
-}
-
-#explore > ul > li:after {
-    content: " /";
-}
-
-#explore > ul > li:last-child:after {
-    content: "";
-}
-
-aside a {
-    text-decoration: none;
-    color: $mygrey;
-
-    &:hover {
-        color: $lion;
-    }
-}
-
-figcaption {
-    font-size: .7em;
-}
-
-a.rss { color:#ffaa31;background:#fff;}
-a.twitter { color:#07beed;background: #fff;}
-a.facebook { color:#314d91;background: #fff;}
-a.github { color:#2d2d2d; background: #fff; }
-a.googleplus { color:#d14836; background: #fff; }
-a.stumbleupon { color:#3ea642; background: #fff;}
-a.linkedin { color:#0dc5ef; background: #fff; }
-a.subscribemail { color:#ffaa31;background: #fff;}
-a.slideshare { color:#00a69c; background: #fff; }
-a.reddit { color:#cee3f8; background: #fff; }
-a.delicious { color:#285da7; background: #fff; }
-
-
-a.rss:hover { background:#ffaa31; color:#fff;}
-a.twitter:hover { background:#07beed; color:#fff;}
-a.facebook:hover { background:#314d91; color:#fff;}
-a.github:hover { background:#2d2d2d; color:#fff;}
-a.googleplus:hover { background:#d14836; color: #fff; }
-a.stumbleupon:hover { background:#3ea642;color:#fff; }
-a.linkedin:hover { background:#0dc5ef; color: #fff; }
-a.subscribemail:hover { background:#ffaa31;color:#fff;}
-a.slideshare:hover { background:#00a69c; color: #fff; }
-a.reddit:hover { background:#cee3f8; color: #fff; }
-a.delicious:hover { background:#285da7; color: #fff; }
-
-.social li a:hover span {margin-left:10px;}
-
-#social .icon {
-    /*padding: 0 .2em .4em 1em;*/
-}
-
-.share .icon, .follow .icon {
-    padding-left: 1em;
-    font-size: .8em;
-    padding-right: .5em;
-}
-
-span#subcount {
-    @include small;
-    color: #CCC;
-}
-
 // USER ADDITIONS
 
 .#{$row-notation} {
@@ -115,3 +34,10 @@ span#subcount {
 
 }
 
+@mixin text-shadow {
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+@mixin no-text-shadow {
+    text-shadow: none;
+}

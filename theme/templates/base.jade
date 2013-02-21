@@ -2,6 +2,8 @@ base_url = setting('base_url')
 
 block vars
     title = setting('author_display_name')
+    meta_description = setting('description')
+    body_class = 'default-body'
 
 doctype 5
 html(lang="en")
@@ -17,6 +19,7 @@ html(lang="en")
             type="application/rss+xml"
             title=setting('blog_name') + " - Feed"
             href="http://feeds.feedburner.com/emptysquare")
+        meta(name="description", content=meta_description)
         meta(name="author", content=setting('author_display_name'))
         meta(name="generator", content="Motor-Blog")
         script(type="text/javascript")
@@ -32,17 +35,24 @@ html(lang="en")
                 s.parentNode.insertBefore(ga, s);
             })();
 
-    body
-        header
-            a(href=reverse_url('home'))
+    body(class=body_class)
+        //
+            .guides
+                each i in range(12)
+                    div
+                        span
+
+        header.main-header
+            a(href=reverse_url('home')).home-link
                 img(
                     class="logo"
                     src="/#{ base_url }/theme/static/square96.png"
-                    width="48px"
-                    height="48px")
+                    width="96px"
+                    height="96px")
             h1
                 a(href=reverse_url('home'))= setting('author_display_name')
 
-        include nav
+            include nav
 
-        block content
+        section
+            block content

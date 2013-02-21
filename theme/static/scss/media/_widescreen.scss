@@ -8,16 +8,9 @@
 
 @media screen and (min-width: #{2048/$em}em) {
 
-    body {
-        @include fontsize(3);
-    }
 
 }
 
 @media screen and (min-width: #{2560/$em}em) {
-
-    body {
-        @include fontsize(3);
-    }
 
 }

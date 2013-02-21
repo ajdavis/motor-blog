@@ -29,7 +29,7 @@ h3 {
 }
 
 // May want to do the clearfix by intent rather than default
-body > header, body > section, body > aside, body > footer, body > .content {
+body > header, body > section, body > aside, body > footer, body > .content, body > nav {
     @include body-container;
 }
 

@@ -1,18 +1,70 @@
 /* min-width: 720px (ipad), 768px (other tabs), 900px (landscape) */
 
-@media screen and (min-width: #{720/$em}em) {
+// Upgrade font, show full articles on home page
 
+// TODO: #{720/$em}em isn't working ...
+@media screen and (min-width: 720px) {
+    body {
+        font-family: Museo, serif;
+        font-size: 1.0625em;
+        background-color: white;
+    }
+
+    .logo {
+        width: 96px;
+        height: 96px;
+    }
+
+    .main-header {
+        @include no-text-shadow;
+    }
+
+    .main-nav ul {
+        li, .search-item {
+            margin: emStep(4) emStep(12);
+        }
+    }
+
+    article {
+        box-shadow: none;
+        text-align: justify;
+    }
+
+    // Remove article summaries and their "more" right-arrows
+    article:after {
+        @include hidden;
+    }
+
+    .home-body, .category-body, .search-body {
+        .post-summary {
+            @include hidden;
+        }
+
+        .post-content {
+            @include visible;
+        }
+    }
+
+    h1 {
+        font-size: 1.5em;
+        margin: emStep(4) 0 emStep(2);
+        font-weight: normal; // Museo bold looks terrible
+    }
+
+    section {
+        max-width: #{600/$em}em;
+    }
+
+    .post-meta {
+        @include normal;
+        margin-bottom: emStep(8);
+        @include no-text-shadow;
+    }
 }
 
 
 
 @media screen and (min-width: #{768/$em}em) {
-
-    #nav {
-        padding-top: 2.7em;
-        @include colmargin(2);
-        @include colwidth(7);
-    }
 
 }
 

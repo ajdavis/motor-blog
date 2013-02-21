@@ -2,6 +2,8 @@ extends base
 
 block vars
     title = setting('author_display_name') + " | All Posts"
+    meta_description = setting('description')
+    body_class = 'all-posts-body'
 
 block content
     h1 All Posts

@@ -2,9 +2,8 @@ extends base
 
 block vars
     title = post.title
-
-block meta_description
-    = post.meta_description or setting('description')
+    meta_description = post.meta_description or setting('description')
+    body_class = 'single-body'
 
 block content
     include post

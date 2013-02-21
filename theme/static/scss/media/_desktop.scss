@@ -1,152 +1,132 @@
 /* min-width: 1024px (xga), 1200px (wxga), 1600px (uxga) */
 
-@media screen and (min-width: #{1024/$em}em) {
+// Start using grid, move nav to left, show categories, grow font
 
-    #header {
-        figure > img {
-                width: 10em;
-            }
+// TODO: #{1024/$em}em isn't working ...
+@media screen and (min-width: 1024px) {
+    body {
+       font-size: 1.125em;
     }
 
-    #nav {
-        padding-top: 3.5em;
-        font-size: 80%;
+    h1 {
+        font-size: 2em;
     }
 
-    #mainnav {
-        span.icon {
-            font-size: 3.5em;
+    .main-header {
+        float: left;
+        @include cellpad;
+        @include colmargin(1);
+        @include colwidth(2);
+
+        h1 {
+            @include hidden;
         }
     }
 
+    .home-link img {
+        float: left;
+        clear: both;
+    }
+
+    .main-nav {
+        @include colwidth(2);
+        clear: both;
+        margin: emStep(4) 0;
+
+        ul {
+            float: left;
+            line-height: 1.2em;
+            color: $grey;
+            font-size: emStep(7);
+            text-transform: lowercase;
+
+            a {
+                text-decoration: none;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            .all-posts-nav-item, .about-nav-item,
+            .photography-nav-item, .feed-nav-item,
+            .category-nav-item, .search-item,
+            .nav-divider-1, {
+                @include visible;
+                margin: emStep(2) 0;
+                text-align: left;
+            }
+
+            .nav-divider {
+                margin-top: emStep(8);
+            }
+        }
+    }
+
+    .search-text-input {
+        margin-top: emStep(8);
+    }
+
+    .search-text-input, .search-button {
+        width: 96px;
+    }
+
+    section {
+        max-width: none;
+    }
+
+    section > article:first-child {
+        border-top: none;
+    }
+
+    body > section {
+        background-color: white;
+        text-align: left;
+        float: left;
+        @include colmargin(0);
+        @include colwidth(7);
+        max-width: 40em;
+        padding-right: 4em;
+    }
+
+    article > header {
+        text-align: left;
+    }
 }
 
 @media screen and (min-width: #{1200/$em}em) {
-
-    h1 {
-        margin: emStep(4) 0 emStep(4);
-    }
-
     body {
-        @include fontsize(3);
+        background: url("/blog/theme/static/paisley-4.png") no-repeat fixed 100% 100% white;
+        // TODO: make some custom bg images
+        background-size: 300px 300px;
     }
 
-    #social, .dropdown {
-        @include visible;
-    }
-
-    #header:hover {
-        opacity: .9;
-    }
-
-    #mainnav {
-        span.icon {
-            font-size: 1.8em;
+    @media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
+        only screen and (min--moz-device-pixel-ratio: 1.5),
+        only screen and (-o-min-device-pixel-ratio: 3/2),
+        only screen and (min-device-pixel-ratio: 1.5),
+        only screen and (min-resolution: 2dppx) {
+        body {
+            background-image: url("/blog/theme/static/paisley-4@2x.png");
         }
     }
 
-    #header {
-        position: fixed;
-        right:0;
-        margin: 0;
-        @include colwidth(2.5);
-        background: $light;
-        height: 100%;
-        opacity: .1;
-        @include easeout(.7);
-
-        figure {
-            display: inline-block;
-            @include colwidth(3);
-            @include colmargin(1);
-            float: left;
-
-            & > img {
-                width: 4em;
-            }
-        }
-
-        nav {
-            @include colwidth(12);
-            margin-left: 0;
-
-            &> ul {
-                display: block;
-            }
-
-            li {
-                width: 20%;
-            }
-
-            .social li {
-                    display:block;
-                }
-        }
-
-        #social > dropdown {
-            display: block;
-            width: 100%;
-        }
-
-        #social li {
-            width: 100%;
-            padding: 0;
-        }
+    .main-nav ul {
+        font-size: emStep(8);
     }
 
-    #social > li {
-        margin-top: 1em;
-        text-align: center;
+    .logo {
+        width: 128px;
+        height: 128px;
     }
 
-    #social > li > span {
-        font-size: 1.7em;
-        color: $shade;
-        padding-bottom: .4em;
+    .search-text-input, .search-button {
+        width: 128px;
     }
-
-    .social > li > a {
-        text-align: left;
-        padding: .2em 0 .2em .5em;
-        background-color:white;
-        font-size: 90%;
-        line-height: 1.35;
-
-    }
-
-    #social span {
-        text-align: left;
-        display: inline; 
-    }
-
-    body > header, body > section, body > aside, body > footer, body > .content {
-        margin: 0 ($column * 4) 0 ($column * ($margin_cols/2));
-        @include clearfix;
-    }
-
-    #byline {
-        padding-top: 1.2em;
-        @include visible;
-        @include colwidth(7);
-        text-align: center;
-        @include normal;
-    }
-
-    #nav {
-        padding-top: 0em;
-        @include colmargin(1);
-        @include colwidth(6);
-    }
-
 }
 
 @media screen and (min-width: #{1600/$em}em) {
-
-    #nav {
-        padding-top: 2.3em;
-        @include colmargin(1);
-        @include colwidth(5);
+    body {
+        background-size: 550px 550px;
     }
-
 }
 

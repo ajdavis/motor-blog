@@ -1,6 +1,6 @@
 $margin_cols: 2;
 $content_cols: 12;
-$font-size: 16; // in pixels
+$font-size: 14; // in pixels
 $line-height: 1.5; // in line height
 $fixed_column: 2.8; // in ems
 $emSteps: 8;
@@ -8,17 +8,11 @@ $emSteps: 8;
 $column-notation: "col";
 $row-notation: "row";
 
-$em: $font-size * 1; // pixel value of an em
 $total_cols: $margin_cols + $content_cols; // total cols 12 + 2 margins
 $line: $font-size * $line_height; // in pixels
 $column: 100% / $total_cols; // width of a column
 
-$litebg: #FAFAF9;
+$litebg: #E6E6E6;
 $light: #EEE;
-$aqua: #00DFFC;
-$she: #00B4CC;
-$deep: #008C9E;
-$lion: #005F6B;
 $dark: #343838;
-$mygrey: #575757;
-$shade: #CCC;
+$grey: #575757;

@@ -1,19 +1,24 @@
-nav
+nav.main-nav
     ul
-        li
+        li.nav-item.menu-nav-item.all-posts-nav-item
             a(href=reverse_url('all-posts')) All Posts
 
         for url, title, classname in setting('nav_menu')
             li.nav-item.menu-nav-item(class=classname)
                 a(href=url)= title
 
+        li.nav-item.nav-divider.nav-divider-1 Categories:
+
         each category in categories
-            li
+            li.nav-item.category-nav-item
                 a(
                     href=reverse_url('category', category.slug)
                     title="View all posts filed under #{ category.name }")
                     = category.name
-        li.search-item
+
+        li.nav-item.nav-divider.nav-divider-2 &nbsp;
+
+        li.nav-item.search-item
             form(action=reverse_url('search'), method="get").search-form
                 input(type="text", name="q", value=q).search-text-input#search-input
                 input(type="submit", value="search").button.search-button#search-submit

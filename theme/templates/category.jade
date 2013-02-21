@@ -2,6 +2,8 @@ extends base
 
 block vars
     title = setting('author_display_name') + " | " + this_category.name
+    meta_description = setting('description')
+    body_class = 'category-body'
 
 block content
     h1.title.page-title Category:

@@ -2,7 +2,9 @@ extends base
 
 block vars
     title = setting('author_display_name') + " | " + this_tag
-    
+    meta_description = setting('description')
+    body_class = 'tag-body'
+
 block content
     h1.title.page-title Tag:
         = this_tag

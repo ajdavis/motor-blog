@@ -3,51 +3,17 @@
 /* min-width: 320px (1st gen), 480px (2nd gen), 640px (landscape) */
 @media screen and (min-width: #{480/$em}em) {
 
-    #mainnav {
-        span.icon {
-            font-size: 2em;
+    .main-nav ul {
+        .photography-nav-item, .feed-nav-item {
+            @include visible-inline;
         }
     }
 
-    #popular, #new {
-        @include colwidth(6);
-        @include cellpad;
-    }
 }
 
 //as an example of a mix & max slice
 /*@media screen and (min-width: #{640/$em}em) and (max-width: #{720/$em}em) {*/
 @media screen and (min-width: #{640/$em}em) {
 
-    body {
-        @include fontsize(1);
-    }
-
-    h1 {
-        text-align: left;
-    }
-
-    #header {
-        figure {
-            @include colwidth(3);
-            margin: 0;
-
-            & > img {
-                width: 8em;
-            }
-        }
-    }
-
-    #nav {
-        padding-top: 2.3em;
-        @include colmargin(1);
-        @include colwidth(8);
-    }
-
-    #mainnav {
-        span.icon {
-            font-size: 2em;
-        }
-    }
 }
 
