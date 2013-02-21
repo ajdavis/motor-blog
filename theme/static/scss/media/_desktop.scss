@@ -1,0 +1,152 @@
+/* min-width: 1024px (xga), 1200px (wxga), 1600px (uxga) */
+
+@media screen and (min-width: #{1024/$em}em) {
+
+    #header {
+        figure > img {
+                width: 10em;
+            }
+    }
+
+    #nav {
+        padding-top: 3.5em;
+        font-size: 80%;
+    }
+
+    #mainnav {
+        span.icon {
+            font-size: 3.5em;
+        }
+    }
+
+}
+
+@media screen and (min-width: #{1200/$em}em) {
+
+    h1 {
+        margin: emStep(4) 0 emStep(4);
+    }
+
+    body {
+        @include fontsize(3);
+    }
+
+    #social, .dropdown {
+        @include visible;
+    }
+
+    #header:hover {
+        opacity: .9;
+    }
+
+    #mainnav {
+        span.icon {
+            font-size: 1.8em;
+        }
+    }
+
+    #header {
+        position: fixed;
+        right:0;
+        margin: 0;
+        @include colwidth(2.5);
+        background: $light;
+        height: 100%;
+        opacity: .1;
+        @include easeout(.7);
+
+        figure {
+            display: inline-block;
+            @include colwidth(3);
+            @include colmargin(1);
+            float: left;
+
+            & > img {
+                width: 4em;
+            }
+        }
+
+        nav {
+            @include colwidth(12);
+            margin-left: 0;
+
+            &> ul {
+                display: block;
+            }
+
+            li {
+                width: 20%;
+            }
+
+            .social li {
+                    display:block;
+                }
+        }
+
+        #social > dropdown {
+            display: block;
+            width: 100%;
+        }
+
+        #social li {
+            width: 100%;
+            padding: 0;
+        }
+    }
+
+    #social > li {
+        margin-top: 1em;
+        text-align: center;
+    }
+
+    #social > li > span {
+        font-size: 1.7em;
+        color: $shade;
+        padding-bottom: .4em;
+    }
+
+    .social > li > a {
+        text-align: left;
+        padding: .2em 0 .2em .5em;
+        background-color:white;
+        font-size: 90%;
+        line-height: 1.35;
+
+    }
+
+    #social span {
+        text-align: left;
+        display: inline; 
+    }
+
+    body > header, body > section, body > aside, body > footer, body > .content {
+        margin: 0 ($column * 4) 0 ($column * ($margin_cols/2));
+        @include clearfix;
+    }
+
+    #byline {
+        padding-top: 1.2em;
+        @include visible;
+        @include colwidth(7);
+        text-align: center;
+        @include normal;
+    }
+
+    #nav {
+        padding-top: 0em;
+        @include colmargin(1);
+        @include colwidth(6);
+    }
+
+}
+
+@media screen and (min-width: #{1600/$em}em) {
+
+    #nav {
+        padding-top: 2.3em;
+        @include colmargin(1);
+        @include colwidth(5);
+    }
+
+}
+

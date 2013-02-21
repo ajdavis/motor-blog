@@ -1,0 +1,123 @@
+// Phone is default so no min-width actually set for lowest setting.
+
+/* min-width: 320px (1st gen), 480px (2nd gen), 640px (landscape) */
+// Should put the lowest one you want to support here without media restrictions. 
+// Others in _phone.scss
+header, section, footer, aside, .content {
+    margin: 0 0;
+}
+
+#header {
+    position: relative;
+    padding-top: emStep(8);
+    @include easeout(.7);
+
+    figure {
+        @include colwidth(6);
+        @include colmargin(3);
+        padding-bottom: emStep(8);
+
+        & > img {
+            width: 8em;
+            margin: 0 auto;
+        }
+    }
+
+}
+
+#byline {
+    @include hidden;
+}
+
+
+#nav {
+        @include colwidth(12);
+        @include center;
+
+    & > ul {
+        @include center;
+        padding: 0;
+        display: inline;
+    }
+
+    li {
+        display: inline-block;
+        list-style: none outside none;
+        text-align: center;
+        padding-bottom: emStep(8);
+        width: 20%;
+    }
+
+    a {
+        display: block;
+        text-decoration: none;
+        width: 100%;
+    }
+
+    span {
+        vertical-align: middle;
+        display:block;
+        @include center;
+    }
+
+    span.icon {
+        font-size: 1.2em;
+    }
+
+}
+
+#mainnav a {
+    color: $mygrey;
+
+    &:hover {
+        color: $she;
+    }
+}
+
+aside#tail {
+
+    &> #search, &> #explore {
+        text-align: center;
+        @include colwidth(12);
+        @include cellpad;
+    }
+
+    section {
+        margin-bottom: 1.5em;
+    }
+}
+
+#sidebar {
+    @include hidden;
+}
+
+article {
+    min-height: 1px;
+    @include colwidth(12);
+    @include cellpad;
+}
+
+body > footer {
+    border-top: thin solid #AAA;
+    @include cellpad;
+    padding-top: emStep(16);
+    margin-top: emStep(16);
+}
+
+h1, h2 {
+    @include huge;
+    margin: emStep(8) 0 emStep(6);
+    text-align: center;
+}
+
+h2 {
+    font-weight: normal;
+}
+
+h3 {
+    margin: emStep(12) 0 emStep(12);
+}
+
+#social, .dropdown {
+    @include hidden;
+}
