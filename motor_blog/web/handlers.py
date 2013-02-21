@@ -154,7 +154,7 @@ class AllPostsHandler(MotorBlogHandler):
     def get_posts(self, callback):
         (self.db.posts.find(
             {'status': 'publish', 'type': 'post'},
-            {'display': False, 'original': False},
+            {'original': False},
         )
         .sort([('pub_date', -1)])
         .to_list(callback=callback))
@@ -175,7 +175,7 @@ class AllPostsHandler(MotorBlogHandler):
 #        postdocs = yield motor.Op(
 #            self.db.posts.find(
 #                {'status': 'publish', 'type': 'post'},
-#                {'display': False, 'original': False},
+#                {'original': False},
 #            )
 #            .sort([('pub_date', -1)])
 #            .to_list)
@@ -421,8 +421,7 @@ class SearchHandler(MotorBlogHandler):
             response = yield motor.Op(self.db.command, 'text', 'posts',
                 search=q,
                 filter={'status': 'publish', 'type': 'post'},
-                projection={
-                    'display': False, 'original': False, 'plain': False},
+                projection={'original': False, 'plain': False},
                 limit=50)
 
             posts = [Post(**result['obj']) for result in response['results']]
