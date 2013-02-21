@@ -3,8 +3,8 @@ nav
         li
             a(href=reverse_url('all-posts')) All Posts
 
-        each url, title in setting('nav_menu')
-            li
+        for url, title, classname in setting('nav_menu')
+            li.nav-item.menu-nav-item(class=classname)
                 a(href=url)= title
 
         each category in categories

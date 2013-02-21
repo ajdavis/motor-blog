@@ -11,9 +11,9 @@ log_file_prefix = 'log/motor-blog.log'
 cookie_secret = 'long secret string'
 timezone = 'America/New_York'
 
-# List of URL, Title pairs
+# List of url, title, CSS-class triples
 nav_menu = [
-    ('/blog/about/', 'About'),
-    ('/photography/', 'Photography'),
-    ('http://feeds.feedburner.com/emptysquare', 'Feed'),
+    ('/blog/about/', 'About', 'about-nav-item'),
+    ('/photography/', 'Photography', 'photography-nav-item'),
+    ('http://feeds.feedburner.com/emptysquare', 'Feed', 'feed-nav-item'),
 ]

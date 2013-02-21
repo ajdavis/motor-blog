@@ -44,7 +44,8 @@ def options():
 
     # Appearance
     tornado.options.define('nav_menu', type=list, default=[], help=(
-        "List of url, title pairs (define this in your motor_blog.conf)'"))
+        "List of url, title, CSS-class triples (define this in your"
+        " motor_blog.conf)'"))
     tornado.options.define('theme', type=str, default='theme', help=(
         "Directory name of your theme files"))
     tornado.options.define('timezone', type=str, default='America/New_York', help=(
