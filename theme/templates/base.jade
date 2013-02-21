@@ -1,0 +1,47 @@
+base_url = setting('base_url')
+
+block vars
+    title = setting('author_display_name')
+
+doctype 5
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        title= title
+        link(rel="shortcut icon", href="/#{ base_url }/theme/static/favicon.gif")
+        link(rel="pingback", href=reverse_url('api'))
+        link(rel="EditURI", type="application/rsd+xml", title="RSD", href=reverse_url('rsd'))
+        link(
+            rel="alternate"
+            type="application/rss+xml"
+            title=setting('blog_name') + " - Feed"
+            href="http://feeds.feedburner.com/emptysquare")
+        meta(name="author", content=setting('author_display_name'))
+        meta(name="generator", content="Motor-Blog")
+        script(type="text/javascript")
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount','#{ setting("google_analytics_id") }']);
+            _gaq.push(['_trackPageview'],['_trackPageLoadTime']);
+            (function() {
+                var ga = document.createElement('script');
+                ga.type = 'text/javascript';
+                ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(ga, s);
+            })();
+
+    body
+        header
+            a(href=reverse_url('home'))
+                img(
+                    class="logo"
+                    src="/#{ base_url }/theme/static/square96.png"
+                    width="48px"
+                    height="48px")
+            h1
+                a(href=reverse_url('home'))= setting('author_display_name')
+
+        include nav
+
+        block content

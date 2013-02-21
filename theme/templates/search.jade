@@ -1,0 +1,21 @@
+extends base
+
+block vars
+    title = setting('author_display_name') + " | Search | " + q
+
+include nav
+
+block content
+    if not q
+        p Go ahead and put a search term in the box next time before you hit 'search'.
+    else
+        h1 Posts and pages with "#{ q }":
+        if not posts
+            p No results.
+            p Maybe just look through the&nbsp;
+                a(href=reverse_url('all-posts')) list of all posts
+                | ?
+        else
+            ul
+                each post in posts
+                    include post-summary

@@ -10,6 +10,11 @@ import tornado.options
 from tornado.web import StaticFileHandler
 from tornado import httpserver
 
+# Patch Tornado with the Jade template loader
+from tornado import template
+from pyjade.ext.tornado import patch_tornado
+patch_tornado()
+
 try:
     import motor
 except ImportError:

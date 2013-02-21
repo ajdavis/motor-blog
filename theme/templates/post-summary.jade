@@ -1,0 +1,4 @@
+li
+    a(href=reverse_url('post', post.slug)).summary-title!= post.title
+    span.date= post.local_short_date(handler.application)
+    span.excerpt!= post.summary

@@ -1,0 +1,21 @@
+article.post
+    header
+        h1
+            a(href=reverse_url('post', post.slug))
+                = post.title
+
+        if (post.type == 'post')
+            .post-meta
+                local_long_date = post.local_long_date(handler.application)
+                time(
+                    title="#{ local_long_date } #{ post.local_time_of_day(handler.application) }"
+                ).post-time= local_long_date
+
+                author_display_name = setting('author_display_name')
+                if author_display_name
+                    span.byline
+                        span.sep &mdash;
+                        span.author= author_display_name
+
+    .post-content
+        != post.body

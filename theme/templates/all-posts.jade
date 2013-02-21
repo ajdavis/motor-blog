@@ -1,0 +1,10 @@
+extends base
+
+block vars
+    title = setting('author_display_name') + " | All Posts"
+
+block content
+    h1 All Posts
+    ul.big-list
+        each post in posts
+            include post-summary

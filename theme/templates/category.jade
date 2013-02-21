@@ -1,0 +1,26 @@
+extends base
+
+block vars
+    title = setting('author_display_name') + " | " + this_category.name
+
+block content
+    h1.title.page-title Category:
+        = this_category.name
+    each post in posts
+        include post
+
+    nav.nav-below
+        div.nav-previous
+            a(href=reverse_url('category-page', this_category.slug, page_num + 1))
+                span.meta-nav &larr;&nbsp;
+                | Older posts
+        if page_num > 0
+            div.nav-next
+                if (page_num > 1)
+                    next_url = reverse_url('category-page', this_category.slug, page_num - 1)
+                else
+                    next_url = reverse_url('category', this_category.slug)
+
+                a(href=next_url)
+                    | Newer posts
+                    span.meta-nav &nbsp;&rarr;

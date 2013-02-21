@@ -1,0 +1,72 @@
+extends base
+
+block vars
+    title = post.title
+
+block meta_description
+    = post.meta_description or setting('description')
+
+block content
+    include post
+    if post.type == 'post'
+        footer.entry-meta
+            if post.categories
+                | Categories:
+                each category, i in post.categories
+                    a(
+                        href=reverse_url('category', category.slug)
+                        title="All posts in #{ category.name }")
+                        = category.name
+                    if (i < len(post.categories) - 1)
+                        | ,
+
+            if (post.categories and post.tags)
+                br
+
+            if post.tags
+                | Tags:
+                each tag, i in post.tags
+                    a(
+                        href=reverse_url('tag', tag)
+                        title="All posts tagged #{ tag }")
+                        = tag
+                    if (i < len(post.tags) - 1)
+                        | ,
+
+    nav.nav-below
+        if prev
+            .nav-previous
+                a(href=reverse_url('post', prev.slug), rel="prev")
+                    span.meta-nav &larr;&nbsp;
+                    != prev.title
+
+        if next
+            .nav-next
+                a(href=reverse_url('post', next.slug), rel="next")
+                    != next.title
+                    span.meta-nav &nbsp;&rarr;
+
+    if (post.type == 'post' and post.status == 'publish')
+        if post.wordpress_id
+            disqus_identifier = '#{ post.wordpress_id  } http://emptysquare.net/blog/?p=#{ post.wordpress_id  }';
+        else
+            disqus_identifier = post.id
+
+        #disqus_thread
+            script(type="text/javascript)
+                var disqus_identifier = '#{ disqus_identifier }';
+                var disqus_shortname = 'emptysquare';
+
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+
+            noscript
+                Please enable JavaScript to view the
+                a(href="http://disqus.com/?ref_noscript") comments
+
+            a(href="http://disqus.com").dsq-brlink
+                Comments powered by
+                span.logo-disqus Disqus.

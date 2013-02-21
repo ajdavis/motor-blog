@@ -42,7 +42,11 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         def get_setting(setting_name):
             return self.application.settings[setting_name]
 
-        ns.update({'setting': get_setting, 'categories': self.categories})
+        ns.update({
+            'q': '',
+            'setting': get_setting,
+            'categories': self.categories})
+
         return ns
 
     def head(self, *args, **kwargs):
@@ -140,7 +144,8 @@ class HomeHandler(MotorBlogHandler):
     @tornado.web.addslash
     @check_last_modified
     def get(self, page_num=0):
-        self.render('home.html',
+        self.render(
+            'home.jade',
             posts=self.posts, categories=self.categories,
             page_num=int(page_num))
 
@@ -157,7 +162,8 @@ class AllPostsHandler(MotorBlogHandler):
     @tornado.web.addslash
     @check_last_modified
     def get(self):
-        self.render('all-posts.html',
+        self.render(
+            'all-posts.jade',
             posts=self.posts, categories=self.categories)
 
 # Doesn't calculate last-modified. Saved for performance comparison.
@@ -250,7 +256,7 @@ class PostHandler(MotorBlogHandler):
     def get(self, slug):
         prev, post, next = self.posts
         self.render(
-            'single.html',
+            'single.jade',
             post=post, prev=prev, next=next, categories=self.categories)
 
 
@@ -279,7 +285,8 @@ class CategoryHandler(MotorBlogHandler):
         else:
             raise tornado.web.HTTPError(404)
 
-        self.render('category.html',
+        self.render(
+            'category.jade',
             posts=self.posts, categories=self.categories,
             this_category=this_category, page_num=page_num)
 
@@ -395,7 +402,7 @@ class TagHandler(MotorBlogHandler):
     def get(self, tag, page_num=0):
         page_num = int(page_num)
         tag = tag.rstrip('/')
-        self.render('tag.html',
+        self.render('tag.jade',
             posts=self.posts, categories=self.categories,
             this_tag=tag, page_num=page_num)
 
@@ -421,4 +428,4 @@ class SearchHandler(MotorBlogHandler):
             posts = [Post(**result['obj']) for result in response['results']]
         else:
             posts = []
-        self.render('search.html', q=q, posts=posts)
+        self.render('search.jade', q=q, posts=posts)
