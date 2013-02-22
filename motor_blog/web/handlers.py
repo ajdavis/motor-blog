@@ -270,7 +270,7 @@ class CategoryHandler(MotorBlogHandler):
             'type': 'post',
             'categories.slug': slug,
         }, {
-            'summary': False, 'original': False
+            'original': False
         }).sort([('pub_date', -1)]
         ).skip(page_num * 10).limit(10).to_list(callback=callback)
 
@@ -394,7 +394,7 @@ class TagHandler(MotorBlogHandler):
             'type': 'post',
             'tags': tag,
         }, {
-            'summary': False, 'original': False
+            'original': False
         }).sort([('pub_date', -1)]).skip(page_num * 10).limit(10).to_list(callback=callback)
 
     @tornado.web.addslash

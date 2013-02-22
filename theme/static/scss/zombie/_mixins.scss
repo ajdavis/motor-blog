@@ -105,9 +105,24 @@
 }
 
 // works within the content column system
+@mixin fixedcolwidth($cols) {
+    width: #{($fixed_column * $cols)}em;
+    @include bb;
+    display: inline-block;
+    float: left;
+}
+
+
+// works within the content column system
 // num_cols needs to be a factor of content_cols
 @mixin colmargin($cols) {
     margin-left: oneCol() * $cols;
+}
+
+// works within the content column system
+// num_cols needs to be a factor of content_cols
+@mixin fixedcolmargin($cols) {
+    margin-left: #{$fixed_column * $cols}em;
 }
 
 @mixin setColWidths($num_cols, $min_resolution) {

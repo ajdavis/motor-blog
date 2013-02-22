@@ -42,17 +42,13 @@ html(lang="en")
                     div
                         span
 
-        header.main-header
-            a(href=reverse_url('home')).home-link
-                img(
-                    class="logo"
-                    src="/#{ base_url }/theme/static/square96.png"
-                    width="96px"
-                    height="96px")
-            h1
-                a(href=reverse_url('home'))= setting('author_display_name')
+        .container
+            header.main-header
+                a(href=reverse_url('home')).logo
+                h1
+                    a(href=reverse_url('home'))= setting('author_display_name')
 
-            include nav
+                include nav
 
-        section
-            block content
+            section
+                block content

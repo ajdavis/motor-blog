@@ -1,0 +1,279 @@
+//@media screen and (min-width: #{480/$em}em) {
+@media screen and (min-width: 480px) {
+    .main-nav ul {
+        li {
+            margin: 0 0.75em;
+        }
+        .photography-nav-item, .feed-nav-item {
+            @include visible-inline;
+        }
+    }
+
+    .post-summary, .post-content {
+        font-size: 1.125em;
+    }
+}
+
+// Upgrade font, move nav to side, justify text, full articles on home page
+// The next few upgrades keep the whole layout left-floated and spend extra
+// width on the right on ever-wider paisley backgrounds. We build much of the
+// layout around a 2em-thick cross dividing the logo, the article header,
+// the nav links, and the article body.
+@media screen and (min-width: 720px) {
+    $logo_dim: ($fixed_column - ($line/$em)/2);
+    body {
+        font-family: Museo, serif;
+        font-size: 0.8em;
+        line-height: 1.75em;
+    }
+
+    .container {
+        float: left;
+        margin: 0 4em;
+    }
+
+    .main-header {
+        position: fixed;
+        top: gutter();
+        left: gutter();
+        @include cellpad;
+        @include fixedcolwidth(1);
+
+        h1 {
+            @include hidden;
+        }
+    }
+
+    .main-nav {
+        clear: both;
+
+        ul {
+            margin-top: 2em; // central cross is 2em thick
+            float: right;
+            line-height: 1.2em;
+            color: $grey;
+            text-transform: lowercase;
+
+            a {
+                text-decoration: none;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            // Show categories
+            .all-posts-nav-item, .about-nav-item,
+            .photography-nav-item, .feed-nav-item,
+            .category-nav-item, .search-item,
+            .nav-divider-1, {
+                @include visible;
+                margin: emStep(2) 0;
+                text-align: right;
+            }
+
+            .nav-divider {
+                margin-top: 1em;
+                margin-right: -.125em;
+            }
+        }
+    }
+
+    .logo {
+        float: right;
+        margin: 0;
+        // 1-column-width, minus gutter, square
+        width: #{$logo_dim}em;
+        height: #{$logo_dim}em;
+        border: #{($logo_dim / 9)}em solid black;
+    }
+
+    .search-text-input {
+        margin-top: 1em;
+    }
+
+    .search-text-input, .search-button {
+        width: 96px;
+    }
+
+    .post-summary, .post-content {
+        font-size: 1.5em;
+    }
+
+    section {
+        background-color: white;
+        text-align: left;
+        @include fixedcolwidth(5);
+        @include fixedcolmargin(1);
+    }
+
+    section > article:first-child {
+        border-top: none;
+    }
+
+    article > header {
+        text-align: left;
+        //height: #{$logo_dim}em;
+    }
+
+    h1.title, h1.page-title {
+        // Grow font from body size of .875em to 1.75em
+        font-size: #{(1.75/.875)}em;
+    }
+
+    h1.title {
+        // Tweak to bottom-align with logo
+        margin: #{($logo_dim - 4.5)}em 0 0;
+        border-bottom: 1px solid $lightergrey;
+    }
+
+    h1.page-title {
+        // Move down to bottom-align with logo
+        margin-top: 3.2em;
+    }
+
+    .post-meta {
+        font-size: 1em;
+    }
+
+    .post-content {
+        margin-top: 1.75em;
+    }
+
+    .byline {
+        @include visible-inline;
+    }
+
+    article {
+        text-align: justify;
+        border-top: none;
+        border-bottom: 1px dotted $lightergrey;
+    }
+
+    // Remove article summaries and their "more" right-arrows
+    article:after {
+        @include hidden;
+    }
+
+    .home-body, .category-body {
+        .post-summary {
+            @include hidden;
+        }
+
+        .post-content {
+            @include visible;
+        }
+    }
+
+    .single-body {
+        .main-header {
+            border-bottom: none;
+        }
+
+        .main-nav {
+            @include visible;
+        }
+
+        article { margin-bottom: 1em; };
+    }
+
+    // Remove button style from bottom nav links
+    .nav-previous, .nav-next {
+        @include nobutton;
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 1em;
+        a:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+// Move sidebar and content one column to the right
+@media screen and (min-width: 1024px) {
+    h1 {
+        // Grow font from body size of .875em to 2.5em
+        font-size: #{(2.5/.875)}em;
+    }
+    .main-header {
+        left: #{(($line/$em)/4 + $fixed_column)}em;
+    }
+
+    .main-nav ul li {
+        // Grow font from body size of .875em to 1em
+        font-size: #{(1/.875)}em;
+    }
+
+    section {
+        @include fixedcolmargin(2);
+    }
+}
+
+// Grow fonts, include bg image
+@media screen and (min-width: 1280px) {
+    section {
+        @include fixedcolwidth(6);
+    }
+
+    .post-content {
+        font-size: 1.75em;
+    }
+
+    body {
+        background: url("/blog/theme/static/images/paisley-bg-375.png") no-repeat fixed 100% 100% white;
+        background-size: 375px 600px;
+    }
+
+    // TODO: some way to refactor
+    @media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
+        only screen and (min--moz-device-pixel-ratio: 1.5),
+        only screen and (-o-min-device-pixel-ratio: 3/2),
+        only screen and (min-device-pixel-ratio: 1.5),
+        only screen and (min-resolution: 2dppx) {
+        body {
+            background-image: url("/blog/theme/static/images/paisley-bg-375@2x.png")
+        }
+    }
+}
+
+// Background image enhancement steps
+@media screen and (min-width: #{(1280 + 200)}px) {
+    .main-nav ul li {
+        // Grow font from body size of .875em to 1.25em
+        font-size: #{(1.25/.875)}em;
+    }
+
+    body {
+        background-image: url("/blog/theme/static/images/paisley-bg-600.png");
+        background-size: 600px 600px;
+    }
+
+    @media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
+        only screen and (min--moz-device-pixel-ratio: 1.5),
+        only screen and (-o-min-device-pixel-ratio: 3/2),
+        only screen and (min-device-pixel-ratio: 1.5),
+        only screen and (min-resolution: 2dppx) {
+        body {
+            background-image: url("/blog/theme/static/images/paisley-bg-600@2x.png");
+        }
+    }
+}
+
+// Spend the remaining pixels on centering the container div
+@media screen and (min-width: #{(1280 + 200 + 200)}px) {
+    body {
+        background-image: url("/blog/theme/static/images/paisley-bg-800.png");
+        background-size: 800px 600px;
+    }
+
+    @media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
+        only screen and (min--moz-device-pixel-ratio: 1.5),
+        only screen and (-o-min-device-pixel-ratio: 3/2),
+        only screen and (min-device-pixel-ratio: 1.5),
+        only screen and (min-resolution: 2dppx) {
+        body {
+            background-image: url("/blog/theme/static/images/paisley-bg-800@2x.png");
+        }
+    }
+
+
+}

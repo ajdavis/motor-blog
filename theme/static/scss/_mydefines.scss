@@ -2,12 +2,13 @@ $margin_cols: 2;
 $content_cols: 12;
 $font-size: 14; // in pixels
 $line-height: 1.5; // in line height
-$fixed_column: 2.8; // in ems
-$emSteps: 8;
+$fixed_column: 8; // in ems
+$emSteps: 4;
 
 $column-notation: "col";
 $row-notation: "row";
 
+// Doesn't matter, we're using fixed cols throughout
 $total_cols: $margin_cols + $content_cols; // total cols 12 + 2 margins
 $line: $font-size * $line_height; // in pixels
 $column: 100% / $total_cols; // width of a column
@@ -16,3 +17,5 @@ $litebg: #E6E6E6;
 $light: #EEE;
 $dark: #343838;
 $grey: #575757;
+$lightgrey: #888;
+$lightergrey: #AAA;
