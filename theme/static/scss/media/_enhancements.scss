@@ -26,6 +26,11 @@
         font-family: Museo, serif;
     }
 
+    h1 {
+        // Museo bold is ugly
+        font-weight: normal;
+    }
+
     .container {
         float: left;
         margin: 0 4em;
@@ -115,7 +120,7 @@
         //height: #{$logo_dim}em;
     }
 
-    h1.title, h1.page-title {
+    h1.title {
         // Grow font from body size of .875em to 1.75em
         font-size: #{(1.75/.875)}em;
     }
@@ -194,7 +199,7 @@
 
 // Move sidebar and content one column to the right
 @media screen and (min-width: 1024px) {
-    h1 {
+    h1.title {
         // Grow font from body size of .875em to 2.5em
         font-size: #{(2.5/.875)}em;
     }
