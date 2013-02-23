@@ -10,7 +10,8 @@
     }
 
     .post-summary, .post-content {
-        font-size: 1.125em;
+        font-size: 1.1em;
+        line-height: 1.35em;
     }
 }
 
@@ -23,8 +24,6 @@
     $logo_dim: ($fixed_column - ($line/$em)/2);
     body {
         font-family: Museo, serif;
-        font-size: 0.8em;
-        line-height: 1.75em;
     }
 
     .container {
@@ -38,6 +37,7 @@
         left: gutter();
         @include cellpad;
         @include fixedcolwidth(1);
+        @include fixedcolmargin(1);
 
         h1 {
             @include hidden;
@@ -102,8 +102,8 @@
     section {
         background-color: white;
         text-align: left;
-        @include fixedcolwidth(5);
-        @include fixedcolmargin(1);
+        @include fixedcolwidth(4);
+        @include fixedcolmargin(2);
     }
 
     section > article:first-child {
@@ -121,14 +121,13 @@
     }
 
     h1.title {
-        // Tweak to bottom-align with logo
-        margin: #{($logo_dim - 4.5)}em 0 0;
+        margin: 0;
         border-bottom: 1px solid $lightergrey;
     }
 
     h1.page-title {
         // Move down to bottom-align with logo
-        margin-top: 3.2em;
+        margin-top: 2.6em;
     }
 
     .post-meta {
@@ -137,6 +136,11 @@
 
     .post-content {
         margin-top: 1.75em;
+    }
+
+    .post-summary, .post-content {
+        font-size: 1.2em;
+        line-height: 1.5em;
     }
 
     .byline {
@@ -195,7 +199,7 @@
         font-size: #{(2.5/.875)}em;
     }
     .main-header {
-        left: #{(($line/$em)/4 + $fixed_column)}em;
+        //left: #{(($line/$em)/4 + $fixed_column)}em;
     }
 
     .main-nav ul li {
@@ -208,30 +212,61 @@
     }
 }
 
-// Grow fonts, include bg image
+@mixin bgimage($minwidth, $number) {
+    @media screen and (min-width: #{$minwidth}px) { 
+        .placeholder#{$number}:after {
+            content: ' ';
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            width: 800px;
+            height: 600px;
+            background-size: 800px 600px;
+            background-repeat:no-repeat;
+            z-index: -#{(100 - $number)};
+            background-image: url("/blog/theme/static/images/paisley-bg-#{$number}@2x.png");
+        }
+    }
+
+    // lodpi
+    //@media screen and (max-width: #{$minwidth}px) and (-Webkit-max-device-pixel-ratio: 1.4),
+    //    screen and (max-width: #{$minwidth}px) and (max--moz-device-pixel-ratio: 1.4),
+    //    screen and (max-width: #{$minwidth}px) and (-o-max-device-pixel-ratio: 3/5),
+    //    screen and (max-width: #{$minwidth}px) and (max-device-pixel-ratio: 1.4),
+    //    screen and (max-width: #{$minwidth}px) and (max-resolution: 1dppx) {
+    //    .placeholder#{$number}:after {
+    //        background-image: url("/blog/theme/static/images/paisley-bg-#{$number}.png");
+    //    }
+    //}
+
+    // hidpi
+    //@media screen and (min-width: #{$minwidth}px) and (-Webkit-min-device-pixel-ratio: 1.5),
+    //    screen and (min-width: #{$minwidth}px) and (min--moz-device-pixel-ratio: 1.5),
+    //    screen and (min-width: #{$minwidth}px) and (-o-min-device-pixel-ratio: 3/2),
+    //    screen and (min-width: #{$minwidth}px) and (min-device-pixel-ratio: 1.5),
+    //    screen and (min-width: #{$minwidth}px) and (min-resolution: 2dppx) {
+    //    .placeholder#{$number}:after {
+    //        background-image: url("/blog/theme/static/images/paisley-bg-#{$number}@2x.png");
+    //    }
+    //}
+}
+
+@include bgimage(850, 1);
+@include bgimage(890, 2);
+@include bgimage(1040, 3);
+@include bgimage(1370, 4);
+@include bgimage(1450, 5);
+@include bgimage(1665, 6);
+
+// Grow fonts
 @media screen and (min-width: 1280px) {
     section {
         @include fixedcolwidth(6);
     }
 
     .post-content {
-        font-size: 1.75em;
-    }
-
-    body {
-        background: url("/blog/theme/static/images/paisley-bg-375.png") no-repeat fixed 100% 100% white;
-        background-size: 375px 600px;
-    }
-
-    // TODO: some way to refactor
-    @media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
-        only screen and (min--moz-device-pixel-ratio: 1.5),
-        only screen and (-o-min-device-pixel-ratio: 3/2),
-        only screen and (min-device-pixel-ratio: 1.5),
-        only screen and (min-resolution: 2dppx) {
-        body {
-            background-image: url("/blog/theme/static/images/paisley-bg-375@2x.png")
-        }
+        font-size: 1.4em;
+        line-height: 1.4em;
     }
 }
 
@@ -241,39 +276,9 @@
         // Grow font from body size of .875em to 1.25em
         font-size: #{(1.25/.875)}em;
     }
-
-    body {
-        background-image: url("/blog/theme/static/images/paisley-bg-600.png");
-        background-size: 600px 600px;
-    }
-
-    @media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
-        only screen and (min--moz-device-pixel-ratio: 1.5),
-        only screen and (-o-min-device-pixel-ratio: 3/2),
-        only screen and (min-device-pixel-ratio: 1.5),
-        only screen and (min-resolution: 2dppx) {
-        body {
-            background-image: url("/blog/theme/static/images/paisley-bg-600@2x.png");
-        }
-    }
 }
 
 // Spend the remaining pixels on centering the container div
-@media screen and (min-width: #{(1280 + 200 + 200)}px) {
-    body {
-        background-image: url("/blog/theme/static/images/paisley-bg-800.png");
-        background-size: 800px 600px;
-    }
-
-    @media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
-        only screen and (min--moz-device-pixel-ratio: 1.5),
-        only screen and (-o-min-device-pixel-ratio: 3/2),
-        only screen and (min-device-pixel-ratio: 1.5),
-        only screen and (min-resolution: 2dppx) {
-        body {
-            background-image: url("/blog/theme/static/images/paisley-bg-800@2x.png");
-        }
-    }
-
-
-}
+//@media screen and (min-width: #{(1280 + 200 + 200)}px) {
+//
+//}

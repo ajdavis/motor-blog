@@ -42,6 +42,9 @@ html(lang="en")
                     div
                         span
 
+        each i in range(1, 7)
+            div(class='placeholder' + str(i))
+
         .container
             header.main-header
                 a(href=reverse_url('home')).logo

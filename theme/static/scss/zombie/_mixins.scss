@@ -99,6 +99,7 @@
 // works within the content column system
 @mixin colwidth($cols) {
     width: (oneCol() * $cols);
+    max-width: (oneCol() * $cols);
     @include bb;
     display: inline-block;
     float: left;
@@ -107,6 +108,7 @@
 // works within the content column system
 @mixin fixedcolwidth($cols) {
     width: #{($fixed_column * $cols)}em;
+    max-width: #{($fixed_column * $cols)}em;
     @include bb;
     display: inline-block;
     float: left;
