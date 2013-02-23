@@ -2,7 +2,7 @@
 @media screen and (min-width: 480px) {
     .main-nav ul {
         li {
-            margin: 0 0.75em;
+            margin: emStep(2) emStep(4);
         }
         .photography-nav-item, .feed-nav-item {
             @include visible-inline;
@@ -10,8 +10,8 @@
     }
 
     .post-summary, .post-content {
-        font-size: 1.1em;
-        line-height: 1.35em;
+        font-size: #{1.05/($font_size/16)}em;
+        line-height: 1.44em;
     }
 }
 
@@ -21,9 +21,12 @@
 // layout around a 2em-thick cross dividing the logo, the article header,
 // the nav links, and the article body.
 @media screen and (min-width: 720px) {
+    $tabletlineheight: 1.3;
     $logo_dim: ($fixed_column - ($line/$em)/2);
     body {
         font-family: Museo, serif;
+        font-size: #{0.8/($font_size/16)}em;
+        line-height: #{$tabletlineheight}em;
     }
 
     h1 {
@@ -50,8 +53,6 @@
     }
 
     .main-nav {
-        clear: both;
-
         ul {
             margin-top: 2em; // central cross is 2em thick
             float: right;
@@ -97,7 +98,16 @@
     }
 
     .search-text-input, .search-button {
-        width: 96px;
+        float: right;
+        width: #{$logo_dim}em;
+    }
+
+    .search-text-input {
+        margin: emStep(4) 0 emStep(1);
+    }
+
+    .search-button {
+        margin: emStep(1) 0;
     }
 
     .post-summary, .post-content {
@@ -107,7 +117,7 @@
     section {
         background-color: white;
         text-align: left;
-        @include fixedcolwidth(4);
+        @include fixedcolwidth(5);
         @include fixedcolmargin(2);
     }
 
@@ -117,30 +127,33 @@
 
     article > header {
         text-align: left;
-        //height: #{$logo_dim}em;
+        border-bottom: 1px solid $lightergrey;
+
+        // Push down the article title so it's base-aligned with logo
+        height: #{($logo_dim)}em;
+
+        // Makes h1.title's "position:absolute; bottom: 0" work.
+        position: relative;
     }
 
     h1.title {
-        // Grow font from body size of .875em to 1.75em
-        font-size: #{(1.75/.875)}em;
+        // Grow font from body size of .875em to 1.5em
+        font-size: #{(1.5/.875)}em;
+        margin: 0;
+
+        display: block;
+        position: absolute;
+        bottom: 0;
+
+        background-color: white;
     }
 
     h1.title {
         margin: 0;
-        border-bottom: 1px solid $lightergrey;
-    }
-
-    h1.page-title {
-        // Move down to bottom-align with logo
-        margin-top: 2.6em;
-    }
-
-    .post-meta {
-        font-size: 1em;
     }
 
     .post-content {
-        margin-top: 1.75em;
+        margin-top: 2em; // central cross
     }
 
     .post-summary, .post-content {
@@ -153,7 +166,6 @@
     }
 
     article {
-        text-align: justify;
         border-top: none;
         border-bottom: 1px dotted $lightergrey;
     }

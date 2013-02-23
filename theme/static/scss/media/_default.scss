@@ -4,13 +4,17 @@
 // Should put the lowest one you want to support here without media restrictions. 
 // Others in _phone.scss
 body {
-    font-family: sans-serif;
+    font-family: Helvetica, sans-serif;
     font-size: #{$font_size/16}em;
     line-height: 1.36em;
 }
 
 blockquote {
     margin-left: 1em;
+}
+
+p {
+    margin-bottom: 1em;
 }
 
 a {
@@ -23,7 +27,7 @@ img {
 
 h1 {
     font-size: #{1.25/($font_size/16)}em;
-    margin: emStep(2);
+    margin: emStep(2) 0;
 
     & > a {
         text-decoration: none;
@@ -41,6 +45,7 @@ header {
 }
 
 .main-header {
+    @include clearfix;
     margin: emStep(2) auto;
 
     h1 {
@@ -88,8 +93,15 @@ header {
     height: emStep(6);
 }
 
+.search-text-input {
+    float: left;
+    width: 65%;
+}
+
 .search-button {
     @include button;
+    float: right;
+    width: 30%;
 }
 
 section {
@@ -98,9 +110,8 @@ section {
 }
 
 article {
-    text-align: left;
-    margin: emStep(2) 0 3em;
-    border-top: 1px solid $grey;
+    text-align: justify;
+    margin: #{$articletopmargin}em 0 1em;
 
     // Necessary for the right-arrow style, below
     position: relative;
@@ -155,6 +166,9 @@ article {
 }
 
 .post-summary {
+    // Make room for the arrow
+    padding-right: 0.5em;
+
     a {
         text-decoration: none;
         color: $dark;
