@@ -22,4 +22,4 @@ def summarize(html, n):
         return ' '.join(summary)
 
     # Text was truncated
-    return ' '.join(summary) + ' [ ... ]'
+    return ' '.join(summary) + ' [...]'
