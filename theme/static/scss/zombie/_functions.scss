@@ -1,5 +1,5 @@
 @function gutter() {
-    @return #{($line/$em)/4}em;
+    @return ($line/$em)/4 * 1em;
 }
 
 @function oneCol() {

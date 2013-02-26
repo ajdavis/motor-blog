@@ -144,10 +144,12 @@
         bottom: 0;
 
         background-color: white;
-    }
-
-    h1.title {
         margin: 0;
+
+        a:hover {
+            text-decoration: none;
+            color: $link-hover-color;
+        }
     }
 
     .byline {
@@ -171,6 +173,12 @@
         .post-content {
             @include visible;
         }
+    }
+
+    // Remove border beneath article header for the first article in the list,
+    // on pages like Category where multiple full articles are shown
+    .multi-body section > article:nth-child(2) > header {
+        border-bottom: none;
     }
 
     .single-body {
@@ -200,18 +208,19 @@
     }
 }
 
-// Grow fonts
+// Grow fonts, move content 1em to right
 @media screen and (min-width: 1280px) {
+    .main-header {
+        left: gutter() + 1em;
+    }
+
     section {
         width: #{550 / $font_size}em; // 475px wide
+        margin-left: 12.5em;
     }
 
-    h1 {
-        @include font-size(28, 38);
-    }
-
-    h1.title {
-        @include font-size(32, 44);
+    h1, h1.title {
+        @include font-size(24, 32);
     }
 
     .post-list {
