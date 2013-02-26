@@ -529,7 +529,7 @@ a.summary-title {
   .home-body .post-content, .category-body .post-content {
     display: block !important; }
 
-  .multi-body section > article:nth-child(2) > header {
+  .category-body section > article:nth-child(2) > header {
     border-bottom: none; }
 
   .single-body .main-header {
