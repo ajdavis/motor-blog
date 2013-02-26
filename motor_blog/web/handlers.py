@@ -42,6 +42,7 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         def get_setting(setting_name):
             return self.application.settings[setting_name]
 
+        # TODO: use ui_methods instead of this
         ns.update({
             'q': '',
             'setting': get_setting,
