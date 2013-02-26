@@ -1,0 +1,45 @@
+@mixin bgimage($minwidth, $number) {
+    @media screen and (min-width: #{$minwidth/16}em) {
+        .backgroundplaceholder#{$number} {
+            content: ' ';
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            width: 800px;
+            height: 600px;
+            background-size: 800px 600px;
+            background-repeat:no-repeat;
+            z-index: -#{(100 - $number)};
+            //background-image: url("/blog/theme/static/images/paisley-bg-#{$number}@2x.png");
+        }
+    }
+
+    // lodpi
+    @media screen and (max-width: #{$minwidth/16}em) and (-Webkit-max-device-pixel-ratio: 1.4),
+        screen and (max-width: #{$minwidth/16}em) and (max--moz-device-pixel-ratio: 1.4),
+        screen and (max-width: #{$minwidth/16}em) and (-o-max-device-pixel-ratio: 3/5),
+        screen and (max-width: #{$minwidth/16}em) and (max-device-pixel-ratio: 1.4),
+        screen and (max-width: #{$minwidth/16}em) and (max-resolution: 1dppx) {
+        .backgroundplaceholder#{$number} {
+            background-image: url("/blog/theme/static/images/paisley-bg-#{$number}.png");
+        }
+    }
+
+    // hidpi
+    @media screen and (min-width: #{$minwidth/16}em) and (-Webkit-min-device-pixel-ratio: 1.5),
+        screen and (min-width: #{$minwidth/16}em) and (min--moz-device-pixel-ratio: 1.5),
+        screen and (min-width: #{$minwidth/16}em) and (-o-min-device-pixel-ratio: 3/2),
+        screen and (min-width: #{$minwidth/16}em) and (min-device-pixel-ratio: 1.5),
+        screen and (min-width: #{$minwidth/16}em) and (min-resolution: 2dppx) {
+        .backgroundplaceholder#{$number} {
+            background-image: url("/blog/theme/static/images/paisley-bg-#{$number}@2x.png");
+        }
+    }
+}
+
+@include bgimage(820, 1);
+@include bgimage(860, 2);
+@include bgimage(1030, 3);
+@include bgimage(1150, 4);
+@include bgimage(1330, 5);
+@include bgimage(1540, 6);

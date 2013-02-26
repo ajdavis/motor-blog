@@ -5,8 +5,7 @@
 // Others in _phone.scss
 body {
     font-family: Helvetica, sans-serif;
-    font-size: #{$font_size/16}em;
-    line-height: 1.36em;
+    @include font-size(14, 21);
 }
 
 blockquote {
@@ -25,13 +24,20 @@ img {
     max-width: 100%;
 }
 
-h1 {
-    font-size: #{1.25/($font_size/16)}em;
+h1, h2, h3, h4 {
     margin: emStep(2) 0;
+}
+
+h1 {
+    @include font-size(20, 21);
 
     & > a {
         text-decoration: none;
         color: $dark;
+
+        &:hover {
+            text-decoration: underline;
+        }
     }
 }
 
@@ -69,6 +75,7 @@ header {
     @include center;
 
     li {
+        @include font-size(14, 21);
         display: inline;
         margin: emStep(2);
     }
@@ -111,14 +118,14 @@ section {
 
 article {
     text-align: justify;
-    margin: #{$articletopmargin}em 0 1em;
+    margin: #{$articletopmargin}em 0;
 
     // Necessary for the right-arrow style, below
     position: relative;
 }
 
 .post-meta {
-    font-size: 0.75em;
+    @include font-size($font-size - 3, 21);
     margin: 1em 0;
     color: $lightgrey;
 }
@@ -165,6 +172,10 @@ article {
     }
 }
 
+.post-summary, .post-content {
+    @include font-size(14, 21);
+}
+
 .post-summary {
     // Make room for the arrow
     padding-right: 0.5em;
@@ -173,9 +184,6 @@ article {
         text-decoration: none;
         color: $dark;
     }
-}
-
-.post-content {
 }
 
 .entry-meta, .entry-meta a {
@@ -198,6 +206,12 @@ article {
     .excerpt {
         margin-bottom: emStep(8);
     }
+}
+
+a.summary-title {
+    @include font-size(16, 21);
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
 }
 
 .nav-below {

@@ -3,10 +3,11 @@ extends base
 block vars
     title = setting('author_display_name') + " | All Posts"
     meta_description = setting('description')
-    body_class = 'all-posts-body'
+    body_class = 'all-posts-body multi-body'
 
 block content
-    h1.title.page-title All Posts
+    header
+        h1.title.page-title All Posts
     ul.post-list
         each post in posts
             include post-summary

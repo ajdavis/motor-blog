@@ -1,23 +1,29 @@
 extends base
 
 block vars
-    title = setting('author_display_name') + " | Search | " + q
+    title = setting('author_display_name') + " | Search | " + (q or '')
     meta_description = setting('description')
-    body_class = 'search-body'
+    body_class = 'search-body multi-body'
 
 include nav
 
 block content
+    header
+        h1.title.page-title
+            if not q or not posts
+                | No results
+            else
+                | Posts and pages with "#{ q }":
+
     if not q
         p Go ahead and put a search term in the box next time before you hit 'search'.
     else
-        h1 Posts and pages with "#{ q }":
         if not posts
             p No results.
             p Maybe just look through the&nbsp;
                 a(href=reverse_url('all-posts')) list of all posts
                 | ?
         else
-            ul
+            ul.post-list
                 each post in posts
                     include post-summary

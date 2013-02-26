@@ -1,17 +1,12 @@
-//@media screen and (min-width: #{480/$em}em) {
 @media screen and (min-width: 480px) {
     .main-nav ul {
         li {
             margin: emStep(2) emStep(4);
         }
+
         .photography-nav-item, .feed-nav-item {
             @include visible-inline;
         }
-    }
-
-    .post-summary, .post-content {
-        font-size: #{1.05/($font_size/16)}em;
-        line-height: 1.44em;
     }
 }
 
@@ -25,18 +20,17 @@
     $logo_dim: ($fixed_column - ($line/$em)/2);
     body {
         font-family: Museo, serif;
-        font-size: #{0.8/($font_size/16)}em;
-        line-height: #{$tabletlineheight}em;
+        line-height: #{20 / $font_size}em;
     }
 
-    h1 {
+    h1, h2, h3, h4 {
         // Museo bold is ugly
         font-weight: normal;
     }
 
     .container {
         float: left;
-        margin: 0 4em;
+        margin: 0;
     }
 
     .main-header {
@@ -44,8 +38,8 @@
         top: gutter();
         left: gutter();
         @include cellpad;
-        @include fixedcolwidth(1);
-        @include fixedcolmargin(1);
+        margin-left: 3em; // 3em * 14px = 42px
+        width: 6em; // 6em * 14px = 84px
 
         h1 {
             @include hidden;
@@ -73,7 +67,7 @@
             .category-nav-item, .search-item,
             .nav-divider-1, {
                 @include visible;
-                margin: emStep(2) 0;
+                margin: 0 0 emStep(2);
                 text-align: right;
             }
 
@@ -111,22 +105,23 @@
     }
 
     .post-summary, .post-content {
-        font-size: 1.5em;
+        @include font-size(16, 24);
     }
 
     section {
         background-color: white;
         text-align: left;
-        @include fixedcolwidth(5);
-        @include fixedcolmargin(2);
+        margin-left: 11.5em;
+        width: #{475 / $font_size}em; // 475px wide
     }
 
     section > article:first-child {
         border-top: none;
     }
 
-    article > header {
+    article > header, section > header {
         text-align: left;
+        margin: 1em 0 2em; // 2em central cross
         border-bottom: 1px solid $lightergrey;
 
         // Push down the article title so it's base-aligned with logo
@@ -136,9 +131,12 @@
         position: relative;
     }
 
+    .post-meta {
+        @include font-size(14, 24);
+    }
+
     h1.title {
-        // Grow font from body size of .875em to 1.5em
-        font-size: #{(1.5/.875)}em;
+        @include font-size(20, 24);
         margin: 0;
 
         display: block;
@@ -152,15 +150,6 @@
         margin: 0;
     }
 
-    .post-content {
-        margin-top: 2em; // central cross
-    }
-
-    .post-summary, .post-content {
-        font-size: 1.2em;
-        line-height: 1.5em;
-    }
-
     .byline {
         @include visible-inline;
     }
@@ -168,12 +157,11 @@
     article {
         border-top: none;
         border-bottom: 1px dotted $lightergrey;
+        margin: #{$articletopmargin}em 0 1em;
     }
 
     // Remove article summaries and their "more" right-arrows
-    article:after {
-        @include hidden;
-    }
+    article:after { @include hidden; }
 
     .home-body, .category-body {
         .post-summary {
@@ -186,117 +174,57 @@
     }
 
     .single-body {
-        .main-header {
-            border-bottom: none;
-        }
-
-        .main-nav {
-            @include visible;
-        }
-
-        article { margin-bottom: 1em; };
+        .main-header { border-bottom: none; }
+        .main-nav { @include visible; }
     }
 
     // Remove button style from bottom nav links
     .nav-previous, .nav-next {
         @include nobutton;
-        font-size: 1.5em;
+        @include font-size(20, 24);
         font-weight: bold;
         margin-bottom: 1em;
         a:hover {
             text-decoration: underline;
         }
     }
-}
 
-// Move sidebar and content one column to the right
-@media screen and (min-width: 1024px) {
-    h1.title {
-        // Grow font from body size of .875em to 2.5em
-        font-size: #{(2.5/.875)}em;
-    }
-
-    .main-header {
-        //left: #{(($line/$em)/4 + $fixed_column)}em;
-    }
-
-    .main-nav ul li {
-        // Grow font from body size of .875em to 1em
-        font-size: #{(1/.875)}em;
-    }
-
-    section {
-        @include fixedcolmargin(2);
-    }
-}
-
-@mixin bgimage($minwidth, $number) {
-    @media screen and (min-width: #{$minwidth}px) { 
-        .backgroundplaceholder#{$number}:after {
-            content: ' ';
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            width: 800px;
-            height: 600px;
-            background-size: 800px 600px;
-            background-repeat:no-repeat;
-            z-index: -#{(100 - $number)};
-            //background-image: url("/blog/theme/static/images/paisley-bg-#{$number}@2x.png");
+    .post-list {
+        .summary-title {
+            @include font-size(20, 24);
         }
-    }
 
-    // lodpi
-    @media screen and (max-width: #{$minwidth}px) and (-Webkit-max-device-pixel-ratio: 1.4),
-        screen and (max-width: #{$minwidth}px) and (max--moz-device-pixel-ratio: 1.4),
-        screen and (max-width: #{$minwidth}px) and (-o-max-device-pixel-ratio: 3/5),
-        screen and (max-width: #{$minwidth}px) and (max-device-pixel-ratio: 1.4),
-        screen and (max-width: #{$minwidth}px) and (max-resolution: 1dppx) {
-        .backgroundplaceholder#{$number}:after {
-            background-image: url("/blog/theme/static/images/paisley-bg-#{$number}.png");
-        }
-    }
-
-    // hidpi
-    @media screen and (min-width: #{$minwidth}px) and (-Webkit-min-device-pixel-ratio: 1.5),
-        screen and (min-width: #{$minwidth}px) and (min--moz-device-pixel-ratio: 1.5),
-        screen and (min-width: #{$minwidth}px) and (-o-min-device-pixel-ratio: 3/2),
-        screen and (min-width: #{$minwidth}px) and (min-device-pixel-ratio: 1.5),
-        screen and (min-width: #{$minwidth}px) and (min-resolution: 2dppx) {
-        .backgroundplaceholder#{$number}:after {
-            background-image: url("/blog/theme/static/images/paisley-bg-#{$number}@2x.png");
+        .summary-title, .date {
+            margin-bottom: 0.5em;
         }
     }
 }
-
-@include bgimage(850, 1);
-@include bgimage(890, 2);
-@include bgimage(1040, 3);
-@include bgimage(1370, 4);
-@include bgimage(1450, 5);
-@include bgimage(1665, 6);
 
 // Grow fonts
 @media screen and (min-width: 1280px) {
     section {
-        @include fixedcolwidth(6);
+        width: #{550 / $font_size}em; // 475px wide
+    }
+
+    h1 {
+        @include font-size(28, 38);
+    }
+
+    h1.title {
+        @include font-size(32, 44);
+    }
+
+    .post-list {
+        .summary-title {
+            @include font-size(24, 28);
+        }
+
+        .date, .excerpt {
+            @include font-size(20, 28);
+        }
     }
 
     .post-content {
-        font-size: 1.4em;
-        line-height: 1.4em;
+        @include font-size(20, 32);
     }
 }
-
-// Background image enhancement steps
-@media screen and (min-width: #{(1280 + 200)}px) {
-    .main-nav ul li {
-        // Grow font from body size of .875em to 1.25em
-        font-size: #{(1.25/.875)}em;
-    }
-}
-
-// Spend the remaining pixels on centering the container div
-//@media screen and (min-width: #{(1280 + 200 + 200)}px) {
-//
-//}

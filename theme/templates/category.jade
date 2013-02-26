@@ -3,11 +3,13 @@ extends base
 block vars
     title = setting('author_display_name') + " | " + this_category.name
     meta_description = setting('description')
-    body_class = 'category-body'
+    body_class = 'category-body multi-body'
 
 block content
-    h1.title.page-title Category:
-        = this_category.name
+    header
+        h1.title.page-title Category:&nbsp;
+            = this_category.name
+
     each post in posts
         include post
 

@@ -1,3 +1,9 @@
+// Input is in pixels
+@mixin font-size($font-size, $line-height) {
+    font-size: ($font-size / 16) * 1em;
+    line-height: ($line-height / $font-size) * 1em;
+}
+
 @mixin small {
     /* 13px / 18px */
     font-size: #{($font-size*0.8125) / $em}em;
