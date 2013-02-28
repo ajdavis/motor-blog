@@ -15,9 +15,10 @@ __all__ = (
 # TODO: what's the login timeout?
 # TODO: can MarsEdit preview a draft of an *edit* of a published post?
 
+
 class MotorBlogAdminHandler(MotorBlogHandler):
     def get_template_path(self):
-        """Override theme template path
+        """Don't use theme template path
         """
         return None
 
