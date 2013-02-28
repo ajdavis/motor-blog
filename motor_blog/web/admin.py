@@ -100,7 +100,7 @@ class DraftHandler(MotorBlogHandler):
         categorydocs = yield motor.Op(self.get_categories)
         categories = [Category(**doc) for doc in categorydocs]
         self.render(
-            'single.html',
+            'single.jade',
             post=post, prev=None, next=None, categories=categories)
 
 
