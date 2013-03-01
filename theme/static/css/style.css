@@ -215,6 +215,17 @@ h1 {
     h1 > a:hover {
       text-decoration: underline; }
 
+pre {
+  margin-bottom: 1.25em;
+  font-family: Monaco, Lucida Console, monospace;
+  font-size: 1em;
+  overflow: auto;
+  line-height: 1.2em; }
+
+/* Make inline code spans closer in size to normal Museo text */
+code {
+  font-size: 110%; }
+
 .container {
   margin: 0 7.14286%;
   *zoom: 1;

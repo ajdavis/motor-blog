@@ -41,6 +41,19 @@ h1 {
     }
 }
 
+pre {
+    margin-bottom: emStep(5);
+    font-family: Monaco,Lucida Console,monospace;
+    font-size: 1em;
+    overflow: auto;
+    line-height: 1.2em;
+}
+
+/* Make inline code spans closer in size to normal Museo text */
+code {
+    font-size: 110%;
+}
+
 .container {
     @include body-container;
     text-align: center;
