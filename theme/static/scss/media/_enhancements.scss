@@ -26,6 +26,26 @@
     h1, h2, h3, h4 {
         // Museo bold is ugly
         font-weight: normal;
+        margin: emStep(4) 0;
+    }
+
+    hr {
+        margin-bottom: 1em; // match paragraph margin
+        border: none;
+        width: 100%;
+        height: 19px;
+        background: #fff url("/blog/theme/static/images/hr.png") no-repeat scroll center;
+        background-size: 300px 19px;
+
+        // hidpi
+        @media screen and (-Webkit-min-device-pixel-ratio: 1.5),
+            screen and (min--moz-device-pixel-ratio: 1.5),
+            screen and (-o-min-device-pixel-ratio: 3/2),
+            screen and (min-device-pixel-ratio: 1.5),
+            screen and (min-resolution: 2dppx)
+        {
+            background-image: url("/blog/theme/static/images/hr@2x.png");
+        }
     }
 
     .container {
@@ -177,7 +197,8 @@
 
     // Remove border beneath article header for the first article in the list,
     // on pages like Category where multiple full articles are shown
-    .category-body section > article:nth-child(2) > header {
+    .category-body section > article:nth-child(2) > header,
+    .tag-body section > article:nth-child(2) > header {
         border-bottom: none;
     }
 
@@ -234,6 +255,12 @@
     }
 
     .post-content {
+        // Grow post content
         @include font-size(20, 32);
+
+        // But not headers within it
+        h1 {
+            @include font-size(24 * (16 / 20), 32);
+        }
     }
 }

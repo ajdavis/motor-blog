@@ -419,8 +419,16 @@ a.summary-title {
     line-height: 1.42857em; }
 
   h1, h2, h3, h4 {
-    font-weight: normal; }
+    font-weight: normal;
+    margin: 1em 0; }
 
+  hr {
+    margin-bottom: 1em;
+    border: none;
+    width: 100%;
+    height: 19px;
+    background: white url("/blog/theme/static/images/hr.png") no-repeat scroll center;
+    background-size: 300px 19px; }
   .container {
     float: left;
     margin: 0; }
@@ -529,7 +537,8 @@ a.summary-title {
   .home-body .post-content, .category-body .post-content {
     display: block !important; }
 
-  .category-body section > article:nth-child(2) > header {
+  .category-body section > article:nth-child(2) > header,
+  .tag-body section > article:nth-child(2) > header {
     border-bottom: none; }
 
   .single-body .main-header {
@@ -567,6 +576,10 @@ a.summary-title {
     line-height: 1.2em; }
   .post-list .summary-title, .post-list .date {
     margin-bottom: 0.5em; } }
+  @media screen and (min-width: 720px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 720px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 720px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 720px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 720px) and (min-resolution: 2dppx) {
+    hr {
+      background-image: url("/blog/theme/static/images/hr@2x.png"); } }
+
 @media screen and (min-width: 1280px) {
   .main-header {
     left: 1.375em; }
@@ -588,7 +601,10 @@ a.summary-title {
 
   .post-content {
     font-size: 1.25em;
-    line-height: 1.6em; } }
+    line-height: 1.6em; }
+    .post-content h1 {
+      font-size: 1.2em;
+      line-height: 1.66667em; } }
 @media screen and (min-width: 51.25em) {
   .backgroundplaceholder1 {
     content: ' ';

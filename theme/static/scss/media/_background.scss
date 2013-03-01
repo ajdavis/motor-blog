@@ -10,7 +10,6 @@
             background-size: 800px 600px;
             background-repeat:no-repeat;
             z-index: -#{(100 - $number)};
-            //background-image: url("/blog/theme/static/images/paisley-bg-#{$number}@2x.png");
         }
     }
 
