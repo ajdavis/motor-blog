@@ -215,6 +215,17 @@ h1 {
     h1 > a:hover {
       text-decoration: underline; }
 
+hr {
+  margin-bottom: 1em;
+  border: none;
+  width: 100%;
+  height: 19px;
+  background: white url("/blog/theme/static/images/hr-small.png") no-repeat scroll center;
+  background-size: 19px 19px; }
+  @media screen and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min--moz-device-pixel-ratio: 1.5), screen and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-device-pixel-ratio: 1.5), screen and (min-resolution: 2dppx) {
+    hr {
+      background-image: url("/blog/theme/static/images/hr-small@2x.png"); } }
+
 pre {
   margin-bottom: 1.25em;
   font-family: Monaco, Lucida Console, monospace;
@@ -243,7 +254,8 @@ header {
 
 .main-header {
   *zoom: 1;
-  margin: 0.5em auto; }
+  margin: 0.5em auto 0;
+  padding-bottom: 0.5em; }
   .main-header:before, .main-header:after {
     display: table;
     content: "";
@@ -254,6 +266,20 @@ header {
     margin: 0.5em 0 0; }
     .main-header h1 a {
       color: #575757; }
+
+.home-body .main-header {
+  padding-bottom: 1em;
+  border-style: solid;
+  border-width: 0 0 33px;
+  max-width: 240px;
+  -moz-border-image: url("/blog/theme/static/images/header-bottom-border.png") 0 0 33 0;
+  -webkit-border-image: url("/blog/theme/static/images/header-bottom-border.png") 0 0 33 0;
+  border-image: url("/blog/theme/static/images/header-bottom-border.png") 0 0 33 0; }
+  @media screen and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min--moz-device-pixel-ratio: 1.5), screen and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-device-pixel-ratio: 1.5), screen and (min-resolution: 2dppx) {
+    .home-body .main-header {
+      -moz-border-image: url("/blog/theme/static/images/header-bottom-border@2x.png") 0 0 66 0;
+      -webkit-border-image: url("/blog/theme/static/images/header-bottom-border@2x.png") 0 0 66 0;
+      border-image: url("/blog/theme/static/images/header-bottom-border@2x.png") 0 0 66 0; } }
 
 .logo {
   margin: 0 auto;
@@ -317,13 +343,13 @@ section {
 
 article {
   text-align: justify;
-  margin: 0.5em 0;
+  margin: 0 0 1em;
   position: relative; }
 
 .post-meta {
   font-size: 0.6875em;
   line-height: 1.90909em;
-  margin: 1em 0;
+  margin: 0 0 1em;
   color: #888888; }
 
 .byline {
@@ -341,9 +367,6 @@ article {
   border: 0.75em solid transparent;
   border-left-color: #575757; }
 
-.single-body .main-header {
-  margin-bottom: 0;
-  border-bottom: 1px solid #888888; }
 .single-body .main-nav {
   display: none !important; }
 .single-body .post-summary {
@@ -421,9 +444,17 @@ a.summary-title {
 
 @media screen and (min-width: 480px) {
   .main-nav ul li {
-    margin: 0.5em 1em; }
+    margin: 0.5em 0.5em; }
   .main-nav ul .photography-nav-item, .main-nav ul .feed-nav-item {
-    display: inline-block !important; } }
+    display: inline-block !important; }
+
+  hr {
+    background-size: 300px 19px;
+    background-image: url("/blog/theme/static/images/hr.png"); } }
+  @media screen and (min-width: 480px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 480px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 480px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 480px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 480px) and (min-resolution: 2dppx) {
+    hr {
+      background-image: url("/blog/theme/static/images/hr@2x.png"); } }
+
 @media screen and (min-width: 720px) {
   body {
     font-family: Museo, serif;
@@ -433,13 +464,6 @@ a.summary-title {
     font-weight: normal;
     margin: 1em 0; }
 
-  hr {
-    margin-bottom: 1em;
-    border: none;
-    width: 100%;
-    height: 19px;
-    background: white url("/blog/theme/static/images/hr.png") no-repeat scroll center;
-    background-size: 300px 19px; }
   .container {
     float: left;
     margin: 0; }
@@ -587,10 +611,6 @@ a.summary-title {
     line-height: 1.2em; }
   .post-list .summary-title, .post-list .date {
     margin-bottom: 0.5em; } }
-  @media screen and (min-width: 720px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 720px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 720px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 720px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 720px) and (min-resolution: 2dppx) {
-    hr {
-      background-image: url("/blog/theme/static/images/hr@2x.png"); } }
-
 @media screen and (min-width: 1280px) {
   .main-header {
     left: 1.375em; }

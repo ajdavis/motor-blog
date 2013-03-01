@@ -1,11 +1,28 @@
 @media screen and (min-width: 480px) {
     .main-nav ul {
         li {
-            margin: emStep(2) emStep(4);
+            margin: emStep(2) emStep(2);
         }
 
         .photography-nav-item, .feed-nav-item {
             @include visible-inline;
+        }
+    }
+
+    hr {
+        background-size: 300px 19px;
+
+        // Replace hr-small.png
+        background-image: url("/blog/theme/static/images/hr.png");
+
+        // hidpi
+        @media screen and (-Webkit-min-device-pixel-ratio: 1.5),
+            screen and (min--moz-device-pixel-ratio: 1.5),
+            screen and (-o-min-device-pixel-ratio: 3/2),
+            screen and (min-device-pixel-ratio: 1.5),
+            screen and (min-resolution: 2dppx)
+        {
+            background-image: url("/blog/theme/static/images/hr@2x.png");
         }
     }
 }
@@ -27,25 +44,6 @@
         // Museo bold is ugly
         font-weight: normal;
         margin: emStep(4) 0;
-    }
-
-    hr {
-        margin-bottom: 1em; // match paragraph margin
-        border: none;
-        width: 100%;
-        height: 19px;
-        background: #fff url("/blog/theme/static/images/hr.png") no-repeat scroll center;
-        background-size: 300px 19px;
-
-        // hidpi
-        @media screen and (-Webkit-min-device-pixel-ratio: 1.5),
-            screen and (min--moz-device-pixel-ratio: 1.5),
-            screen and (-o-min-device-pixel-ratio: 3/2),
-            screen and (min-device-pixel-ratio: 1.5),
-            screen and (min-resolution: 2dppx)
-        {
-            background-image: url("/blog/theme/static/images/hr@2x.png");
-        }
     }
 
     .container {
@@ -179,7 +177,7 @@
     article {
         border-top: none;
         border-bottom: 1px dotted $lightergrey;
-        margin: #{$articletopmargin}em 0 1em;
+        margin: emStep(2) 0 1em;
     }
 
     // Remove article summaries and their "more" right-arrows
