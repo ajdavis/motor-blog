@@ -468,6 +468,12 @@ a.summary-title {
     float: left;
     margin: 0; }
 
+  .home-body .main-header {
+    border: none;
+    -moz-border-image: none;
+    -webkit-border-image: none;
+    border-image: none; }
+
   .main-header {
     position: fixed;
     top: 0.375em;
