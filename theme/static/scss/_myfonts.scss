@@ -1,4 +1,79 @@
 @font-face {
-    font-family: "Museo";
-    src: url("/blog/theme/static/Museo300-Regular.otf");
+    font-family: 'Museo-900';
+    src: url('/blog/theme/static/webfonts/museo/260EEB_0_0.eot');
+    src: url('/blog/theme/static/webfonts/museo/260EEB_0_0.eot?#iefix') format('embedded-opentype'),
+        url('/blog/theme/static/webfonts/museo/260EEB_0_0.woff') format('woff'),
+        url('/blog/theme/static/webfonts/museo/260EEB_0_0.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Museo-700';
+    src: url('/blog/theme/static/webfonts/museo/260EEB_1_0.eot');
+    src: url('/blog/theme/static/webfonts/museo/260EEB_1_0.eot?#iefix') format('embedded-opentype'),
+        url('/blog/theme/static/webfonts/museo/260EEB_1_0.woff') format('woff'),
+        url('/blog/theme/static/webfonts/museo/260EEB_1_0.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Museo-300';
+    src: url('/blog/theme/static/webfonts/museo/260EEB_2_0.eot');
+    src: url('/blog/theme/static/webfonts/museo/260EEB_2_0.eot?#iefix') format('embedded-opentype'),
+        url('/blog/theme/static/webfonts/museo/260EEB_2_0.woff') format('woff'),
+        url('/blog/theme/static/webfonts/museo/260EEB_2_0.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Museo-100';
+    src: url('/blog/theme/static/webfonts/museo/260EEB_3_0.eot');
+    src: url('/blog/theme/static/webfonts/museo/260EEB_3_0.eot?#iefix') format('embedded-opentype'),
+        url('/blog/theme/static/webfonts/museo/260EEB_3_0.woff') format('woff'),
+        url('/blog/theme/static/webfonts/museo/260EEB_3_0.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Museo-500';
+    src: url('/blog/theme/static/webfonts/museo/260EEB_4_0.eot');
+    src: url('/blog/theme/static/webfonts/museo/260EEB_4_0.eot?#iefix') format('embedded-opentype'),
+        url('/blog/theme/static/webfonts/museo/260EEB_4_0.woff') format('woff'),
+        url('/blog/theme/static/webfonts/museo/260EEB_4_0.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Museo-300Italic';
+    src: url('/blog/theme/static/webfonts/museo/260EEB_5_0.eot');
+    src: url('/blog/theme/static/webfonts/museo/260EEB_5_0.eot?#iefix') format('embedded-opentype'),
+        url('/blog/theme/static/webfonts/museo/260EEB_5_0.woff') format('woff'),
+        url('/blog/theme/static/webfonts/museo/260EEB_5_0.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Museo-900Italic';
+    src: url('/blog/theme/static/webfonts/museo/260EEB_6_0.eot');
+    src: url('/blog/theme/static/webfonts/museo/260EEB_6_0.eot?#iefix') format('embedded-opentype'),
+        url('/blog/theme/static/webfonts/museo/260EEB_6_0.woff') format('woff'),
+        url('/blog/theme/static/webfonts/museo/260EEB_6_0.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Museo-100Italic';
+    src: url('/blog/theme/static/webfonts/museo/260EEB_7_0.eot');
+    src: url('/blog/theme/static/webfonts/museo/260EEB_7_0.eot?#iefix') format('embedded-opentype'),
+        url('/blog/theme/static/webfonts/museo/260EEB_7_0.woff') format('woff'),
+        url('/blog/theme/static/webfonts/museo/260EEB_7_0.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Museo-500Italic';
+    src: url('/blog/theme/static/webfonts/museo/260EEB_8_0.eot');
+    src: url('/blog/theme/static/webfonts/museo/260EEB_8_0.eot?#iefix') format('embedded-opentype'),
+        url('/blog/theme/static/webfonts/museo/260EEB_8_0.woff') format('woff'),
+        url('/blog/theme/static/webfonts/museo/260EEB_8_0.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Museo-700Italic';
+    src: url('/blog/theme/static/webfonts/museo/260EEB_9_0.eot');
+    src: url('/blog/theme/static/webfonts/museo/260EEB_9_0.eot?#iefix') format('embedded-opentype'),
+        url('/blog/theme/static/webfonts/museo/260EEB_9_0.woff') format('woff'),
+        url('/blog/theme/static/webfonts/museo/260EEB_9_0.ttf') format('truetype');
 }

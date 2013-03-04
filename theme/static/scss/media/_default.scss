@@ -24,12 +24,8 @@ img {
     max-width: 100%;
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5 {
     margin: emStep(2) 0;
-}
-
-h1 {
-    @include font-size(20, 21);
 
     & > a {
         text-decoration: none;
@@ -40,6 +36,14 @@ h1 {
         }
     }
 }
+
+h1 { @include font-size(28, 28); }
+
+h2 { @include font-size(21, 21); }
+
+h3 { font-variant: small-caps; }
+
+h4, h5 { font-weight: bold; font-style: italic; }
 
 hr {
     margin-bottom: 1em; // match paragraph margin
@@ -63,7 +67,7 @@ hr {
 pre {
     margin-bottom: emStep(5);
     font-family: Monaco,Lucida Console,monospace;
-    font-size: 1em;
+    font-size: 1.1em;
     overflow: auto;
     line-height: 1.2em;
 }
@@ -247,24 +251,26 @@ article {
     @include bulletless;
     text-align: left;
 
-    .summary-title, .date, .excerpt {
+    .summary-title, .summary-date, .excerpt {
         float: left;
         clear: both;
+        text-decoration: none;
+        &:hover { text-decoration: underline; }
+        margin: 0 0 emStep(2);
     }
 
-    .date {
+    .summary-title {
+        @include font-size(18, 21);
+        font-weight: bold;
+    }
+
+    .summary-date {
         color: $lightgrey;
     }
 
     .excerpt {
         margin-bottom: emStep(8);
     }
-}
-
-a.summary-title {
-    @include font-size(16, 21);
-    text-decoration: none;
-    &:hover { text-decoration: underline; }
 }
 
 .nav-below {
