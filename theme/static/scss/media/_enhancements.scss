@@ -129,7 +129,7 @@
         margin: emStep(1) 0;
     }
 
-    .post-summary p, .post-content p, .post-list .summary-title {
+    .post-summary p, .post-content li, .post-content p, .post-list .summary-title {
         @include font-size(16, 24);
     }
 
@@ -250,7 +250,7 @@
         }
     }
 
-    .post-content p {
+    .post-content li, .post-content p {
         @include font-size(22, 30);
     }
 }

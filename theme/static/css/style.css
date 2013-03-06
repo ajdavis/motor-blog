@@ -431,7 +431,7 @@ article {
 .single-body article {
   border-top: none; }
 
-.post-summary, .post-content {
+.post-summary p, .post-content li, .post-content p {
   font-size: 0.875em;
   line-height: 1.5em; }
 
@@ -584,7 +584,7 @@ article {
   .search-button {
     margin: 0.25em 0; }
 
-  .post-summary p, .post-content p, .post-list .summary-title {
+  .post-summary p, .post-content li, .post-content p, .post-list .summary-title {
     font-size: 1em;
     line-height: 1.5em; }
 
@@ -686,7 +686,7 @@ article {
     font-size: 1.125em;
     line-height: 1.44444em; }
 
-  .post-content p {
+  .post-content li, .post-content p {
     font-size: 1.375em;
     line-height: 1.36364em; } }
 @media screen and (min-width: 51.25em) {
