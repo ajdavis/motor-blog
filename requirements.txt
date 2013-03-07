@@ -1,10 +1,8 @@
 pytz
-tornado
-greenlet
 werkzeug
 pygments
 git+git://github.com/joshmarshall/tornadorpc.git
-git+git://github.com/mongodb/motor.git
+motor
 dictshield
 cMarkdown
 beautifulsoup4
