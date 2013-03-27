@@ -47,7 +47,7 @@ block content
 
     if (post.type == 'post' and post.status == 'publish')
         if post.wordpress_id
-            disqus_identifier = '#{ post.wordpress_id  } http://emptysquare.net/blog/?p=#{ post.wordpress_id  }';
+            disqus_identifier = "{0} http://emptysquare.net/blog/?p={0}".format(post.wordpress_id)
         else
             disqus_identifier = post.id
 
