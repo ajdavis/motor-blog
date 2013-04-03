@@ -118,9 +118,8 @@ if __name__ == "__main__":
         template_path=os.path.join(opts.theme, 'templates'),
         tz=pytz.timezone(opts.timezone),
         gzip=True,
-        **{k: v.value() for k, v in opts.items()}
+        **dict([(option, getattr(opts, option, None)) for option in ["debug","cookie_secret", "base_url"]])
     )
-
     http_server = httpserver.HTTPServer(application, xheaders=True)
     http_server.listen(opts.port)
     msg = 'Listening on port %s' % opts.port

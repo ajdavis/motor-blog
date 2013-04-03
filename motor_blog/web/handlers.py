@@ -40,7 +40,9 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         ns = super(MotorBlogHandler, self).get_template_namespace()
 
         def get_setting(setting_name):
-            return self.application.settings[setting_name]
+            #TODO: Must be definied settings variables and options variables.
+            return self.application.settings.get(setting_name, None) or getattr(
+                            opts, setting_name, None)
 
         # TODO: use ui_methods instead of this
         ns.update({

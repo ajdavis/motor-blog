@@ -67,7 +67,7 @@ def options():
     for required in (
         'host', 'port', 'blog_name', 'base_url', 'cookie_secret', 'timezone',
     ):
-        if not opts[required].value():
+        if not getattr(opts, required, None):
             raise Exception('%s required' % required)
 
     return opts
