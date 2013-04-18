@@ -431,7 +431,7 @@ article {
 .single-body article {
   border-top: none; }
 
-.post-summary p, .post-content li, .post-content p {
+.post-summary p, .post-content li, .post-content p, .post-content li p {
   font-size: 0.875em;
   line-height: 1.5em; }
 
