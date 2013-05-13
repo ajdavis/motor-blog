@@ -10,7 +10,7 @@ import xmlrpclib
 
 from tornadorpc.xml import XMLRPCHandler, XMLRPCParser
 
-from motor_blog.api import categories, posts, media, tags
+from motor_blog.api import categories, posts, media, tags, users
 from motor_blog.api.rsd import RSDHandler
 
 
@@ -29,7 +29,7 @@ class WordpressParser(XMLRPCParser):
 
 
 class APIHandler(
-    XMLRPCHandler, categories.Categories, posts.Posts, tags.Tags, media.Media
+    XMLRPCHandler, categories.Categories, posts.Posts, tags.Tags, media.Media, users.Users
 ):
     _RPC_ = WordpressParser(xmlrpclib)
 

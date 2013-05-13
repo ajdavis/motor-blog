@@ -49,6 +49,21 @@ class Categories(object):
     @rpc
     @engine
     def mt_setPostCategories(self, postid, user, password, categories):
+
+        #Sometimes we receive only id from categories, so we must query the names.
+        if categories and len(categories[0].keys()) == 1:
+            categories_ids = [ObjectId(category.get('categoryId')) for category in categories]
+
+            cursor = self.settings['db'].categories.find({"_id": {'$in': categories_ids}}, fields=["name"])
+            categories = []
+            while (yield cursor.fetch_next):
+                category = cursor.next_object()
+                categories.append(dict(
+                        categoryId = category['_id'],
+                        categoryName = category['name']
+                    )
+                )
+
         embedded_cats = [
             EmbeddedCategory.from_metaweblog(cat).to_python()
             for cat in categories]
