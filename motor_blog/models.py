@@ -111,10 +111,6 @@ class Post(BlogDocument):
 
         meta_description = custom_fields.get('description', '')
 
-        # We expect MarsEdit to set categories with mt_setPostCategories(),
-        # for now we are ignoring this field.
-        # assert 'categories' not in struct or not struct['categories']
-
         if 'mt_keywords' in struct:
             tags = [
                 tag.strip() for tag in struct['mt_keywords'].split(',')

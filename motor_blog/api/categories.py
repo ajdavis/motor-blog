@@ -51,7 +51,7 @@ class Categories(object):
     def mt_setPostCategories(self, postid, user, password, categories):
 
         #Sometimes we receive only id from categories, so we must query the names.
-        if categories and len(categories[0].keys()) == 1:
+        if categories and 'categoryName' not in categories[0]:
             categories_ids = [ObjectId(category.get('categoryId')) for category in categories]
 
             cursor = self.settings['db'].categories.find({"_id": {'$in': categories_ids}}, fields=["name"])
