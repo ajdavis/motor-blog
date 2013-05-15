@@ -3,7 +3,6 @@
 {% block title %}{{ setting('blog_name') }} - Drafts{% end %}
 
 {% block content %}
-    <p><a href="{{ reverse_url('media-page') }}">Go to media page.</a></p>
     {% if drafts %}
         {% for post in drafts %}
             <li>

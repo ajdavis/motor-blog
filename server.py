@@ -75,6 +75,8 @@ if __name__ == "__main__":
             return path, group_count
 
     static_path = os.path.join(opts.theme, 'static')
+    this_dir = os.path.dirname(__file__)
+    admin_static_path = os.path.join(this_dir, 'motor_blog/web/admin-static')
 
     application = tornado.web.Application([
         # XML-RPC API
@@ -88,6 +90,7 @@ if __name__ == "__main__":
         U(r"admin/draft/(?P<slug>.+)/?", DraftHandler, name='draft'),
         U(r"admin/media/?", MediaPageHandler, name='media-page'),
         U(r"admin/media/delete", DeleteMediaHandler, name='delete-media'),
+        U(r"admin/static/(.+)", StaticFileHandler, {"path": admin_static_path}),
 
         # Atom
         U(r"feed/?", FeedHandler, name='feed'),

@@ -1,12 +1,11 @@
 <html>
 <head>
     <title>{% block title %}{% end %}</title>
+    <link rel="stylesheet" type="text/css" href="/{{ setting('base_url') }}/admin/static/admin-style.css">
     {% block extra-head %}{% end %}
 </head>
 <body>
-<form id="logout" action="{{ reverse_url('logout') }}" method="post">
-    <input type="submit" id="logoutbtn" value="Log out">
-</form>
+{% include "admin-nav.html" %}
 {% block content %}{% end %}
 </body>
 </html>
