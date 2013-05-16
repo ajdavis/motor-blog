@@ -15,8 +15,6 @@ def options():
         "Ensure collection indexes before starting"))
     tornado.options.define('rebuild_indexes', default=False, type=bool, help=(
         "Drop all indexes and recreate before starting"))
-    tornado.options.define('logdir', type=str, default='log', help=(
-        "Location of logging (if debug mode is off)"))
 
     # Identity
     tornado.options.define('host', default='localhost', type=str, help=(
