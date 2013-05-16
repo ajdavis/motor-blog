@@ -214,7 +214,8 @@ class PostHandler(MotorBlogHandler):
                 callback=(yield gen.Callback('nextdoc')))
 
             # Overkill for this case, but in theory we reduce latency by
-            # querying for previous and next posts at once, and wait for both
+            # querying for previous and next posts at once, and waiting for
+            # both.
             prevdoc, nextdoc = yield motor.WaitAllOps(['prevdoc', 'nextdoc'])
         else:
             prevdoc, nextdoc = None, None
