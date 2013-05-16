@@ -12,13 +12,15 @@ from motor_blog.models import Post
 
 
 class Posts(object):
-    """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
-       related to blog posts and pages
+    """Handle XML-RPC calls related to blog posts and pages.
+
+    Mixin for motor_blog.api.handlers.APIHandler.
     """
     @gen.engine
     def _recent(self, num_posts, type):
         cursor = self.settings['db'].posts.find({'type': type})
-        cursor.sort([('_id', -1)]).limit(num_posts) # _id starts with timestamp
+        # _id starts with timestamp.
+        cursor.sort([('_id', -1)]).limit(num_posts)
         posts = yield motor.Op(cursor.to_list)
         self.result([
             Post(**post).to_metaweblog(self.application)
@@ -54,8 +56,8 @@ class Posts(object):
         self._new_post(user, password, struct, 'page')
 
     @engine
-    def _edit_post(self, postid, struct, type):
-        new_post = Post.from_metaweblog(struct, type, is_edit=True)
+    def _edit_post(self, postid, struct, post_type):
+        new_post = Post.from_metaweblog(struct, post_type, is_edit=True)
         db = self.settings['db']
 
         old_post_doc = yield motor.Op(
@@ -71,15 +73,14 @@ class Posts(object):
             update_result = yield motor.Op(
                 db.posts.update,
                 {'_id': old_post_doc['_id']},
-                {'$set': new_post.to_python()}) # set fields to new values
+                {'$set': new_post.to_python()})  # set fields to new values
 
             if update_result['n'] != 1:
                 self.result(xmlrpclib.Fault(404, "Not found"))
             else:
                 # If link changes, add redirect from old
                 if (old_post.slug != new_post.slug
-                    and old_post['status'] == 'publish'
-                ):
+                        and old_post['status'] == 'publish'):
                     redirect_post = Post(
                         redirect=new_post.slug,
                         slug=old_post.slug,
@@ -104,7 +105,8 @@ class Posts(object):
 
     @engine
     def _get_post(self, postid):
-        postdoc = yield motor.Op(self.settings['db'].posts.find_one,
+        postdoc = yield motor.Op(
+            self.settings['db'].posts.find_one,
             {'_id': ObjectId(postid)})
 
         if not postdoc:
@@ -120,7 +122,8 @@ class Posts(object):
     @engine
     def _delete_post(self, postid):
         # TODO: a notion of 'trashed', not removed
-        result = yield motor.Op(self.settings['db'].posts.remove,
+        result = yield motor.Op(
+            self.settings['db'].posts.remove,
             {'_id': ObjectId(postid)})
 
         if result['n'] != 1:

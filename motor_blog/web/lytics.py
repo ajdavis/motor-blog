@@ -25,12 +25,12 @@ def ga_track_event_url(
     utmhn = opts.host
     utmn = str(randint(0, 0x7fffffff))
     cookie = str(randint(0, 0x7fffffff))
-    random = str(randint(1000000000,2147483647))
+    random = str(randint(1000000000, 2147483647))
     today = str(int(time.time()))
     referer = referer
-    uservar = '-' # enter your own user defined variable
+    uservar = '-'  # enter your own user defined variable
     utmp = path + 'rss'
-    
+
     utm_gif_location = (
         'http://www.google-analytics.com/__utm.gif?utmwv=1&utmn=' + utmn +
         '&utmsr=-&utmsc=-&utmul=-&utmje=0&utmfl=-&utmdt=-&utmhn=' + utmhn +

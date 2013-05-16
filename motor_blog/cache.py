@@ -29,7 +29,8 @@ def create_events_collection(db):
     try:
         # Size is in bytes; event documents are rare and very small
         sync_db.create_collection('events', size=100 * 1024, capped=True)
-        logging.info('Created capped collection "events" in database "%s"' %
+        logging.info(
+            'Created capped collection "events" in database "%s"' %
             sync_db.name)
     except pymongo.errors.CollectionInvalid:
         # Collection already exists

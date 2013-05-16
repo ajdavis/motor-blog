@@ -34,5 +34,3 @@ def resized(data, maxwidth):
     out = StringIO()
     im_resized.save(out, im.format)
     return out.getvalue(), new_width, new_height
-
-

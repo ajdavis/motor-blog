@@ -9,8 +9,9 @@ from motor_blog.models import Post, Category, EmbeddedCategory
 
 
 class Categories(object):
-    """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
-       related to categories
+    """Handle XML-RPC calls related to categories.
+
+    Mixin for motor_blog.api.handlers.APIHandler.
     """
     @rpc
     @engine
@@ -26,7 +27,8 @@ class Categories(object):
     @rpc
     @engine
     def mt_getPostCategories(self, postid, user, password):
-        post = yield motor.Op(self.settings['db'].posts.find_one,
+        post = yield motor.Op(
+            self.settings['db'].posts.find_one,
             {'_id': ObjectId(postid)})
 
         if not post:
@@ -40,7 +42,8 @@ class Categories(object):
     @engine
     def wp_newCategory(self, blogid, user, password, struct):
         category = Category.from_wordpress(struct)
-        _id = yield motor.Op(self.settings['db'].categories.insert,
+        _id = yield motor.Op(
+            self.settings['db'].categories.insert,
             category.to_python())
 
         cache.event('categories_changed')
@@ -68,7 +71,8 @@ class Categories(object):
             EmbeddedCategory.from_metaweblog(cat).to_python()
             for cat in categories]
 
-        result = yield motor.Op(self.settings['db'].posts.update,
+        result = yield motor.Op(
+            self.settings['db'].posts.update,
             {'_id': ObjectId(postid)},
             {'$set': {'categories': embedded_cats}})
 

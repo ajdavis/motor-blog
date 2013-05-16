@@ -18,8 +18,10 @@ from motor_blog.models import Category, Post
 
 
 def cache(method):
-    """Cache result of a method on file, useful for rerunning this script
-       without waiting for XML-RPC requests to Wordpress
+    """Cache result of a method on file.
+
+    Useful for rerunning this script without waiting for XML-RPC requests to
+    Wordpress.
     """
     def _cache(blog, *args, **kwargs):
         class_name = blog.__class__.__name__
@@ -54,13 +56,14 @@ def cache(method):
 
 
 class Blog(object):
-    """Wordpress XML-RPC client, connect to source blog"""
+    """Wordpress XML-RPC client, connect to source blog."""
     def __init__(self, url, username, password, use_cache, verbose):
         self.url = url
         self.username = username
         self.password = password
         self.use_cache = use_cache
-        self.server = xmlrpclib.ServerProxy(self.url, allow_none=True, verbose=verbose)
+        self.server = xmlrpclib.ServerProxy(
+            self.url, allow_none=True, verbose=verbose)
 
     @cache
     def get_recent_posts(self, n):
@@ -79,25 +82,27 @@ class Blog(object):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Dump from Wordpress into MongoDB',
-    )
-    parser.add_argument('--verbose', action='store_true', default=False,
-        help="Debug-level logging",
-    )
-    parser.add_argument('--wipe', '-w', action='store_true', default=False,
-        help="Wipe MongoDB before importing",
-    )
-    parser.add_argument('--refresh', '-r', action='store_true', default=False,
-        help="Don't use cached data",
-    )
-    parser.add_argument('-u', '--username', help="Wordpress username",
+        description='Dump from Wordpress into MongoDB')
+    parser.add_argument(
+        '--verbose', action='store_true', default=False,
+        help="Debug-level logging")
+    parser.add_argument(
+        '--wipe', '-w', action='store_true', default=False,
+        help="Wipe MongoDB before importing")
+    parser.add_argument(
+        '--refresh', '-r', action='store_true', default=False,
+        help="Don't use cached data")
+    parser.add_argument(
+        '-u', '--username', help="Wordpress username",
         dest='source_username')
-    parser.add_argument('-p', '--password', help="Wordpress password",
+    parser.add_argument(
+        '-p', '--password', help="Wordpress password",
         dest='source_password')
-    parser.add_argument('-n', '--nposts', help="Number of posts (default all)",
+    parser.add_argument(
+        '-n', '--nposts', help="Number of posts (default all)",
         dest='nposts', default=999999999)
-
-    parser.add_argument('source_url', type=str,
+    parser.add_argument(
+        'source_url', type=str,
         help='WordPress XML-RPC endpoint')
 
     args = parser.parse_args()
@@ -116,7 +121,7 @@ def main(args):
     print 'Base URL', source_base_url
 
     db = pymongo.Connection(safe=True).motorblog
-    motordb = motor.MotorConnection().open_sync().motorblog
+    motordb = motor.MotorClient().open_sync().motorblog
     if args.wipe:
         print 'Wiping motorblog database'
         db.connection.drop_database('motorblog')
@@ -142,17 +147,17 @@ def main(args):
     print '    %s pages' % len(page_structs)
     print
 
-    for structs, type in [
+    for structs, post_type in [
         (post_structs, 'post'),
         (page_structs, 'page'),
     ]:
-        print '%sS' % type.upper()
+        print '%sS' % post_type.upper()
         for struct in structs:
             categories = struct.pop('categories', [])
             struct['description'] = wordpress_to_markdown(
                 struct, media_library, db, destination_url, source_base_url)
 
-            post = Post.from_metaweblog(struct, type)
+            post = Post.from_metaweblog(struct, post_type)
 
             print '%-34s %s' % (post.title, post.status.upper())
             for category_name in categories:
@@ -171,13 +176,13 @@ def main(args):
 
             db.posts.insert(post.to_python())
 
-        print '\nFinished %s %ss' % (len(structs), type)
-
+        print '\nFinished %s %ss' % (len(structs), post_type)
 
     print 'Posting "categories_changed" event'
+
     db.events.insert(
         {'ts': datetime.datetime.utcnow(), 'name': 'categories_changed'},
-        manipulate=False) # No need to add _id
+        manipulate=False)  # No need to add _id
 
     print '\nFinished in %.2f seconds' % (time.time() - start)
 

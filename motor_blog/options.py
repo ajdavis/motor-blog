@@ -4,6 +4,7 @@ import tornado.options
 
 config_path = 'motor_blog.conf'
 
+
 def options():
     # Debugging
     tornado.options.define('debug', default=False, type=bool, help=(
@@ -48,9 +49,11 @@ def options():
         " motor_blog.conf)'"))
     tornado.options.define('theme', type=str, default='theme', help=(
         "Directory name of your theme files"))
-    tornado.options.define('timezone', type=str, default='America/New_York', help=(
-        "Your timezone name"))
-    tornado.options.define('maxwidth', type=int, default=600,
+    tornado.options.define(
+        'timezone', type=str, default='America/New_York',
+        help="Your timezone name")
+    tornado.options.define(
+        'maxwidth', type=int, default=600,
         help="Maximum width of images for non-retina displays")
 
     # Parse config file, then command line, so command line switches take

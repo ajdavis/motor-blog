@@ -4,8 +4,9 @@ from motor_blog.api import engine, rpc
 
 
 class Tags(object):
-    """Mixin for motor_blog.api.handlers.APIHandler, deals with XML-RPC calls
-       related to tags
+    """Handle XML-RPC calls related to tags.
+
+    Mixin for motor_blog.api.handlers.APIHandler.
     """
     @rpc
     @engine

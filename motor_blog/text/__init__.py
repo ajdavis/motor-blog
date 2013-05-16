@@ -3,8 +3,9 @@ from HTMLParser import HTMLParser
 
 
 class HTMLPassThrough(HTMLParser):
-    """Maintains a stack of tags and returns the same HTML it parses - base
-       class for more interesting parsers in markup.py.
+    """Maintains a stack of tags and returns the same HTML it parses.
+
+    Base class for more interesting parsers in markup.py.
     """
     def reset(self):
         HTMLParser.reset(self)
@@ -20,14 +21,17 @@ class HTMLPassThrough(HTMLParser):
 
     def handle_endtag(self, tag):
         assert self.stack, "Unmatched closing tag %s" % tag
-        assert self.stack[-1] == tag, "Unmatched closing tag %s, expected %s" % (tag, self.stack[-1])
+        assert self.stack[-1] == tag, \
+            "Unmatched closing tag %s, expected %s" % (tag, self.stack[-1])
         self.stack.pop()
         self.out.append('</%s>' % tag)
 
     def handle_starttag(self, tag, attrs):
         self.stack.append(tag)
         if attrs:
-            self.out.append("<%s %s>" % (tag, ' '.join('%s="%s"' % (k, v) for k, v in attrs)))
+            self.out.append(
+                "<%s %s>" % (
+                    tag, ' '.join('%s="%s"' % (k, v) for k, v in attrs)))
         else:
             self.out.append("<%s>" % tag)
 
@@ -61,5 +65,5 @@ class HTMLStripTags(HTMLParser):
         return self.handle_entityref('#' + name)
 
     def value(self):
-        # Collapse whitespace
+        # Collapse whitespace.
         return whitespace.sub(' ', self.out).strip()

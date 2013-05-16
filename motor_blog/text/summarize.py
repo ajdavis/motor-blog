@@ -18,8 +18,8 @@ def summarize(html, n):
             else:
                 break
     else:
-        # Not truncated
+        # Not truncated.
         return ' '.join(summary)
 
-    # Text was truncated
+    # Text was truncated.
     return ' '.join(summary) + ' [...]'

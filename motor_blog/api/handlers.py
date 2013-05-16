@@ -18,8 +18,9 @@ __all__ = ('APIHandler', 'RSDHandler')
 
 
 class WordpressParser(XMLRPCParser):
-    """Special parsing for method names like 'wp.getRecentPosts' to dispatch
-       to wp_getRecentPosts()
+    """Special parsing.
+
+    Dispatches names like 'wp.getRecentPosts' to wp_getRecentPosts().
     """
     def parse_request(self, request_body):
         ((method_name, params),) = super(WordpressParser, self).parse_request(
@@ -37,6 +38,6 @@ class APIHandler(
         # TODO, someday: read MarsEdit's incoming mt_textFilter and handle it
         # on new and edited posts
         return [
-            {'key': 'markdown', 'label': 'Markdown' },
+            {'key': 'markdown', 'label': 'Markdown'},
 #            {'key': 'htmlauto', 'label': "Convert line breaks" },
         ]

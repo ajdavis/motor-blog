@@ -9,6 +9,7 @@ from tornado.options import options as opts
 
 def superwraps(wrapped):
     """Replaces wrapper's arg spec with wrapped function's.
+
     For when functools.wraps() just isn't enough.
     """
     def wrap(wrapper):
@@ -45,7 +46,7 @@ def fault(f):
     def _f(self, *args, **kwargs):
         def fault_exception_handler(type, value, traceback):
             self.result(xmlrpclib.Fault(500, str(value)))
-            return True # Swallow exception
+            return True  # Swallow exception
 
         with stack_context.ExceptionStackContext(fault_exception_handler):
             f(self, *args, **kwargs)
@@ -54,12 +55,10 @@ def fault(f):
 
 
 def engine(f):
-    """Like gen.engine, but copy method signature
-    """
+    """Like gen.engine, but copy method signature."""
     return superwraps(f)(gen.engine(f))
 
 
 def rpc(f):
-    """Decorate a function with tornadorpc.async, auth, and fault.
-    """
+    """Decorate a function with tornadorpc.async, auth, and fault."""
     return tornadorpc.async(auth(fault(f)))

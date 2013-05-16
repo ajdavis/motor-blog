@@ -25,9 +25,7 @@ __all__ = ('markup', )
 
 
 class PreCodeFinder(HTMLPassThrough):
-    """Find text within <pre><code></code></pre> and syntax-highlight it with
-       pygments.
-    """
+    """Find text within <pre><code></code></pre> and syntax-highlight it."""
     def reset(self):
         HTMLPassThrough.reset(self)
         self.data = []
@@ -46,7 +44,7 @@ class PreCodeFinder(HTMLPassThrough):
         if not match:
             raise Exception("Can't parse options: %s" % options_list)
 
-        # Python 2.7 dict literal
+        # Python 2.7 dict literal.
         return {
             key.strip(): value.strip('"\' ')
             for key, value in [
@@ -70,7 +68,7 @@ class PreCodeFinder(HTMLPassThrough):
             lexer = TextLexer()
 
         # 'no_classes' forces all CSS styles to be inline, which works best for
-        # RSS feeds
+        # RSS feeds.
         formatter = HtmlFormatter(
             style='default', noclasses=True, hl_lines=hl_lines,
             nowrap=True)
@@ -81,7 +79,7 @@ class PreCodeFinder(HTMLPassThrough):
         if self.data:
             # We've ended a <code> tag within <pre>.
             options, hl_lines = {}, []
-            # parts of self.data will have \n in them
+            # Parts of self.data will have \n in them.
             data = ''.join(self.data)
 
             lines = data.split('\n')
@@ -90,7 +88,7 @@ class PreCodeFinder(HTMLPassThrough):
                 options = self.parse_code_header(firstline)
 
             if options.get('highlight'):
-                # Highlighted lines within the code example
+                # Highlighted lines within the code example.
                 hl_lines = options['highlight'].split(',')
 
             code = '\n'.join(lines)
@@ -108,7 +106,7 @@ class PreCodeFinder(HTMLPassThrough):
             HTMLPassThrough.handle_data(self, data)
 
     def handle_entityref(self, name):
-        # Unescape special chars in code -- pygments will re-escape them
+        # Unescape special chars in code -- pygments will re-escape them.
         if self.in_code():
             if name == 'quot':
                 self.data.append('"')
@@ -119,7 +117,7 @@ class PreCodeFinder(HTMLPassThrough):
             else:
                 self.data.append('&%s;' % name)
         else:
-            # Default, pass through as-is
+            # Default, pass through as-is.
             HTMLPassThrough.handle_entityref(self, name)
 
 
@@ -147,11 +145,10 @@ def markup(text):
     if not text:
         return ''
 
-    # cMarkdown seems to enjoy utf-8 rather than unicode
+    # cMarkdown seems to enjoy utf-8 rather than unicode.
     html = markdown(text.encode('utf-8')).decode('utf-8')
     html = pygmentize(html)
     html = center_images(html)
     html = xmlcharrefreplace(html)
 
     return html
-

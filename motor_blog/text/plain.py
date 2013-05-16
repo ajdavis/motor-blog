@@ -4,8 +4,7 @@ __all__ = ('plain', )
 
 
 def plain(html):
-    """Returns plain text
-    """
+    """Returns plain text."""
     parser = HTMLStripTags()
     parser.feed(html)
     return parser.value()

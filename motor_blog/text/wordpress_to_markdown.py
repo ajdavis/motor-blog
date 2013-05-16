@@ -1,5 +1,5 @@
 import datetime
-import logging # TODO: set requests' logging to 'warn' level
+import logging
 import os
 import pickle
 import re
@@ -12,21 +12,25 @@ import requests
 from motor_blog.text.slugify import slugify
 
 
-def replace_crayon_and_paragraphize(body, media_library, db, destination_url, source_base_url):
-    """Specific to emptysquare.net/blog: replace the CodeColorer Wordpress
-       plugin's markup, like this:
+def replace_crayon_and_paragraphize(
+        body, media_library, db, destination_url, source_base_url):
+    """Replace WordPress markup with HTML.
+
+    Specific to emptysquare.net/blog: replace the CodeColorer Wordpress
+    plugin's markup, like this:
 
            [cc lang="python"][/cc]
 
-       or
+    or
 
            [cci][/cci]
 
-       with <code></code>, and at the same time, search for \n\n and replace
-       with <p/>.
+    with <code></code>, and at the same time, search for \n\n and replace
+    with <p/>.
     """
 
-    crayon_pat = re.compile(r"\[cc(?P<inline>i?)(?P<options>.*?)\](?P<code>.*?)\[/cci?\]", re.S)
+    crayon_pat = re.compile(
+        r"\[cc(?P<inline>i?)(?P<options>.*?)\](?P<code>.*?)\[/cci?\]", re.S)
 
     def codify(match):
         inline = match.group('inline')
@@ -47,44 +51,46 @@ def replace_crayon_and_paragraphize(body, media_library, db, destination_url, so
         try:
             double_newline_pos = body.index('\n\n')
         except ValueError:
-            double_newline_pos = sys.maxint # Not found
+            double_newline_pos = sys.maxint  # Not found
 
         if crayon_pos == double_newline_pos == sys.maxint:
             # Done
             tokens.append(body)
             break
 
-        # Consume
+        # Consume.
         n = min(crayon_pos, double_newline_pos)
         tokens.append(body[:n])
         body = body[n:]
 
         if crayon_pos < double_newline_pos:
-            # Consume the code portion
+            # Consume the code portion.
             tokens.append(match)
             start, end = match.span()
             body = body[end - start:]
         else:
-            # Consume '\n\n'
+            # Consume '\n\n'.
             body = body[2:]
 
-    # Replace \n\n with <p/> and code with <code>
+    # Replace \n\n with <p/> and code with <code>.
     out = []
     for i, token in enumerate(tokens):
         if isinstance(token, basestring):
             out.append(token)
             if i < len(tokens) - 1 and isinstance(tokens[i+1], basestring):
                 # Add newline between text portions that were separated by
-                # '\n\n'
+                # '\n\n'.
                 out.append('<p/>')
         else:
-            # It's a code regex match
+            # It's a code regex match.
             out.append(codify(token))
 
     return ''.join(out)
 
 
-def replace_media_links(body, media_library, db, destination_url, source_base_url):
+def replace_media_links(
+    body, media_library, db, destination_url, source_base_url
+):
     for link in media_library:
         if link in body:
             # This is making some big assumptions about the structure
@@ -121,11 +127,13 @@ def replace_media_links(body, media_library, db, destination_url, source_base_ur
     return body
 
 
-def replace_internal_links(body, media_library, db, destination_url, source_base_url):
+def replace_internal_links(
+        body, media_library, db, destination_url, source_base_url):
     return body.replace(source_base_url, destination_url)
 
 
-def html_to_markdown(body, media_library, db, destination_url, source_base_url):
+def html_to_markdown(
+        body, media_library, db, destination_url, source_base_url):
     # Requires pandoc from http://johnmacfarlane.net/pandoc/
     p = subprocess.Popen(
         ['pandoc', '--from=html', '--to=markdown'],
@@ -134,15 +142,18 @@ def html_to_markdown(body, media_library, db, destination_url, source_base_url):
     return stdout.decode('utf-8')
 
 
-def reformat_markdown_code(body, media_library, db, destination_url, source_base_url):
-    """Replace pandoc's markdown code blocks, like this:
+def reformat_markdown_code(
+        body, media_library, db, destination_url, source_base_url):
+    """Replace pandoc's markdown code blocks with Motor-Blog's code blocks.
+
+    Replace pandoc's markdown code blocks, like this:
 
         ~~~~ {lang="Python" highlight="8,12,13,20"}
             ... code ...
         ~~~~
     with this:
 
-            ::: lang="Python" highlight="8,12,13,20"
+        ::: lang="Python" highlight="8,12,13,20"
     """
     pat = re.compile(
         r'^~~~~\s\{(?P<options>.+?)\}\s*$(?P<code>.*?)^~~~~\s*$',
@@ -159,8 +170,7 @@ def reformat_markdown_code(body, media_library, db, destination_url, source_base
 
 
 def wordpress_to_markdown(
-        post_struct, media_library, db, destination_url, source_base_url
-):
+        post_struct, media_library, db, destination_url, source_base_url):
     filters = [
         replace_crayon_and_paragraphize,
         replace_media_links,

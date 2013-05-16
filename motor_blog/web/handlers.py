@@ -10,7 +10,6 @@ import tornado.web
 from tornado import gen
 from tornado.options import options as opts
 import motor
-from gridfs import NoFile
 from werkzeug.contrib.atom import AtomFeed
 
 from motor_blog.models import Post, Category
@@ -29,6 +28,7 @@ __all__ = (
 )
 
 # TODO: cache-control headers
+
 
 class MotorBlogHandler(tornado.web.RequestHandler):
     def initialize(self, **kwargs):
@@ -68,7 +68,6 @@ class MotorBlogHandler(tornado.web.RequestHandler):
     def get_categories(self, callback):
         # This odd control flow ensures we don't confuse exceptions thrown
         # by find() with exceptions thrown by the callback
-        category_docs = None
         try:
             category_docs = yield motor.Op(
                 self.db.categories.find().sort('name').to_list)
@@ -95,8 +94,9 @@ def check_last_modified(get):
     @tornado.web.asynchronous
     @gen.engine
     def _get(self, *args, **kwargs):
-        categorydocs = yield motor.Op(self.get_categories)
-        self.categories = categories = [Category(**doc) for doc in categorydocs]
+        category_docs = yield motor.Op(self.get_categories)
+        self.categories = categories = [
+            Category(**doc) for doc in category_docs]
 
         postdocs = yield motor.Op(self.get_posts, *args, **kwargs)
         self.posts = posts = [
@@ -138,9 +138,9 @@ class HomeHandler(MotorBlogHandler):
             {'status': 'publish', 'type': 'post'},
             {'original': False},
         ).sort([('pub_date', -1)])
-        .skip(int(page_num) * 10)
-        .limit(10)
-        .to_list(callback=callback))
+            .skip(int(page_num) * 10)
+            .limit(10)
+            .to_list(callback=callback))
 
     @tornado.web.addslash
     @check_last_modified
@@ -157,8 +157,8 @@ class AllPostsHandler(MotorBlogHandler):
             {'status': 'publish', 'type': 'post'},
             {'original': False},
         )
-        .sort([('pub_date', -1)])
-        .to_list(callback=callback))
+            .sort([('pub_date', -1)])
+            .to_list(callback=callback))
 
     @tornado.web.addslash
     @check_last_modified
@@ -167,37 +167,6 @@ class AllPostsHandler(MotorBlogHandler):
             'all-posts.jade',
             posts=self.posts, categories=self.categories)
 
-# Doesn't calculate last-modified. Saved for performance comparison.
-#class AllPostsHandler(MotorBlogHandler):
-#    @tornado.web.asynchronous
-#    @gen.engine
-#    @tornado.web.addslash
-#    def get(self):
-#        postdocs = yield motor.Op(
-#            self.db.posts.find(
-#                {'status': 'publish', 'type': 'post'},
-#                {'original': False},
-#            )
-#            .sort([('pub_date', -1)])
-#            .to_list)
-#
-#        posts = [Post(**postdoc) for postdoc in postdocs]
-#        categories = yield motor.Op(get_categories, self.db)
-#        categories = [Category(**doc) for doc in categories]
-#
-#        mod = max(
-#            max(
-#                thing.date_created
-#                    for things in (posts, categories)
-#                    for thing in things
-#            ),
-#            max(post.mod for post in posts)
-#        )
-#
-#        self.render(
-#            'all-posts.html',
-#            posts=posts, categories=categories)
-
 
 class PostHandler(MotorBlogHandler):
     """Show a single blog post or page"""
@@ -205,7 +174,8 @@ class PostHandler(MotorBlogHandler):
     def get_posts(self, slug, callback):
         slug = slug.rstrip('/')
         posts = self.db.posts
-        postdoc = yield motor.Op(posts.find_one,
+        postdoc = yield motor.Op(
+            posts.find_one,
             {'slug': slug, 'status': 'publish'},
             {'summary': False, 'original': False})
 
@@ -255,10 +225,13 @@ class PostHandler(MotorBlogHandler):
     @tornado.web.addslash
     @check_last_modified
     def get(self, slug):
-        prev, post, next = self.posts
+        prev_post, post, next_post = self.posts
         self.render(
             'single.jade',
-            post=post, prev=prev, next=next, categories=self.categories)
+            post=post,
+            prev=prev_post,
+            next=next_post,
+            categories=self.categories)
 
 
 class CategoryHandler(MotorBlogHandler):
@@ -272,7 +245,8 @@ class CategoryHandler(MotorBlogHandler):
             'categories.slug': slug,
         }, {
             'original': False
-        }).sort([('pub_date', -1)]
+        }).sort(
+            [('pub_date', -1)]
         ).skip(page_num * 10).limit(10).to_list(callback=callback)
 
     @tornado.web.addslash
@@ -305,8 +279,8 @@ class FeedHandler(MotorBlogHandler):
             query,
             {'summary': False, 'original': False},
         ).sort([('pub_date', -1)])
-        .limit(20)
-        .to_list(callback=callback))
+            .limit(20)
+            .to_list(callback=callback))
 
     @check_last_modified
     def get(self, slug=None):
@@ -343,7 +317,12 @@ class FeedHandler(MotorBlogHandler):
         else:
             updated = datetime.datetime.now(tz=self.application.settings['tz'])
 
-        referer = self.request.headers.get('referer', '-') # (sic)
+        referer = self.request.headers.get('referer', '-')  # (sic)
+        icon = absolute(
+            self.reverse_url('theme-static', '/theme/static/square96.png'))
+
+        generator = (
+            'Motor-Blog', 'https://github.com/ajdavis/motor-blog', '0.1')
 
         feed = AtomFeed(
             title=title,
@@ -352,30 +331,32 @@ class FeedHandler(MotorBlogHandler):
             author=author,
             updated=updated,
             # TODO: customizable icon, also a 'logo' kwarg
-            icon=absolute(self.reverse_url('theme-static', '/theme/static/square96.png')),
-            generator=('Motor-Blog', 'https://github.com/ajdavis/motor-blog', '0.1'),
-        )
+            icon=icon,
+            generator=generator)
 
         for post in self.posts:
             url = absolute(self.reverse_url('post', post.slug))
-            body = post.body + '<img src="%s" width="1px" height="1px">' % ga_track_event_url(
+            category_name = this_category.name if this_category else 'unknown'
+            tracking_pixel_url = ga_track_event_url(
                 path=url,
                 title=post.title,
-                category_name=this_category.name if this_category else 'unknown',
-                referer=referer
-            )
+                category_name=category_name,
+                referer=referer)
+
+            tracking_pixel = '<img src="%s" width="1px" height="1px">' \
+                % tracking_pixel_url
 
             feed.add(
                 title=post.title,
-                content=body,
+                content=post.body + tracking_pixel,
                 content_type='html',
                 summary=post.summary,
                 author=author,
                 url=url,
                 id=url,
                 published=post.date_created,
-                # Don't update 'updated' - it seems to make Planet Python re-post my updated items,
-                #    which is spammy.
+                # Don't update 'updated' - it seems to make Planet Python
+                # re-post my updated items, which is spammy.
                 #updated=post.mod,
                 updated=post.date_created,
             )
@@ -396,14 +377,16 @@ class TagHandler(MotorBlogHandler):
             'tags': tag,
         }, {
             'original': False
-        }).sort([('pub_date', -1)]).skip(page_num * 10).limit(10).to_list(callback=callback)
+        }).sort([('pub_date', -1)]).skip(page_num * 10).limit(10).to_list(
+            callback=callback)
 
     @tornado.web.addslash
     @check_last_modified
     def get(self, tag, page_num=0):
         page_num = int(page_num)
         tag = tag.rstrip('/')
-        self.render('tag.jade',
+        self.render(
+            'tag.jade',
             posts=self.posts, categories=self.categories,
             this_tag=tag, page_num=page_num)
 
@@ -414,12 +397,13 @@ class SearchHandler(MotorBlogHandler):
     def get(self):
         # TODO: refactor with check_last_modified(), this is gross
         #   we need an async version of RequestHandler.prepare()
-        categorydocs = yield motor.Op(self.get_categories)
-        self.categories = [Category(**doc) for doc in categorydocs]
+        category_docs = yield motor.Op(self.get_categories)
+        self.categories = [Category(**doc) for doc in category_docs]
 
         q = self.get_argument('q', None)
         if q:
-            response = yield motor.Op(self.db.command, 'text', 'posts',
+            response = yield motor.Op(
+                self.db.command, 'text', 'posts',
                 search=q,
                 filter={'status': 'publish', 'type': 'post'},
                 projection={'original': False, 'plain': False},

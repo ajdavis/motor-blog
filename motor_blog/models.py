@@ -32,7 +32,9 @@ class Category(BlogDocument):
 
     @classmethod
     def _from_rpc(cls, struct, name):
-        _id = ObjectId(struct['categoryId']) if 'categoryId' in struct else None
+        _id = ObjectId(
+            struct['categoryId']) if 'categoryId' in struct else None
+
         return cls(name=name, slug=slugify.slugify(name), id=_id)
 
     @classmethod
@@ -68,13 +70,13 @@ class EmbeddedCategory(Category, EmbeddedDocument):
 class Post(BlogDocument):
     """A post or a page"""
     title = StringField(default='')
-    # Formatted for display
+    # Formatted for display.
     body = StringField(default='')
-    # Input from MarsEdit or migrate_from_wordpress
+    # Input from MarsEdit or migrate_from_wordpress.
     original = StringField(default='')
-    # Plain text
+    # Plain text.
     plain = StringField(default='')
-    # Plain-text excerpt
+    # Plain-text excerpt.
     summary = StringField(default='')
     author = StringField(default='')
     type = StringField(choices=('post', 'page'), default='post')
@@ -84,10 +86,10 @@ class Post(BlogDocument):
     tags = SortedListField(StringField())
     categories = SortedListField(EmbeddedDocumentField(EmbeddedCategory))
     slug = StringField(default='')
-    wordpress_id = IntField() # legacy id from WordPress
+    wordpress_id = IntField()  # legacy id from WordPress
     pub_date = DateTimeField()
     mod = DateTimeField()
-    # Post was moved, this is its new slug
+    # Post was moved, this is its new slug.
     redirect = StringField(default=None)
 
     def __init__(self, *args, **kwargs):
@@ -176,7 +178,8 @@ class Post(BlogDocument):
             'description': self.original,
             'link': url,
             'permaLink': url,
-            'categories': [cat.to_metaweblog(application) for cat in self['categories']],
+            'categories': [
+                cat.to_metaweblog(application) for cat in self['categories']],
             'mt_keywords': ','.join(self['tags']),
             'dateCreated': self.local_date_created(application),
             'date_created_gmt': self.date_created,
@@ -209,7 +212,10 @@ class Post(BlogDocument):
 
     @property
     def date_created(self):
-        return utc_tz.localize(self.pub_date) if self.pub_date else super(Post, self).date_created
+        if self.pub_date:
+            return utc_tz.localize(self.pub_date)
+        else:
+            return super(Post, self).date_created
 
     def local_date_created(self, application):
         dc = self.date_created

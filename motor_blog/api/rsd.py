@@ -5,12 +5,17 @@ from motor_blog.text.link import absolute
 
 
 class RSDHandler(tornado.web.RequestHandler):
-    """MarsEdit uses RSD to determine the blog's XML-RPC capabilities. Link to
-       this URL from your base template's <head>, e.g.:
+    """Serve a Really Simple Discovery XML document.
 
-       <link rel="EditURI" type="application/rsd+xml" title="RSD" href="/{{ reverse_url('rsd') }}" />
+     MarsEdit uses RSD to determine the blog's XML-RPC capabilities. Link to
+     this URL from your base template's <head>, e.g.:
 
-       http://en.wikipedia.org/wiki/Really_Simple_Discovery
+     <link
+       rel="EditURI"
+       type="application/rsd+xml"
+       title="RSD" href="/{{ reverse_url('rsd') }}" />
+
+    See: http://en.wikipedia.org/wiki/Really_Simple_Discovery
     """
     def get(self):
         self.set_header('Content-Type', 'text/xml')

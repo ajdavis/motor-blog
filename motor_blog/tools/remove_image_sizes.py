@@ -14,11 +14,10 @@ from motor_blog.text import remove_image_sizes
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Dump from "media" collection into GridFS',
-    )
-    parser.add_argument('--dry-run', '-n', action='store_true', default=False,
-        dest='dry_run', help="Don't actually do anything",
-    )
+        description='Dump from "media" collection into GridFS')
+    parser.add_argument(
+        '--dry-run', '-n', action='store_true', default=False,
+        dest='dry_run', help="Don't actually do anything")
 
     args = parser.parse_args()
     return args

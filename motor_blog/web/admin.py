@@ -28,16 +28,15 @@ class MotorBlogAdminHandler(MotorBlogHandler):
 
 
 class LoginHandler(MotorBlogAdminHandler):
-    """Log in so you can see your unpublished drafts, and in the future possibly
-       other administrative functions
-    """
+    """Authenticate as the administrator."""
     @tornado.web.addslash
     def get(self):
         if self.current_user:
             self.redirect(self.reverse_url('drafts'))
         else:
             next_url = self.get_argument('next', None)
-            self.render('admin-templates/login.html',
+            self.render(
+                'admin-templates/login.html',
                 error=None, next_url=next_url)
 
     def post(self):
@@ -49,7 +48,8 @@ class LoginHandler(MotorBlogAdminHandler):
             self.redirect(next_url or self.reverse_url('drafts'))
         else:
             error = 'Incorrect username or password, check motor_blog.conf'
-            self.render('admin-templates/login.html',
+            self.render(
+                'admin-templates/login.html',
                 error=error, next_url=next_url)
 
 
@@ -60,8 +60,7 @@ class LogoutHandler(MotorBlogAdminHandler):
 
 
 class DraftsHandler(MotorBlogAdminHandler):
-    """When logged in, see list of drafts of posts
-    """
+    """Show list of draft posts."""
     @tornado.web.asynchronous
     @gen.engine
     @tornado.web.addslash
@@ -69,17 +68,17 @@ class DraftsHandler(MotorBlogAdminHandler):
     def get(self):
         # TODO: pagination
         db = self.settings['db']
-        draftdocs = yield motor.Op(db.posts.find(
-                {'status': 'draft', 'type': 'post'},
-                {'original': False, 'body': False},
+        draft_docs = yield motor.Op(db.posts.find(
+            {'status': 'draft', 'type': 'post'},
+            {'original': False, 'body': False},
         ).sort([('_id', -1)]).to_list)
 
-        drafts = [Post(**draftdoc) for draftdoc in draftdocs]
+        drafts = [Post(**draft_doc) for draft_doc in draft_docs]
         self.render('admin-templates/drafts.html', drafts=drafts)
 
 
 class CategoriesAdminHandler(MotorBlogAdminHandler):
-    """Show a single draft post or page"""
+    """Show a single draft post or page."""
     @tornado.web.asynchronous
     @gen.engine
     @tornado.web.addslash
@@ -121,7 +120,7 @@ class DeleteCategoryHandler(MotorBlogAdminHandler):
 
 
 class DraftHandler(MotorBlogHandler):
-    """Show a single draft post or page"""
+    """Show a single draft post or page."""
     @tornado.web.asynchronous
     @gen.engine
     @tornado.web.addslash
@@ -130,42 +129,42 @@ class DraftHandler(MotorBlogHandler):
         slug = slug.rstrip('/')
         postdoc = yield motor.Op(
             self.settings['db'].posts.find_one,
-                {'slug': slug},
-                {'summary': False, 'original': False})
+            {'slug': slug},
+            {'summary': False, 'original': False})
 
         if not postdoc:
             raise tornado.web.HTTPError(404)
 
-        post=Post(**postdoc)
+        post = Post(**postdoc)
 
         if post.status == 'publish':
             # Not a draft any more
             self.redirect(self.reverse_url('post', slug))
             return
 
-        categorydocs = yield motor.Op(self.get_categories)
-        categories = [Category(**doc) for doc in categorydocs]
+        category_docs = yield motor.Op(self.get_categories)
+        categories = [Category(**doc) for doc in category_docs]
         self.render(
             'single.jade',
             post=post, prev=None, next=None, categories=categories)
 
 
 class MediaPageHandler(MotorBlogAdminHandler):
-    """Show list of media assets like images"""
+    """Show list of media assets like images."""
     @tornado.web.asynchronous
     @gen.engine
     @tornado.web.addslash
     @tornado.web.authenticated
     def get(self, page_num=0):
         page_num = int(page_num)
-        mediadocs = yield motor.Op(
+        media_docs = yield motor.Op(
             self.settings['db'].fs.files.find()
             .sort([('uploadDate', -1)])
             .skip(page_num * 40)
             .limit(40)
             .to_list)
 
-        self.render('admin-templates/media.html', mediadocs=mediadocs)
+        self.render('admin-templates/media.html', mediadocs=media_docs)
 
 
 class DeleteMediaHandler(MotorBlogAdminHandler):

@@ -1,14 +1,15 @@
 import argparse
-import pymongo, gridfs
+
+import gridfs
+import pymongo
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Dump from "media" collection into GridFS',
-    )
-    parser.add_argument('--wipe', '-w', action='store_true', default=False,
-        help="Wipe MongoDB before importing",
-    )
+        description='Dump from "media" collection into GridFS')
+    parser.add_argument(
+        '--wipe', '-w', action='store_true', default=False,
+        help="Wipe MongoDB before importing")
 
     args = parser.parse_args()
     return args
