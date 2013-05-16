@@ -2,6 +2,7 @@ pytz
 werkzeug
 pygments
 git+git://github.com/joshmarshall/tornadorpc.git
+tornado>=3
 motor
 dictshield
 cMarkdown
