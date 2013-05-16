@@ -1,3 +1,4 @@
+import datetime
 import tornado.web
 from tornado import gen
 from tornado.options import options as opts
@@ -106,7 +107,11 @@ class DeleteCategoryHandler(MotorBlogAdminHandler):
         yield motor.Op(
             self.db.posts.update,
             {},
-            {'$pull': {'categories': {'slug': category_slug}}},
+            {
+                # Hack: Set *all* posts' mod dates to now.
+                '$pull': {'categories': {'slug': category_slug}},
+                '$set': {'mod': datetime.datetime.utcnow()}
+            },
             multi=True)
 
         # Yield and wait for listeners to run before redirecting, so there's
