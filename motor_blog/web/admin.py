@@ -4,11 +4,14 @@ from tornado.options import options as opts
 from bson import ObjectId
 import motor
 
+from motor_blog import cache
 from motor_blog.models import Post, Category
 from motor_blog.web.handlers import MotorBlogHandler
 
 __all__ = (
-    'LoginHandler', 'LogoutHandler', 'DraftsHandler', 'DraftHandler',
+    'LoginHandler', 'LogoutHandler',
+    'CategoriesAdminHandler', 'DeleteCategoryHandler',
+    'DraftsHandler', 'DraftHandler',
     'MediaPageHandler', 'DeleteMediaHandler',
 )
 
@@ -72,6 +75,42 @@ class DraftsHandler(MotorBlogAdminHandler):
 
         drafts = [Post(**draftdoc) for draftdoc in draftdocs]
         self.render('admin-templates/drafts.html', drafts=drafts)
+
+
+class CategoriesAdminHandler(MotorBlogAdminHandler):
+    """Show a single draft post or page"""
+    @tornado.web.asynchronous
+    @gen.engine
+    @tornado.web.addslash
+    @tornado.web.authenticated
+    def get(self):
+        category_docs = yield motor.Op(self.get_categories)
+        categories = [Category(**doc) for doc in category_docs]
+        self.render('admin-templates/categories.html', categories=categories)
+
+
+class DeleteCategoryHandler(MotorBlogAdminHandler):
+    @tornado.web.asynchronous
+    @gen.engine
+    def post(self):
+        if not self.current_user:
+            raise tornado.web.HTTPError(401)
+
+        category_slug = self.get_argument('category_slug')
+        result = yield motor.Op(
+            self.db.categories.remove, {'slug': category_slug})
+
+        if not result.get('n'):
+            raise tornado.web.HTTPError(404)
+
+        yield motor.Op(
+            self.db.posts.update,
+            {},
+            {'$pull': {'categories': {'slug': category_slug}}},
+            multi=True)
+
+        cache.event('categories_changed')
+        self.redirect(self.reverse_url('categories-page'))
 
 
 class DraftHandler(MotorBlogHandler):

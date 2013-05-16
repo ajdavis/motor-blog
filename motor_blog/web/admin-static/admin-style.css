@@ -7,3 +7,12 @@
     color: black;
     margin: 0 10px;
 }
+
+.admin-table, .admin-table th, .admin-table td {
+    border: 1px solid #666666;
+    border-collapse: collapse;
+    padding: 5px 10px;
+}
+.admin-table th {
+    background-color: #dedede;
+}

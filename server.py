@@ -86,6 +86,8 @@ if __name__ == "__main__":
         # Admin
         U(r"admin/?", LoginHandler, name='login'),
         U(r"admin/logout/?", LogoutHandler, name='logout'),
+        U(r"admin/categories/?", CategoriesAdminHandler, name='categories-page'),
+        U(r"admin/categories/delete", DeleteCategoryHandler, name='delete-category'),
         U(r"admin/drafts/?", DraftsHandler, name='drafts'),
         U(r"admin/draft/(?P<slug>.+)/?", DraftHandler, name='draft'),
         U(r"admin/media/?", MediaPageHandler, name='media-page'),

@@ -1,0 +1,42 @@
+{% extends "admin.html" %}
+
+{% block title %}{{ setting('blog_name') }} - Categories{% end %}
+
+{% block extra-head %}
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('.delete-category').submit(function() {
+                return confirm("Really delete the category forever?");
+            });
+        });
+    </script>
+{% end %}
+
+{% block content %}
+    {% if categories %}
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th></th>
+                </tr>
+            </thead>
+        {% for cat in categories %}
+        <tr>
+            <td><a class="title" href="{{ reverse_url('category', cat.slug) }}">{{ cat.name }}</a></td>
+            <td class="name">{{ cat.slug }}</td>
+            <td>
+            <form action="{{ reverse_url('delete-category') }}" method="post" class="delete-category">
+                <input type="hidden" name="category_slug" value="{{ cat.slug }}">
+                <input type="submit" value="delete">
+            </form>
+            </td>
+        </tr>
+        {% end %}
+        </table>
+    {% else %}
+        <p>No categories. Create some by publishing posts with categories in MarsEdit!</p>
+    {% end %}
+{% end %}
