@@ -62,7 +62,7 @@ class LogoutHandler(MotorBlogAdminHandler):
 class DraftsHandler(MotorBlogAdminHandler):
     """Show list of draft posts."""
     @tornado.web.asynchronous
-    @gen.engine
+    @gen.coroutine
     @tornado.web.addslash
     @tornado.web.authenticated
     def get(self):
@@ -80,7 +80,7 @@ class DraftsHandler(MotorBlogAdminHandler):
 class CategoriesAdminHandler(MotorBlogAdminHandler):
     """Show a single draft post or page."""
     @tornado.web.asynchronous
-    @gen.engine
+    @gen.coroutine
     @tornado.web.addslash
     @tornado.web.authenticated
     def get(self):
@@ -91,7 +91,7 @@ class CategoriesAdminHandler(MotorBlogAdminHandler):
 
 class DeleteCategoryHandler(MotorBlogAdminHandler):
     @tornado.web.asynchronous
-    @gen.engine
+    @gen.coroutine
     def post(self):
         if not self.current_user:
             raise tornado.web.HTTPError(401)
@@ -115,14 +115,14 @@ class DeleteCategoryHandler(MotorBlogAdminHandler):
 
         # Yield and wait for listeners to run before redirecting, so there's
         # a good chance the categories page will reload the categories.
-        yield motor.Op(cache.event, 'categories_changed')
+        yield cache.event('categories_changed')
         self.redirect(self.reverse_url('categories-page'))
 
 
 class DraftHandler(MotorBlogHandler):
     """Show a single draft post or page."""
     @tornado.web.asynchronous
-    @gen.engine
+    @gen.coroutine
     @tornado.web.addslash
     @tornado.web.authenticated
     def get(self, slug):
@@ -152,7 +152,7 @@ class DraftHandler(MotorBlogHandler):
 class MediaPageHandler(MotorBlogAdminHandler):
     """Show list of media assets like images."""
     @tornado.web.asynchronous
-    @gen.engine
+    @gen.coroutine
     @tornado.web.addslash
     @tornado.web.authenticated
     def get(self, page_num=0):
@@ -169,7 +169,7 @@ class MediaPageHandler(MotorBlogAdminHandler):
 
 class DeleteMediaHandler(MotorBlogAdminHandler):
     @tornado.web.asynchronous
-    @gen.engine
+    @gen.coroutine
     def post(self):
         if not self.current_user:
             raise tornado.web.HTTPError(401)

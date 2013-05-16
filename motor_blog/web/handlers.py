@@ -64,20 +64,14 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         return self.reverse_url('login')
 
     @cache.cached(key='categories', invalidate_event='categories_changed')
-    @gen.engine
-    def get_categories(self, callback):
-        # This odd control flow ensures we don't confuse exceptions thrown
-        # by find() with exceptions thrown by the callback
-        try:
-            category_docs = yield motor.Op(
-                self.db.categories.find().sort('name').to_list)
+    @gen.coroutine
+    def get_categories(self):
+        category_docs = yield motor.Op(
+            self.db.categories.find().sort('name').to_list)
 
-        except Exception, e:
-            callback(None, e)
-            return
+        raise gen.Return(category_docs)
 
-        callback(category_docs, None)
-
+    @gen.coroutine
     def get_posts(self, *args, **kwargs):
         raise NotImplementedError()
 
@@ -92,16 +86,16 @@ class MotorBlogHandler(tornado.web.RequestHandler):
 def check_last_modified(get):
     @functools.wraps(get)
     @tornado.web.asynchronous
-    @gen.engine
+    @gen.coroutine
     def _get(self, *args, **kwargs):
-        category_docs = yield motor.Op(self.get_categories)
+        category_docs = yield self.get_categories()
         self.categories = categories = [
             Category(**doc) for doc in category_docs]
 
-        postdocs = yield motor.Op(self.get_posts, *args, **kwargs)
+        post_docs = yield self.get_posts(*args, **kwargs)
         self.posts = posts = [
             Post(**doc) if doc else None
-            for doc in postdocs]
+            for doc in post_docs]
 
         if posts or categories:
             mod = max(
@@ -127,20 +121,27 @@ def check_last_modified(get):
                     self.finish()
                     return
 
-        gen.engine(get)(self, *args, **kwargs)
+        # Yielding, and returning result, are unneeded. We're not waiting for
+        # a return value, we're waiting for get() to call finish(). But let's
+        # yield and return anyway for sanity's sake.
+        result = yield gen.coroutine(get)(self, *args, **kwargs)
+        raise gen.Return(result)
 
     return _get
 
 
 class HomeHandler(MotorBlogHandler):
-    def get_posts(self, callback, page_num=0):
-        (self.db.posts.find(
+    @gen.coroutine
+    def get_posts(self, page_num=0):
+        cursor = (self.db.posts.find(
             {'status': 'publish', 'type': 'post'},
             {'original': False},
         ).sort([('pub_date', -1)])
             .skip(int(page_num) * 10)
-            .limit(10)
-            .to_list(callback=callback))
+            .limit(10))
+
+        result = yield motor.Op(cursor.to_list, 100)
+        raise gen.Return(result)
 
     @tornado.web.addslash
     @check_last_modified
@@ -152,13 +153,16 @@ class HomeHandler(MotorBlogHandler):
 
 
 class AllPostsHandler(MotorBlogHandler):
-    def get_posts(self, callback):
-        (self.db.posts.find(
+    @gen.coroutine
+    def get_posts(self):
+        cursor = (self.db.posts.find(
             {'status': 'publish', 'type': 'post'},
             {'original': False},
         )
-            .sort([('pub_date', -1)])
-            .to_list(callback=callback))
+            .sort([('pub_date', -1)]))
+
+        results = yield motor.Op(cursor.to_list, 100)
+        raise gen.Return(results)
 
     @tornado.web.addslash
     @check_last_modified
@@ -170,8 +174,8 @@ class AllPostsHandler(MotorBlogHandler):
 
 class PostHandler(MotorBlogHandler):
     """Show a single blog post or page"""
-    @gen.engine
-    def get_posts(self, slug, callback):
+    @gen.coroutine
+    def get_posts(self, slug):
         slug = slug.rstrip('/')
         posts = self.db.posts
         postdoc = yield motor.Op(
@@ -221,7 +225,7 @@ class PostHandler(MotorBlogHandler):
             prevdoc, nextdoc = None, None
 
         # Done
-        callback([prevdoc, postdoc, nextdoc], None)
+        raise gen.Return([prevdoc, postdoc, nextdoc])
 
     @tornado.web.addslash
     @check_last_modified
@@ -237,10 +241,11 @@ class PostHandler(MotorBlogHandler):
 
 class CategoryHandler(MotorBlogHandler):
     """Page of posts for a category"""
-    def get_posts(self, callback, slug, page_num=0):
+    @gen.coroutine
+    def get_posts(self, slug, page_num=0):
         page_num = int(page_num)
         slug = slug.rstrip('/')
-        self.db.posts.find({
+        cursor = (self.db.posts.find({
             'status': 'publish',
             'type': 'post',
             'categories.slug': slug,
@@ -248,7 +253,10 @@ class CategoryHandler(MotorBlogHandler):
             'original': False
         }).sort(
             [('pub_date', -1)]
-        ).skip(page_num * 10).limit(10).to_list(callback=callback)
+        ).skip(page_num * 10).limit(10))
+
+        results = yield motor.Op(cursor.to_list, 100)
+        raise gen.Return(results)
 
     @tornado.web.addslash
     @check_last_modified
@@ -269,19 +277,22 @@ class CategoryHandler(MotorBlogHandler):
 
 # TODO: move to feed.py
 class FeedHandler(MotorBlogHandler):
-    def get_posts(self, callback, slug=None):
+    @gen.coroutine
+    def get_posts(self, slug=None):
         query = {'status': 'publish', 'type': 'post'}
 
         if slug:
             slug = slug.rstrip('/')
             query['categories.slug'] = slug
 
-        (self.db.posts.find(
+        cursor = (self.db.posts.find(
             query,
             {'summary': False, 'original': False},
         ).sort([('pub_date', -1)])
-            .limit(20)
-            .to_list(callback=callback))
+            .limit(20))
+
+        results = yield motor.Op(cursor.to_list, 100)
+        raise gen.Return(results)
 
     @check_last_modified
     def get(self, slug=None):
@@ -369,17 +380,20 @@ class FeedHandler(MotorBlogHandler):
 
 class TagHandler(MotorBlogHandler):
     """Page of posts for a tag"""
-    def get_posts(self, callback, tag, page_num=0):
+    @gen.coroutine
+    def get_posts(self, tag, page_num=0):
         page_num = int(page_num)
         tag = tag.rstrip('/')
-        self.db.posts.find({
+        cursor = (self.db.posts.find({
             'status': 'publish',
             'type': 'post',
             'tags': tag,
         }, {
             'original': False
-        }).sort([('pub_date', -1)]).skip(page_num * 10).limit(10).to_list(
-            callback=callback)
+        }).sort([('pub_date', -1)]).skip(page_num * 10).limit(10))
+
+        results = yield motor.Op(cursor.to_list, 100)
+        raise gen.Return(results)
 
     @tornado.web.addslash
     @check_last_modified
@@ -394,11 +408,11 @@ class TagHandler(MotorBlogHandler):
 
 class SearchHandler(MotorBlogHandler):
     @tornado.web.asynchronous
-    @gen.engine
+    @gen.coroutine
     def get(self):
         # TODO: refactor with check_last_modified(), this is gross
         #   we need an async version of RequestHandler.prepare()
-        category_docs = yield motor.Op(self.get_categories)
+        category_docs = yield self.get_categories()
         self.categories = [Category(**doc) for doc in category_docs]
 
         q = self.get_argument('q', None)

@@ -1,6 +1,6 @@
 import motor
 
-from motor_blog.api import engine, rpc
+from motor_blog.api import coroutine, rpc
 
 
 class Tags(object):
@@ -9,7 +9,7 @@ class Tags(object):
     Mixin for motor_blog.api.handlers.APIHandler.
     """
     @rpc
-    @engine
+    @coroutine
     def wp_getTags(self, blogid, user, password):
         tags = yield motor.Op(
             self.settings['db'].posts.find().distinct, 'tags')

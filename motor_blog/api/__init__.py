@@ -54,9 +54,9 @@ def fault(f):
     return _f
 
 
-def engine(f):
-    """Like gen.engine, but copy method signature."""
-    return superwraps(f)(gen.engine(f))
+def coroutine(f):
+    """Like gen.coroutine, but copy method signature."""
+    return superwraps(f)(gen.coroutine(f))
 
 
 def rpc(f):

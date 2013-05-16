@@ -7,7 +7,7 @@ import motor
 from tornado import gen
 from bson.objectid import ObjectId
 
-from motor_blog.api import engine, rpc
+from motor_blog.api import coroutine, rpc
 from motor_blog.models import Post
 
 
@@ -16,7 +16,7 @@ class Posts(object):
 
     Mixin for motor_blog.api.handlers.APIHandler.
     """
-    @gen.engine
+    @gen.coroutine
     def _recent(self, num_posts, type):
         cursor = self.settings['db'].posts.find({'type': type})
         # _id starts with timestamp.
@@ -34,7 +34,7 @@ class Posts(object):
     def wp_getPages(self, blogid, user, password, num_posts):
         self._recent(num_posts, 'page')
 
-    @engine
+    @coroutine
     def _new_post(self, user, password, struct, type):
         new_post = Post.from_metaweblog(struct, type)
         if new_post.status == 'publish':
@@ -55,7 +55,7 @@ class Posts(object):
         # the post status is actually in struct['post_status']
         self._new_post(user, password, struct, 'page')
 
-    @engine
+    @coroutine
     def _edit_post(self, postid, struct, post_type):
         new_post = Post.from_metaweblog(struct, post_type, is_edit=True)
         db = self.settings['db']
@@ -103,7 +103,7 @@ class Posts(object):
     def wp_editPage(self, blogid, postid, user, password, struct, publish):
         self._edit_post(postid, struct, 'page')
 
-    @engine
+    @coroutine
     def _get_post(self, postid):
         postdoc = yield motor.Op(
             self.settings['db'].posts.find_one,
@@ -119,7 +119,7 @@ class Posts(object):
     def metaWeblog_getPost(self, postid, user, password):
         self._get_post(postid)
 
-    @engine
+    @coroutine
     def _delete_post(self, postid):
         # TODO: a notion of 'trashed', not removed
         result = yield motor.Op(

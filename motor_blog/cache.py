@@ -12,6 +12,7 @@ from tornado import gen
 
 import motor
 import pymongo.errors
+from tornado.concurrent import Future
 from tornado.ioloop import IOLoop
 
 
@@ -58,52 +59,48 @@ def shutdown():
         _cursor.close()
 
 
-@gen.engine
-def event(name, callback=None):
+@gen.coroutine
+def event(name):
     """Insert event into events collection.
 
-    The optional callback taking (result, error) is executed after listeners
-    have responded to the event.
+    Returns a Future. Yield it to wait until listeners have responded to the
+    event.
     """
+    # event() is expected to be very rare -- e.g., called from
+    # wp_newCategory. If it becomes more common, this will need work.
     try:
-        # event() is expected to be very rare -- e.g., called from
-        # wp_newCategory. If it becomes more common, this will need work.
-        try:
-            # Size is in bytes; event documents are rare and very small
-            yield motor.Op(
-                _db.create_collection, 'events', size=100 * 1024, capped=True)
+        # Size is in bytes; event documents are rare and very small
+        yield motor.Op(
+            _db.create_collection, 'events', size=100 * 1024, capped=True)
 
-            logging.info(
-                'Created capped collection "events" in database "%s"',
-                _db.name)
-        except pymongo.errors.CollectionInvalid:
-            # Collection already exists
-            collection_options = yield motor.Op(_db.events.options)
-            if 'capped' not in collection_options:
-                logging.error(
-                    '%s.events exists and is not a capped collection,\n'
-                    'please drop the collection and start this app again.' %
-                    _db.name
-                )
+        logging.info(
+            'Created capped collection "events" in database "%s"',
+            _db.name)
+    except pymongo.errors.CollectionInvalid:
+        # Collection already exists
+        collection_options = yield motor.Op(_db.events.options)
+        if 'capped' not in collection_options:
+            logging.error(
+                '%s.events exists and is not a capped collection,\n'
+                'please drop the collection and start this app again.' %
+                _db.name
+            )
 
-        if callback:
-            # Ensure callback isn't run until after other listeners.
-            def event_listener(_):
-                # Unregister this function.
-                remove_callback(name, event_listener)
-                IOLoop.instance().add_callback(
-                    functools.partial(callback(result, None)))
+    future = Future()
 
-            on(name, event_listener)
+    # Ensure future isn't resolved until after other listeners.
+    def event_listener(_):
+        # Unregister this function.
+        remove_callback(name, event_listener)
+        IOLoop.instance().add_callback(
+            functools.partial(future.set_result, None))
 
-        result = yield motor.Op(
-            _db.events.insert,
-            {'ts': datetime.datetime.utcnow(), 'name': name},
-            manipulate=False)  # No need to add _id
+    on(name, event_listener)
 
-    except Exception, e:
-        if callback:
-            callback(None, e)
+    yield motor.Op(
+        _db.events.insert,
+        {'ts': datetime.datetime.utcnow(), 'name': name},
+        manipulate=False)  # No need to add _id
 
 
 def cached(key, invalidate_event):
@@ -122,19 +119,14 @@ def cached(key, invalidate_event):
     on(invalidate_event, invalidate)
 
     def _cached(fn):
+        @gen.coroutine
         def maybecall(*args, **kwargs):
-            assert 'callback' in kwargs
-            callback = kwargs.pop('callback')
             if key in _cache:
-                callback(_cache[key], None)
+                raise gen.Return(_cache[key])
             else:
-                def inner_callback(result, error):
-                    if not error:
-                        _cache[key] = result
-                    callback(result, error)
-
-                kwargs['callback'] = inner_callback
-                fn(*args, **kwargs)
+                result = yield fn(*args, **kwargs)
+                _cache[key] = result
+                raise gen.Return(result)
 
         return maybecall
     return _cached

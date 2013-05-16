@@ -4,7 +4,7 @@ import motor
 from bson.objectid import ObjectId
 
 from motor_blog import cache
-from motor_blog.api import engine, rpc
+from motor_blog.api import coroutine, rpc
 from motor_blog.models import Post, Category, EmbeddedCategory
 
 
@@ -14,7 +14,7 @@ class Categories(object):
     Mixin for motor_blog.api.handlers.APIHandler.
     """
     @rpc
-    @engine
+    @coroutine
     def wp_getCategories(self, blogid, user, password):
         # Could cache this as we do on the web side, but not worth the risk
         db = self.settings['db']
@@ -25,7 +25,7 @@ class Categories(object):
             Category(**c).to_wordpress(self.application) for c in categories])
 
     @rpc
-    @engine
+    @coroutine
     def mt_getPostCategories(self, postid, user, password):
         post = yield motor.Op(
             self.settings['db'].posts.find_one,
@@ -39,7 +39,7 @@ class Categories(object):
                 for cat in Post(**post).categories])
 
     @rpc
-    @engine
+    @coroutine
     def wp_newCategory(self, blogid, user, password, struct):
         category = Category.from_wordpress(struct)
         _id = yield motor.Op(
@@ -50,7 +50,7 @@ class Categories(object):
         self.result(str(_id))
 
     @rpc
-    @engine
+    @coroutine
     def mt_setPostCategories(self, postid, user, password, categories):
 
         #Sometimes we receive only id from categories, so we must query the names.
