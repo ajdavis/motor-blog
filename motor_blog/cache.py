@@ -59,8 +59,10 @@ def shutdown():
 
 @gen.engine
 def event(name, callback=None):
-    """Insert event into events collection; optional callback taking
-       (result, error) executed after insert
+    """Insert event into events collection.
+
+    The optional callback taking (result, error) is executed after listeners
+    have responded to the event.
     """
     try:
         # event() is expected to be very rare -- e.g., called from
@@ -69,6 +71,7 @@ def event(name, callback=None):
             # Size is in bytes; event documents are rare and very small
             yield motor.Op(
                 _db.create_collection, 'events', size=100 * 1024, capped=True)
+
             logging.info(
                 'Created capped collection "events" in database "%s"',
                 _db.name)
@@ -82,12 +85,21 @@ def event(name, callback=None):
                     _db.name
                 )
 
-        result = yield motor.Op(_db.events.insert,
-            {'ts': datetime.datetime.utcnow(), 'name': name},
-            manipulate=False) # No need to add _id
-
         if callback:
-            callback(result, None)
+            # Ensure callback isn't run until after other listeners.
+            def event_listener(_):
+                # Unregister this function.
+                remove_callback(name, event_listener)
+                IOLoop.instance().add_callback(
+                    functools.partial(callback(result, None)))
+
+            on(name, event_listener)
+
+        result = yield motor.Op(
+            _db.events.insert,
+            {'ts': datetime.datetime.utcnow(), 'name': name},
+            manipulate=False)  # No need to add _id
+
     except Exception, e:
         if callback:
             callback(None, e)
@@ -148,7 +160,9 @@ def _on_event(event, error):
             time.time() + 10,
             functools.partial(startup, _db, datetime.datetime.utcnow()))
     elif event:
-        for callback in _callbacks.get(event['name'], []):
+        # Copy, since callbacks themselves may add / remove callbacks.
+        callbacks = _callbacks.get(event['name'], []).copy()
+        for callback in callbacks:
             try:
                 callback(event)
             except Exception:

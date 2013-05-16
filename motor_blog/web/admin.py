@@ -109,7 +109,9 @@ class DeleteCategoryHandler(MotorBlogAdminHandler):
             {'$pull': {'categories': {'slug': category_slug}}},
             multi=True)
 
-        cache.event('categories_changed')
+        # Yield and wait for listeners to run before redirecting, so there's
+        # a good chance the categories page will reload the categories.
+        yield motor.Op(cache.event, 'categories_changed')
         self.redirect(self.reverse_url('categories-page'))
 
 
