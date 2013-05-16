@@ -8,7 +8,7 @@ import sys
 import datetime
 import time
 
-from tornado import gen
+from tornado import gen, stack_context
 
 import motor
 import pymongo.errors
@@ -18,12 +18,12 @@ from tornado.ioloop import IOLoop
 
 _cache = {}
 _callbacks = {}
-_cursor = None
 
 
 def create_events_collection(db):
-    """Pass in MotorDatabase, create capped collection synchronously at
-       startup
+    """Create capped collection.
+
+    Pass in a MotorDatabase.
     """
     sync_cx = db.connection.sync_client()
     sync_db = sync_cx[db.name]
@@ -132,31 +132,63 @@ def cached(key, invalidate_event):
     return _cached
 
 
-def startup(db, last_event=None):
-    global _db, _cursor
-    _db = db
-    create_events_collection(_db)
-    if not _cursor:
-        _cursor = db.events.find({
-            'ts': {'$gte': last_event or datetime.datetime.utcnow()}
-        }).tail(_on_event)
+def startup(db):
+    create_events_collection(db)
+    loop = IOLoop.current()
 
+    @gen.coroutine
+    def tail():
+        collection = db.events
+        now = datetime.datetime.utcnow()
+        last_event_ts = None
 
-def _on_event(event, error):
-    global _cursor
-    if error:
-        logging.error('Tailing events collection: %s', error)
+        def make_cursor():
+            return collection.find(
+                {'ts': {'$gte': last_event_ts or now}},
+                tailable=True, await_data=True)
 
-        # Retry in a few seconds
-        _cursor = None
-        IOLoop.instance().add_timeout(
-            time.time() + 10,
-            functools.partial(startup, _db, datetime.datetime.utcnow()))
-    elif event:
-        # Copy, since callbacks themselves may add / remove callbacks.
-        callbacks = _callbacks.get(event['name'], []).copy()
-        for callback in callbacks:
+        cursor = make_cursor()
+
+        while True:
+            if not cursor.alive:
+                # While collection is empty, tailable cursor dies immediately.
+                yield gen.Task(loop.add_timeout, datetime.timedelta(seconds=1))
+                logging.debug('new cursor, last_event_ts = %s, now = %s',
+                              last_event_ts, now)
+                cursor = make_cursor()
+
             try:
-                callback(event)
+                while (yield cursor.fetch_next):
+                    event = cursor.next_object()
+                    logging.info(
+                        "Event: %r, %s", event.get('name'), event.get('ts'))
+
+                    _on_event(event)
+                    last_event_ts = event.get('ts')
+            except pymongo.errors.OperationFailure:
+                # Collection dropped?
+                logging.exception('Tailing "events" collection.')
+                yield gen.Task(loop.add_timeout, datetime.timedelta(seconds=1))
+                logging.error(
+                    'Resuming tailing "events" collection.'
+                    ' Last_event_ts = %s, now = %s',
+                    last_event_ts, now)
+
+                cursor = make_cursor()
+
             except Exception:
-                logging.exception('Processing event %s' % event)
+                logging.exception('Tailing "events" collection.')
+                return  # Give up
+
+    # Start infinite loop
+    tail()
+
+
+def _on_event(event):
+    # Copy, since callbacks themselves may add / remove callbacks.
+    callbacks = _callbacks.get(event['name'], [])[:]
+    for callback in callbacks:
+        try:
+            callback(event)
+        except Exception:
+            logging.exception('Processing event %s' % event)
