@@ -118,7 +118,7 @@ if __name__ == "__main__":
         template_path=os.path.join(opts.theme, 'templates'),
         tz=pytz.timezone(opts.timezone),
         gzip=True,
-        **{k: v.value() for k, v in opts.items()}
+        **{k: v.value() for k, v in opts._options.items()}
     )
     http_server = httpserver.HTTPServer(application, xheaders=True)
     http_server.listen(opts.port)
