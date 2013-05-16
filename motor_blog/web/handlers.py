@@ -197,8 +197,6 @@ class PostHandler(MotorBlogHandler):
         # Only posts have prev / next navigation, not pages
         elif postdoc['type'] == 'post':
             fields = {'summary': False, 'body': False, 'original': False}
-            # TODO: this will break if drafts are published out of the order
-            #   they were created; make a real publish-date and use that
             posts.find_one(
                 {
                     'status': 'publish', 'type': 'post',
