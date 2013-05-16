@@ -64,8 +64,7 @@ def event(name, callback=None):
     """
     try:
         # event() is expected to be very rare -- e.g., called from
-        # migrate_from_wordpress or wp_newCategory. If it becomes more common,
-        # this will need work.
+        # wp_newCategory. If it becomes more common, this will need work.
         try:
             # Size is in bytes; event documents are rare and very small
             yield motor.Op(
