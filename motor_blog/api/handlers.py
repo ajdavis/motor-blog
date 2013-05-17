@@ -30,8 +30,8 @@ class WordpressParser(XMLRPCParser):
 
 
 class APIHandler(
-    XMLRPCHandler, categories.Categories, posts.Posts, tags.Tags, media.Media, users.Users
-):
+        XMLRPCHandler, categories.Categories, posts.Posts, tags.Tags,
+        media.Media, users.Users):
     _RPC_ = WordpressParser(xmlrpclib)
 
     def mt_supportedTextFilters(self):
