@@ -46,7 +46,7 @@ class Categories(object):
             self.settings['db'].categories.insert,
             category.to_python())
 
-        cache.event('categories_changed')
+        yield cache.event('categories_changed')
         self.result(str(_id))
 
     @rpc

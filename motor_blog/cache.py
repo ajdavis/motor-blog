@@ -1,14 +1,14 @@
 """Manage in-memory cache of some data from Mongo, tail an 'events'
    capped collection to know when to invalidate
 """
-import functools
 
+import copy
+import functools
 import logging
 import sys
 import datetime
-import time
 
-from tornado import gen, stack_context
+from tornado import gen
 
 import motor
 import pymongo.errors
@@ -18,6 +18,7 @@ from tornado.ioloop import IOLoop
 
 _cache = {}
 _callbacks = {}
+_db = None
 
 
 def create_events_collection(db):
@@ -39,8 +40,8 @@ def create_events_collection(db):
             logging.error(
                 '%s.events exists and is not a capped collection,\n'
                 'please drop the collection and start this app again.' %
-                sync_db.name
-            )
+                sync_db.name)
+
             sys.exit(1)
 
 
@@ -54,11 +55,6 @@ def remove_callback(event_name, callback):
     _callbacks.get(event_name, set()).discard(callback)
 
 
-def shutdown():
-    if _cursor:
-        _cursor.close()
-
-
 @gen.coroutine
 def event(name):
     """Insert event into events collection.
@@ -66,26 +62,9 @@ def event(name):
     Returns a Future. Yield it to wait until listeners have responded to the
     event.
     """
+    assert _db, "Call cache.startup() once before calling event()."
     # event() is expected to be very rare -- e.g., called from
     # wp_newCategory. If it becomes more common, this will need work.
-    try:
-        # Size is in bytes; event documents are rare and very small
-        yield motor.Op(
-            _db.create_collection, 'events', size=100 * 1024, capped=True)
-
-        logging.info(
-            'Created capped collection "events" in database "%s"',
-            _db.name)
-    except pymongo.errors.CollectionInvalid:
-        # Collection already exists
-        collection_options = yield motor.Op(_db.events.options)
-        if 'capped' not in collection_options:
-            logging.error(
-                '%s.events exists and is not a capped collection,\n'
-                'please drop the collection and start this app again.' %
-                _db.name
-            )
-
     future = Future()
 
     # Ensure future isn't resolved until after other listeners.
@@ -133,6 +112,9 @@ def cached(key, invalidate_event):
 
 
 def startup(db):
+    global _db
+    assert not _db, "cache.startup() already called once."
+    _db = db
     create_events_collection(db)
     loop = IOLoop.current()
 
@@ -186,7 +168,7 @@ def startup(db):
 
 def _on_event(event):
     # Copy, since callbacks themselves may add / remove callbacks.
-    callbacks = _callbacks.get(event['name'], [])[:]
+    callbacks = copy.copy(_callbacks.get(event['name'], []))
     for callback in callbacks:
         try:
             callback(event)
