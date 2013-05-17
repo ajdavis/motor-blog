@@ -67,7 +67,7 @@ class MotorBlogHandler(tornado.web.RequestHandler):
     @gen.coroutine
     def get_categories(self):
         category_docs = yield motor.Op(
-            self.db.categories.find().sort('name').to_list)
+            self.db.categories.find().sort('name').to_list, 100)
 
         raise gen.Return(category_docs)
 
@@ -197,28 +197,20 @@ class PostHandler(MotorBlogHandler):
         # Only posts have prev / next navigation, not pages
         elif postdoc['type'] == 'post':
             fields = {'summary': False, 'body': False, 'original': False}
-            posts.find_one(
-                {
-                    'status': 'publish', 'type': 'post',
-                    'pub_date': {'$lt': postdoc['pub_date']}
-                },
-                fields,
-                sort=[('pub_date', -1)],
-                callback=(yield gen.Callback('prevdoc')))
+            prev_doc_future = posts.find_one({
+                'status': 'publish', 'type': 'post',
+                'pub_date': {'$lt': postdoc['pub_date']}
+            }, fields, sort=[('pub_date', -1)])
 
-            posts.find_one(
-                {
-                    'status': 'publish', 'type': 'post',
-                    'pub_date': {'$gt': postdoc['pub_date']}
-                },
-                fields,
-                sort=[('pub_date', 1)],
-                callback=(yield gen.Callback('nextdoc')))
+            next_doc_future = posts.find_one({
+                'status': 'publish', 'type': 'post',
+                'pub_date': {'$gt': postdoc['pub_date']}
+            }, fields, sort=[('pub_date', 1)])
 
             # Overkill for this case, but in theory we reduce latency by
             # querying for previous and next posts at once, and waiting for
             # both.
-            prevdoc, nextdoc = yield motor.WaitAllOps(['prevdoc', 'nextdoc'])
+            prevdoc, nextdoc = yield [prev_doc_future, next_doc_future]
         else:
             prevdoc, nextdoc = None, None
 

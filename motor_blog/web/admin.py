@@ -71,7 +71,7 @@ class DraftsHandler(MotorBlogAdminHandler):
         draft_docs = yield motor.Op(db.posts.find(
             {'status': 'draft', 'type': 'post'},
             {'original': False, 'body': False},
-        ).sort([('_id', -1)]).to_list)
+        ).sort([('_id', -1)]).to_list, 100)
 
         drafts = [Post(**draft_doc) for draft_doc in draft_docs]
         self.render('admin-templates/drafts.html', drafts=drafts)
@@ -162,7 +162,7 @@ class MediaPageHandler(MotorBlogAdminHandler):
             .sort([('uploadDate', -1)])
             .skip(page_num * 40)
             .limit(40)
-            .to_list)
+            .to_list, 100)
 
         self.render('admin-templates/media.html', mediadocs=media_docs)
 

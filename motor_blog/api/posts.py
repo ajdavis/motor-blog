@@ -21,7 +21,7 @@ class Posts(object):
         cursor = self.settings['db'].posts.find({'type': type})
         # _id starts with timestamp.
         cursor.sort([('_id', -1)]).limit(num_posts)
-        posts = yield motor.Op(cursor.to_list)
+        posts = yield motor.Op(cursor.to_list, 100)
         self.result([
             Post(**post).to_metaweblog(self.application)
             for post in posts])

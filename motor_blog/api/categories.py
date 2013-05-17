@@ -19,7 +19,7 @@ class Categories(object):
         # Could cache this as we do on the web side, but not worth the risk
         db = self.settings['db']
         categories = yield motor.Op(
-            db.categories.find().sort([('name', 1)]).to_list)
+            db.categories.find().sort([('name', 1)]).to_list, 100)
 
         self.result([
             Category(**c).to_wordpress(self.application) for c in categories])
