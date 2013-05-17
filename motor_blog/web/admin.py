@@ -68,10 +68,10 @@ class DraftsHandler(MotorBlogAdminHandler):
     def get(self):
         # TODO: pagination
         db = self.settings['db']
-        draft_docs = yield motor.Op(db.posts.find(
+        draft_docs = yield db.posts.find(
             {'status': 'draft', 'type': 'post'},
             {'original': False, 'body': False},
-        ).sort([('_id', -1)]).to_list, 100)
+        ).sort([('_id', -1)]).to_list(100)
 
         drafts = [Post(**draft_doc) for draft_doc in draft_docs]
         self.render('admin-templates/drafts.html', drafts=drafts)
@@ -84,7 +84,7 @@ class CategoriesAdminHandler(MotorBlogAdminHandler):
     @tornado.web.addslash
     @tornado.web.authenticated
     def get(self):
-        category_docs = yield motor.Op(self.get_categories)
+        category_docs = yield self.get_categories()
         categories = [Category(**doc) for doc in category_docs]
         self.render('admin-templates/categories.html', categories=categories)
 
@@ -97,14 +97,12 @@ class DeleteCategoryHandler(MotorBlogAdminHandler):
             raise tornado.web.HTTPError(401)
 
         category_slug = self.get_argument('category_slug')
-        result = yield motor.Op(
-            self.db.categories.remove, {'slug': category_slug})
+        result = yield self.db.categories.remove({'slug': category_slug})
 
         if not result.get('n'):
             raise tornado.web.HTTPError(404)
 
-        yield motor.Op(
-            self.db.posts.update,
+        yield self.db.posts.update(
             {},
             {
                 # Hack: Set *all* posts' mod dates to now.
@@ -127,8 +125,7 @@ class DraftHandler(MotorBlogHandler):
     @tornado.web.authenticated
     def get(self, slug):
         slug = slug.rstrip('/')
-        postdoc = yield motor.Op(
-            self.settings['db'].posts.find_one,
+        postdoc = yield self.settings['db'].posts.find_one(
             {'slug': slug},
             {'summary': False, 'original': False})
 
@@ -142,7 +139,7 @@ class DraftHandler(MotorBlogHandler):
             self.redirect(self.reverse_url('post', slug))
             return
 
-        category_docs = yield motor.Op(self.get_categories)
+        category_docs = yield self.get_categories()
         categories = [Category(**doc) for doc in category_docs]
         self.render(
             'single.jade',
@@ -157,12 +154,12 @@ class MediaPageHandler(MotorBlogAdminHandler):
     @tornado.web.authenticated
     def get(self, page_num=0):
         page_num = int(page_num)
-        media_docs = yield motor.Op(
+        media_docs = yield (
             self.settings['db'].fs.files.find()
             .sort([('uploadDate', -1)])
             .skip(page_num * 40)
             .limit(40)
-            .to_list, 100)
+            .to_list(100))
 
         self.render('admin-templates/media.html', mediadocs=media_docs)
 
@@ -175,6 +172,6 @@ class DeleteMediaHandler(MotorBlogAdminHandler):
             raise tornado.web.HTTPError(401)
 
         media_id = self.get_argument('media_id')
-        fs = yield motor.Op(motor.MotorGridFS(self.settings['db']).open)
-        yield motor.Op(fs.delete, ObjectId(media_id))
+        fs = yield motor.MotorGridFS(self.settings['db']).open()
+        yield fs.delete(ObjectId(media_id))
         self.redirect(self.reverse_url('media-page'))

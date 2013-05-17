@@ -76,8 +76,7 @@ def event(name):
 
     on(name, event_listener)
 
-    yield motor.Op(
-        _db.events.insert,
+    yield _db.events.insert(
         {'ts': datetime.datetime.utcnow(), 'name': name},
         manipulate=False)  # No need to add _id
 

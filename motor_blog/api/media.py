@@ -48,19 +48,18 @@ class Media(object):
         """
         # In a higher-volume site this work should be offloaded to a queue.
         resized_content, width, height = image.resized(content, maxwidth)
-        fs = yield motor.Op(motor.MotorGridFS(self.settings['db']).open)
+        fs = yield motor.MotorGridFS(self.settings['db']).open()
 
         # This is the tail end of the URL, like 2012/06/foo.png.
         now = datetime.datetime.utcnow()
         mlink = media_link(now.year, now.month, name)
-        gridin = yield motor.Op(
-            fs.new_file,
+        gridin = yield fs.new_file(
             filename=mlink,
             content_type=content_type,
             # GridFS stores any metadata we want
             width=width,
             height=height)
 
-        yield motor.Op(gridin.write, resized_content)
-        yield motor.Op(gridin.close)
+        yield gridin.write(resized_content)
+        yield gridin.close()
         raise gen.Return((mlink, width, height))

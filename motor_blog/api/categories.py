@@ -1,6 +1,5 @@
 import xmlrpclib
 
-import motor
 from bson.objectid import ObjectId
 
 from motor_blog import cache
@@ -18,8 +17,8 @@ class Categories(object):
     def wp_getCategories(self, blogid, user, password):
         # Could cache this as we do on the web side, but not worth the risk
         db = self.settings['db']
-        categories = yield motor.Op(
-            db.categories.find().sort([('name', 1)]).to_list, 100)
+        categories = yield db.categories.find().sort(
+            [('name', 1)]).to_list(100)
 
         self.result([
             Category(**c).to_wordpress(self.application) for c in categories])
@@ -27,9 +26,7 @@ class Categories(object):
     @rpc
     @coroutine
     def mt_getPostCategories(self, postid, user, password):
-        post = yield motor.Op(
-            self.settings['db'].posts.find_one,
-            {'_id': ObjectId(postid)})
+        post = yield self.settings['db'].posts.find_one(ObjectId(postid))
 
         if not post:
             self.result(xmlrpclib.Fault(404, "Not found"))
@@ -42,9 +39,7 @@ class Categories(object):
     @coroutine
     def wp_newCategory(self, blogid, user, password, struct):
         category = Category.from_wordpress(struct)
-        _id = yield motor.Op(
-            self.settings['db'].categories.insert,
-            category.to_python())
+        _id = yield self.settings['db'].categories.insert(category.to_python())
 
         yield cache.event('categories_changed')
         self.result(str(_id))
@@ -73,8 +68,7 @@ class Categories(object):
             EmbeddedCategory.from_metaweblog(cat).to_python()
             for cat in categories]
 
-        result = yield motor.Op(
-            self.settings['db'].posts.update,
+        result = yield self.settings['db'].posts.update(
             {'_id': ObjectId(postid)},
             {'$set': {'categories': embedded_cats}})
 

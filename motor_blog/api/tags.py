@@ -11,8 +11,7 @@ class Tags(object):
     @rpc
     @coroutine
     def wp_getTags(self, blogid, user, password):
-        tags = yield motor.Op(
-            self.settings['db'].posts.find().distinct, 'tags')
+        tags = yield self.settings['db'].posts.find().distinct('tags')
 
         self.result([
             {'name': tag, 'tag_id': tag}

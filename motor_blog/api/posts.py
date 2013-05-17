@@ -21,7 +21,7 @@ class Posts(object):
         cursor = self.settings['db'].posts.find({'type': type})
         # _id starts with timestamp.
         cursor.sort([('_id', -1)]).limit(num_posts)
-        posts = yield motor.Op(cursor.to_list, 100)
+        posts = yield cursor.to_list(100)
         self.result([
             Post(**post).to_metaweblog(self.application)
             for post in posts])
@@ -40,8 +40,7 @@ class Posts(object):
         if new_post.status == 'publish':
             new_post.pub_date = datetime.datetime.utcnow()
 
-        _id = yield motor.Op(
-            self.settings['db'].posts.insert, new_post.to_python())
+        _id = yield self.settings['db'].posts.insert(new_post.to_python())
 
         self.result(str(_id))
 
@@ -60,8 +59,7 @@ class Posts(object):
         new_post = Post.from_metaweblog(struct, post_type, is_edit=True)
         db = self.settings['db']
 
-        old_post_doc = yield motor.Op(
-            db.posts.find_one, {'_id': ObjectId(postid)})
+        old_post_doc = yield db.posts.find_one(ObjectId(postid))
 
         if not old_post_doc:
             self.result(xmlrpclib.Fault(404, "Not found"))
@@ -70,8 +68,7 @@ class Posts(object):
             if not old_post.pub_date and new_post.status == 'publish':
                 new_post.pub_date = datetime.datetime.utcnow()
 
-            update_result = yield motor.Op(
-                db.posts.update,
+            update_result = yield db.posts.update(
                 {'_id': old_post_doc['_id']},
                 {'$set': new_post.to_python()})  # set fields to new values
 
@@ -88,7 +85,7 @@ class Posts(object):
                         type='redirect',
                         mod=datetime.datetime.utcnow())
 
-                    yield motor.Op(db.posts.insert, redirect_post.to_python())
+                    yield db.posts.insert(redirect_post.to_python())
 
                 # Done
                 self.result(True)
@@ -105,9 +102,7 @@ class Posts(object):
 
     @coroutine
     def _get_post(self, postid):
-        postdoc = yield motor.Op(
-            self.settings['db'].posts.find_one,
-            {'_id': ObjectId(postid)})
+        postdoc = yield self.settings['db'].posts.find_one(ObjectId(postid))
 
         if not postdoc:
             self.result(xmlrpclib.Fault(404, "Not found"))
@@ -122,9 +117,7 @@ class Posts(object):
     @coroutine
     def _delete_post(self, postid):
         # TODO: a notion of 'trashed', not removed
-        result = yield motor.Op(
-            self.settings['db'].posts.remove,
-            {'_id': ObjectId(postid)})
+        result = yield self.settings['db'].posts.remove(ObjectId(postid))
 
         if result['n'] != 1:
             self.result(xmlrpclib.Fault(404, "Not found"))

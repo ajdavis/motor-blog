@@ -66,8 +66,8 @@ class MotorBlogHandler(tornado.web.RequestHandler):
     @cache.cached(key='categories', invalidate_event='categories_changed')
     @gen.coroutine
     def get_categories(self):
-        category_docs = yield motor.Op(
-            self.db.categories.find().sort('name').to_list, 100)
+        cursor = self.db.categories.find().sort('name')
+        category_docs = yield cursor.to_list(100)
 
         raise gen.Return(category_docs)
 
@@ -140,7 +140,7 @@ class HomeHandler(MotorBlogHandler):
             .skip(int(page_num) * 10)
             .limit(10))
 
-        result = yield motor.Op(cursor.to_list, 100)
+        result = yield cursor.to_list(100)
         raise gen.Return(result)
 
     @tornado.web.addslash
@@ -161,7 +161,7 @@ class AllPostsHandler(MotorBlogHandler):
         )
             .sort([('pub_date', -1)]))
 
-        results = yield motor.Op(cursor.to_list, 100)
+        results = yield cursor.to_list(100)
         raise gen.Return(results)
 
     @tornado.web.addslash
@@ -178,8 +178,7 @@ class PostHandler(MotorBlogHandler):
     def get_posts(self, slug):
         slug = slug.rstrip('/')
         posts = self.db.posts
-        postdoc = yield motor.Op(
-            posts.find_one,
+        postdoc = yield posts.find_one(
             {'slug': slug, 'status': 'publish'},
             {'summary': False, 'original': False})
 
@@ -245,7 +244,7 @@ class CategoryHandler(MotorBlogHandler):
             [('pub_date', -1)]
         ).skip(page_num * 10).limit(10))
 
-        results = yield motor.Op(cursor.to_list, 100)
+        results = yield cursor.to_list(100)
         raise gen.Return(results)
 
     @tornado.web.addslash
@@ -281,7 +280,7 @@ class FeedHandler(MotorBlogHandler):
         ).sort([('pub_date', -1)])
             .limit(20))
 
-        results = yield motor.Op(cursor.to_list, 100)
+        results = yield cursor.to_list(100)
         raise gen.Return(results)
 
     @check_last_modified
@@ -382,7 +381,7 @@ class TagHandler(MotorBlogHandler):
             'original': False
         }).sort([('pub_date', -1)]).skip(page_num * 10).limit(10))
 
-        results = yield motor.Op(cursor.to_list, 100)
+        results = yield cursor.to_list(100)
         raise gen.Return(results)
 
     @tornado.web.addslash
@@ -407,8 +406,9 @@ class SearchHandler(MotorBlogHandler):
 
         q = self.get_argument('q', None)
         if q:
-            response = yield motor.Op(
-                self.db.command, 'text', 'posts',
+            response = yield self.db.command(
+                'text',
+                'posts',
                 search=q,
                 filter={'status': 'publish', 'type': 'post'},
                 projection={'original': False, 'plain': False},
