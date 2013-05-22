@@ -33,6 +33,7 @@ from motor.web import GridFSHandler
 from motor_blog import indexes, cache, options
 
 from motor_blog.api.handlers import APIHandler, RSDHandler
+from motor_blog.web import get_url_spec
 from motor_blog.web.lytics import TrackingPixelHandler
 from motor_blog.web.handlers import *
 from motor_blog.web.admin import *
@@ -55,27 +56,10 @@ if __name__ == "__main__":
             opts.rebuild_indexes)
 
     base_url = opts.base_url
-
-    class U(tornado.web.URLSpec):
-        def __init__(self, pattern, *args, **kwargs):
-            """Include base_url in pattern"""
-            super(U, self).__init__(
-                '/' + base_url.strip('/') + '/' + pattern.lstrip('/'),
-                *args, **kwargs
-            )
-
-        def _find_groups(self):
-            """Get rid of final '?' -- Tornado's reverse_url() works poorly
-               with tornado.web.addslash
-            """
-            path, group_count = super(U, self)._find_groups()
-            if path.endswith('?'):
-                path = path[:-1]
-            return path, group_count
-
     static_path = os.path.join(opts.theme, 'static')
     this_dir = os.path.dirname(__file__)
     admin_static_path = os.path.join(this_dir, 'motor_blog/web/admin-static')
+    U = get_url_spec(base_url)
 
     application = tornado.web.Application([
         # XML-RPC API
