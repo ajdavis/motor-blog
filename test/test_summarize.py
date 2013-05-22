@@ -12,4 +12,4 @@ class SummarizeTest(unittest.TestCase):
 
     def test_summarize_short(self):
         # Truncated
-        self.assertEqual("bar baz [ ... ]".strip(), summarize(sample_html, 10))
+        self.assertEqual("bar baz [...]".strip(), summarize(sample_html, 10))
