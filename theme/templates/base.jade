@@ -23,6 +23,13 @@ html(lang="en")
         meta(name="author", content=setting('author_display_name'))
         meta(name="generator", content="Motor-Blog")
 
+        // Twitter card stuff.
+        meta(name="twitter:card", content="summary")
+        meta(name="twitter:title", content=title)
+        meta(name="twitter:description", content=meta_description)
+        meta(name="twitter:creator", content="@#{ setting('twitter_handle') }")
+        meta(name="twitter:domain", content=setting('host'))
+
     body(class=body_class)
         //
             .guides

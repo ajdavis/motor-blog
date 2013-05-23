@@ -10,6 +10,7 @@ theme = 'theme'
 log_file_prefix = 'log/motor-blog.log'
 cookie_secret = 'long secret string'
 timezone = 'America/New_York'
+twitter_handle = 'myhandle'  # No @-sign
 
 # List of url, title, CSS-class triples
 nav_menu = [

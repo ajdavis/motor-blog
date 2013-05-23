@@ -29,6 +29,8 @@ def define_options(option_parser):
         "Author name to display in posts and titles"))
     option_parser.define('author_email', type=str, help=(
         "Author email to display in feed"))
+    option_parser.define('twitter_handle', type=str, help=(
+        "Author's Twitter handle (no @-sign)"))
     option_parser.define('description', type=str, help=(
         "Site description"))
     option_parser.define('google_analytics_id', type=str, help=(
