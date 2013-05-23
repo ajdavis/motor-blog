@@ -28,11 +28,11 @@ class Posts(object):
 
     @rpc
     def metaWeblog_getRecentPosts(self, blogid, user, password, num_posts):
-        self._recent(num_posts, 'post')
+        return self._recent(num_posts, 'post')
 
     @rpc
     def wp_getPages(self, blogid, user, password, num_posts):
-        self._recent(num_posts, 'page')
+        return self._recent(num_posts, 'page')
 
     @coroutine
     def _new_post(self, user, password, struct, type):
@@ -46,13 +46,13 @@ class Posts(object):
 
     @rpc
     def metaWeblog_newPost(self, blogid, user, password, struct, publish):
-        self._new_post(user, password, struct, 'post')
+        return self._new_post(user, password, struct, 'post')
 
     @rpc
     def wp_newPage(self, blogid, user, password, struct, publish):
         # As of MarsEdit 3.5.7 or so, the 'publish' parameter is wrong and
         # the post status is actually in struct['post_status']
-        self._new_post(user, password, struct, 'page')
+        return self._new_post(user, password, struct, 'page')
 
     @coroutine
     def _edit_post(self, postid, struct, post_type):
@@ -94,11 +94,11 @@ class Posts(object):
     def metaWeblog_editPost(self, postid, user, password, struct, publish):
         # As of MarsEdit 3.5.7 or so, the 'publish' parameter is wrong and
         # the post status is actually in struct['post_status']
-        self._edit_post(postid, struct, 'post')
+        return self._edit_post(postid, struct, 'post')
 
     @rpc
     def wp_editPage(self, blogid, postid, user, password, struct, publish):
-        self._edit_post(postid, struct, 'page')
+        return self._edit_post(postid, struct, 'page')
 
     @coroutine
     def _get_post(self, postid):
@@ -112,7 +112,7 @@ class Posts(object):
 
     @rpc
     def metaWeblog_getPost(self, postid, user, password):
-        self._get_post(postid)
+        return self._get_post(postid)
 
     @coroutine
     def _delete_post(self, postid):
@@ -126,8 +126,8 @@ class Posts(object):
 
     @rpc
     def blogger_deletePost(self, appkey, postid, user, password, publish):
-        self._delete_post(postid)
+        return self._delete_post(postid)
 
     @rpc
     def wp_deletePage(self, blogid, user, password, postid):
-        self._delete_post(postid)
+        return self._delete_post(postid)

@@ -1,9 +1,10 @@
 import functools
 import inspect
+import logging
 import xmlrpclib
 
 import tornadorpc
-from tornado import stack_context, gen
+from tornado import gen
 from tornado.options import options as opts
 
 
@@ -25,10 +26,18 @@ def superwraps(wrapped):
 
 
 def auth(fn):
+    """Verify an XML-RPC method is authorized.
+
+    Check the 'user' and 'password' arguments against those in conf file
+    or command line options. If unmatched, return an XML-RPC Fault, else
+    call wrapped method.
+    """
     argspec = inspect.getargspec(fn)
     assert 'user' in argspec.args
     assert 'password' in argspec.args
 
+    @superwraps(fn)
+    @gen.coroutine
     def _auth(*args, **kwargs):
         self = args[0]
         user = args[argspec.args.index('user')]
@@ -36,22 +45,37 @@ def auth(fn):
         if user != opts.user or password != opts.password:
             self.result(xmlrpclib.Fault(403, 'Bad login/pass combination.'))
         else:
-            return fn(*args, **kwargs)
+            raise gen.Return((yield fn(*args, **kwargs)))
 
-    return superwraps(fn)(_auth)
+    return _auth
 
 
-def fault(f):
-    @superwraps(f)
-    def _f(self, *args, **kwargs):
-        def fault_exception_handler(type, value, traceback):
-            self.result(xmlrpclib.Fault(500, str(value)))
-            return True  # Swallow exception
+def fault(fn):
+    """Convert exceptions thrown by coroutine to XML-RPC Faults."""
+    @superwraps(fn)
+    @gen.coroutine
+    def _fault(self, *args, **kwargs):
+        try:
+            result = yield fn(self, *args, **kwargs)
+        except Exception, e:
+            logging.exception('XML-RPC call "%s"' % fn.__name__)
+            self.result(xmlrpclib.Fault(500, str(e)))
+        else:
+            raise gen.Return(result)
 
-        with stack_context.ExceptionStackContext(fault_exception_handler):
-            f(self, *args, **kwargs)
+    return _fault
 
-    return _f
+
+def return_none(fn):
+    """Ensure a coroutine method returns None, not a Future.
+
+    tornadorpc logs a warning if an async method returns non-None.
+    """
+    @superwraps(fn)
+    def _return_none(*args, **kwargs):
+        fn(*args, **kwargs)
+
+    return _return_none
 
 
 def coroutine(f):
@@ -60,5 +84,5 @@ def coroutine(f):
 
 
 def rpc(f):
-    """Decorate a function with tornadorpc.async, auth, and fault."""
-    return tornadorpc.async(auth(fault(f)))
+    """Decorate function with tornadorpc.async, return_none, auth, fault."""
+    return tornadorpc.async(return_none(auth(fault(f))))
