@@ -112,6 +112,9 @@ class Post(BlogDocument):
             for field in struct.get('custom_fields', [])}
 
         meta_description = custom_fields.get('description', '')
+        if len(meta_description) > 155:
+            raise ValueError(
+                "Description is %d chars, max 155" % len(meta_description))
 
         if 'mt_keywords' in struct:
             tags = [
