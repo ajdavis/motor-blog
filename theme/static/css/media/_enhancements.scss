@@ -189,7 +189,7 @@
     // Remove article summaries and their "more" right-arrows
     article:after { @include hidden; }
 
-    .home-body, .category-body {
+    .home-body, .category-body, .tag-body {
         .post-summary {
             @include hidden;
         }

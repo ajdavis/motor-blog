@@ -196,7 +196,7 @@ article {
     @include hidden;
 }
 
-.home-body, .all-posts-body, .category-body, .search-body {
+.home-body, .all-posts-body, .category-body, .tag-body, .search-body {
     .post-content {
         @include hidden;
     }
