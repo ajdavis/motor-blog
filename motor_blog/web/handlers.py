@@ -93,9 +93,12 @@ def check_last_modified(get):
             Category(**doc) for doc in category_docs]
 
         post_docs = yield self.get_posts(*args, **kwargs)
-        self.posts = posts = [
-            Post(**doc) if doc else None
-            for doc in post_docs]
+        if post_docs:
+            self.posts = posts = [
+                Post(**doc) if doc else None
+                for doc in post_docs]
+        else:
+            self.posts = posts = []
 
         if posts or categories:
             mod = max(
