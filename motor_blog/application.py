@@ -12,9 +12,9 @@ from motor_blog.web.handlers import *
 from motor_blog.web.admin import *
 
 
-def get_application(root_dir, db, opts):
-    base_url = opts.base_url
-    static_path = os.path.join(opts.theme, 'static')
+def get_application(root_dir, db, option_parser):
+    base_url = option_parser.base_url
+    static_path = os.path.join(option_parser.theme, 'static')
     admin_static_path = os.path.join(root_dir, 'motor_blog/web/admin-static')
     U = get_url_spec(base_url)
 
@@ -67,8 +67,8 @@ def get_application(root_dir, db, opts):
         U(r"(?P<slug>.+)/?", PostHandler, name='post'),
         U(r"/?", HomeHandler, name='home')],
         db=db,
-        template_path=os.path.join(opts.theme, 'templates'),
-        tz=pytz.timezone(opts.timezone),
+        template_path=os.path.join(option_parser.theme, 'templates'),
+        tz=pytz.timezone(option_parser.timezone),
         gzip=True,
-        **{k: v.value() for k, v in opts._options.items()}
+        **{k: v.value() for k, v in option_parser._options.items()}
     )

@@ -49,7 +49,7 @@ Set your PYTHONPATH to include PyMongo and Motor:
 
 Copy motor\_blog.conf.example to motor\_blog.conf, edit it as desired. Start the application:
 
-    python server.py --debug
+    python server.py --debug --conf=motor\_blog.conf
 
 Visit http://localhost:8888/blog
 

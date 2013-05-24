@@ -5,7 +5,6 @@ from dictshield.document import Document, EmbeddedDocument
 from dictshield.fields import StringField, IntField, DateTimeField
 from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
 from dictshield.fields.mongo import ObjectIdField
-from tornado.options import options as opts
 
 from motor_blog.text.link import absolute
 
