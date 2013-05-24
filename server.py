@@ -4,6 +4,7 @@ import os
 import sys
 
 import pytz
+import motor
 import tornado.ioloop
 import tornado.web
 import tornado.options
@@ -15,18 +16,6 @@ from tornado import template
 from pyjade.ext.tornado import patch_tornado
 patch_tornado()
 
-try:
-    import motor
-except ImportError:
-    print >> sys.stderr, (
-        "Can't import motor.\n\n"
-        " Motor is an experimental async driver for"
-        " MongoDB, get it by cloning\n"
-        " git://github.com/mongodb/motor.git \n"
-        " then put the mongo-python-driver directory"
-        " on your PYTHONPATH\n\n")
-
-    raise
 
 from motor.web import GridFSHandler
 
