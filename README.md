@@ -7,7 +7,7 @@ Blog platform based on Tornado, MongoDB, and Motor. To be used with MarsEdit.
 * [MongoDB](http://www.mongodb.org/downloads)
 * Python 2.7
 * [Tornado](http://www.tornadoweb.org/)
-* [Motor](http://emptysquare.net/motor/), my experimental asynchronous MongoDB driver for Tornado
+* [Motor](http://motor.readthedocs.org/)
 * [Greenlet](http://pypi.python.org/pypi/greenlet)
 * Other packages in `requirements.txt`
 
@@ -43,9 +43,6 @@ Start MongoDB
     mkdir data
     mongod --dbpath data --logpath data/mongod.log --fork
 
-Set your PYTHONPATH to include PyMongo and Motor:
-
-    export PYTHONPATH=/path/to/mongo-python-driver
 
 Copy motor\_blog.conf.example to motor\_blog.conf, edit it as desired. Start the application:
 
