@@ -10,3 +10,4 @@ beautifulsoup4
 requests
 PIL
 pyjade
+mock
