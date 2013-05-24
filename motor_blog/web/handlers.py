@@ -9,7 +9,6 @@ import time
 import tornado.web
 from tornado import gen
 from tornado.options import options as opts
-import motor
 from werkzeug.contrib.atom import AtomFeed
 
 from motor_blog.models import Post, Category
