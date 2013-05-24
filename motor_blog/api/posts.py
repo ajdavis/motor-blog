@@ -3,7 +3,6 @@
 import datetime
 import xmlrpclib
 
-import motor
 from tornado import gen
 from bson.objectid import ObjectId
 

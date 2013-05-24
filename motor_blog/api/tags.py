@@ -1,5 +1,3 @@
-import motor
-
 from motor_blog.api import coroutine, rpc
 
 
