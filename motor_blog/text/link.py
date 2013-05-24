@@ -1,14 +1,10 @@
 import os
-import urllib2
 
 from tornado.options import options as opts
 
 
 def media_link(year, month, filename):
-    # We override quote()'s list of safe chars, replacing '/' with '@'. This is
-    # good because a filename like 'off/on' is normalized as 'off%2fon', while
-    # a retina image like 'image@2x.jpg' is left as-is.
-    return '%04d/%02d/%s' % (year, month, urllib2.quote(filename, safe='@'))
+    return '%04d/%02d/%s' % (year, month, filename)
 
 
 def absolute(relative):

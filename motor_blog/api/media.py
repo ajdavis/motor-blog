@@ -52,9 +52,9 @@ class Media(object):
 
         # This is the tail end of the URL, like 2012/06/foo.png.
         now = datetime.datetime.utcnow()
-        mlink = media_link(now.year, now.month, name)
+        fullname = media_link(now.year, now.month, name)
         gridin = yield fs.new_file(
-            filename=mlink,
+            filename=fullname,
             content_type=content_type,
             # GridFS stores any metadata we want
             width=width,
@@ -62,4 +62,6 @@ class Media(object):
 
         yield gridin.write(resized_content)
         yield gridin.close()
-        raise gen.Return((mlink, width, height))
+        raise gen.Return((
+            self.application.reverse_url('media', fullname),
+            width, height))
