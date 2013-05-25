@@ -106,11 +106,7 @@ class Post(BlogDocument):
         """
         title = struct.get('title', '')
 
-        custom_fields = {
-            field['key']: field['value']
-            for field in struct.get('custom_fields', [])}
-
-        meta_description = custom_fields.get('description', '')
+        meta_description = struct.get('mt_excerpt', '')
         if len(meta_description) > 155:
             raise ValueError(
                 "Description is %d chars, max 155" % len(meta_description))
@@ -189,6 +185,7 @@ class Post(BlogDocument):
             'id': str(self.id),
             'status': self.status,
             'wp_slug': self.slug,
+            'mt_excerpt': self.meta_description,
         }
 
         if self.type == 'post':

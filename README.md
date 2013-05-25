@@ -65,13 +65,11 @@ In the "General" tab of your blog's settings, I suggest setting "Download the 10
 since Motor-Blog can handle it.
 Under "Editing," set Preview Text Filter to "Markdown",
 and Image Size "Defaults To Full Size".
-Under "Custom Fields," add a "description" field. This lets you set the
-meta-description field for each post, which search engines show as the excerpt:
 
-![MarsEdit custom field setup](https://raw.github.com/ajdavis/motor-blog/master/docs/_static/marsedit-description-custom-field.png)
-
-When you're editing a post, do "View -> Slug Field" to set a custom slug as the final
-part of the post's URL.
+When you're editing a post, do "View -> Excerpt" to edit the post's meta-description.
+This text appears in Google results as a snippet, or when sharing a link to the post on Facebook.
+Motor-Blog refuses the post if the meta-description field is over 155 characters.
+Do "View -> Slug Field" to set a custom slug as the final part of the post's URL.
 If you leave the slug empty, Motor-Blog slugifies the title.
 
 # Blogging

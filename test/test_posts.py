@@ -18,12 +18,10 @@ class PostsTest(test.MotorBlogTest):
                 {
                     'mt_keywords': 'a tag,another tag',
                     'post_status': 'publish',
-                    'custom_fields': [
-                        {'key': 'description', 'value': 'the description'}],
+                    'mt_excerpt': 'the description',
                     'title': 'the title',
                     'description': 'the body'},
                 True))
-
 
         post = self.fetch_rpc(
             'metaWeblog.getPost',
@@ -41,4 +39,5 @@ class PostsTest(test.MotorBlogTest):
         self.assertEqual('a tag,another tag', post['mt_keywords'])
         self.assertEqual('publish', post['status'])
         self.assertEqual('the title', post['title'])
+        self.assertEqual('the description', post['mt_excerpt'])
         self.assertEqual('the body', post['description'])  # Confusing I know.
