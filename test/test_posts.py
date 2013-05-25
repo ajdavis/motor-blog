@@ -1,4 +1,4 @@
-import time
+import datetime
 
 from tornado.options import options as tornado_options
 
@@ -8,7 +8,7 @@ import test  # Motor-Blog project's test/__init__.py.
 
 class PostsTest(test.MotorBlogTest):
     def test_new_post(self):
-        start = time.time()
+        start = datetime.datetime.utcnow()
         post_id = self.fetch_rpc(
             'metaWeblog.newPost',
             (
@@ -22,6 +22,8 @@ class PostsTest(test.MotorBlogTest):
                     'title': 'the title',
                     'description': 'the body'},
                 True))
+
+        end = datetime.datetime.utcnow()
 
         post = self.fetch_rpc(
             'metaWeblog.getPost',
@@ -41,3 +43,7 @@ class PostsTest(test.MotorBlogTest):
         self.assertEqual('the title', post['title'])
         self.assertEqual('the description', post['mt_excerpt'])
         self.assertEqual('the body', post['description'])  # Confusing I know.
+        self.assertTrue(
+            start <= post['date_created_gmt'] <= end,
+            "Post's date_created_gmt %s isn't between %s and %s" % (
+                post['date_created_gmt'], start, end))
