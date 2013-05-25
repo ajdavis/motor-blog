@@ -1,6 +1,7 @@
 import xmlrpclib
 import mock
 import motor
+import pymongo.mongo_client
 
 from motor_blog import application
 from motor_blog.options import define_options
@@ -20,7 +21,17 @@ define_options(tornado_options)
 
 class MotorBlogTest(AsyncHTTPTestCase):
     def setUp(self):
-        # TODO: clear database between tests.
+        self.database_name = 'test_motorblog'
+        sync_client = pymongo.mongo_client.MongoClient()
+        sync_db = sync_client[self.database_name]
+        for collection_name in [
+                'events',
+                'fs.chunks',
+                'fs.files',
+                'posts',
+                'categories']:
+            sync_db.drop_collection(collection_name)
+
         self.patchers = []
         patcher = mock.patch.multiple(
             tornado_options.mockable(),
@@ -52,7 +63,7 @@ class MotorBlogTest(AsyncHTTPTestCase):
 
     def get_db(self):
         client = motor.MotorClient(io_loop=self.io_loop).open_sync()
-        return client.test_motorblog
+        return client[self.database_name]
 
     def get_app(self):
         # At the point Tornado
