@@ -9,6 +9,11 @@ import tornado.web
 from tornado.options import options as tornado_options
 from tornado.testing import AsyncHTTPTestCase
 
+# Patch Tornado with the Jade template loader
+from tornado import template
+from pyjade.ext.tornado import patch_tornado
+patch_tornado()
+
 sample_html = """
 <h1>bar</h1>
 <p>baz
