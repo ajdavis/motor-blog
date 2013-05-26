@@ -9,5 +9,5 @@ cMarkdown
 beautifulsoup4
 requests
 PIL
-pyjade
+git+git://github.com/SyrusAkbary/pyjade.git@a4db664b
 mock
