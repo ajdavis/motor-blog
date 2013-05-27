@@ -107,6 +107,7 @@ queries to display them on retina devices.
 
 * Set your theme directory in `motor_blog.conf`.
 * The theme directory should contain a `templates` subdir with the same set of filenames as the example theme.
+  Tornado templates or Jade templates are both supported.
 * Follow the example theme for inspiration.
 * The `setting()` function is available to all templates, and gives access to values in `motor_blog.conf`.
 
@@ -132,5 +133,5 @@ queries to display them on retina devices.
         * migrate\_media\_to\_gridfs.py: Tool to migrate media from a single
           document per image in the "media" collection to GridFS.
     * cache.py: Cache results from MongoDB, invalidate when events are emitted
-    * indexes.py: Index definitions for server.py --ensure_indexes
+    * indexes.py: Index definitions for `server.py --ensure_indexes`
     * options.py: Configuration parsing
