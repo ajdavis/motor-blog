@@ -52,8 +52,10 @@ html(lang="en")
                 block content
 
         script(type="text/javascript")
+            var pixelRatio = (window.devicePixelRatio >= 1.5) ? "high" : "normal";
             var _gaq = _gaq || [];
             _gaq.push(['_setAccount','#{ setting("google_analytics_id") }']);
+            _gaq.push(['_setCustomVar', 1, 'Pixel Ratio', pixelRatio, 2 ]);
             _gaq.push(['_trackPageview'],['_trackPageLoadTime']);
             (function() {
                 var ga = document.createElement('script');
