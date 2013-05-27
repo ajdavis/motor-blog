@@ -22,17 +22,12 @@ class Media(object):
         content = struct['bits'].data  # xmlrpclib created a 'Binary' object
         content_type = struct['type']
 
-        if image.is_retina_filename(name):
-            # Store a HiDPI version and a half-sized regular version.
-            _, width, height = yield self.store_image(
-                name, content, content_type, opts.maxwidth * 2)
-
-            regular_name = image.regular_from_retina(name)
-            mlink, _, _ = yield self.store_image(
-                regular_name, content, content_type, width / 2)
-        else:
-            mlink, _, _ = yield self.store_image(
-                name, content, content_type, opts.maxwidth)
+        # opts.maxwidth should be set to twice the maximum width of your
+        # theme's layout. In the default theme the responsive layout is a
+        # maximum of roughly 600px wide. The image maxwidth is 1200px, so it
+        # will look nice on all displays, including retina.
+        mlink, _, _ = yield self.store_image(
+            name, content, content_type, opts.maxwidth)
 
         full_link = absolute(
             os.path.join(opts.base_url, 'media', mlink))

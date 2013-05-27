@@ -1,17 +1,6 @@
-import os
 from cStringIO import StringIO
 
 from PIL import Image
-
-
-def is_retina_filename(filename):
-    base, extension = os.path.splitext(filename)
-    return base.endswith('@2x')
-
-
-def regular_from_retina(filename):
-    base, extension = os.path.splitext(filename)
-    return base.rsplit('@2x', 1)[0] + extension
 
 
 def resized(data, maxwidth):

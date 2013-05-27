@@ -21,8 +21,6 @@ Blog platform based on Tornado, MongoDB, and Motor. To be used with MarsEdit.
 * Comments: Motor-Blog does not support comments natively, I recommend a
   third-party Javascript comments API like [Disqus](http://disqus.com).
 
-* Retina Ready: See [image-handling](#image-handling) below.
-
 * Customization: Appearance is completely customizable.
 
 # Installation
@@ -90,19 +88,21 @@ console sessions.
 
 Motor-Blog tries to show images beautifully on every device.
 
-When you upload an image, Motor-Blog resizes the image to 600px wide and centers it.
+Using MarsEdit, add images your blog posts at full resolution.
+When you upload an image, Motor-Blog resizes the image to 1200px wide and centers it.
+(Images less than 1200px wide are not resized.)
+The assumption is that your theme's columns are a maximum of 600px,
+so all visitors including those with retina displays will see high-resolution images.
 If your theme has columns of some width other than 600px, override `maxwidth`
 in `motor_blog.conf`.
 Motor-Blog strips the `width` and `height` attributes from
-`\<img\>` tags so images can be resized responsively on mobile screens.
+`\<img\>` tags so images can be resized responsively.
+The default theme enables responsive resizing with this CSS rule:
 
-## Retina display support
+    `img { max-width: 100%; }
 
-To support visitors with Retina displays, upload your images at double resolution and named like
-`<filename>@2x.<extension>`, for example `image@2x.jpg`.
-Motor-Blog replaces such images with regular images but stores the retina image for later.
-The default theme includes `retina.js`, which replaces regular images with double-res
-images on retina devices.
+The default theme includes double-resolution background images and media
+queries to display them on retina devices.
 
 # Customization
 

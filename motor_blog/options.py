@@ -65,8 +65,8 @@ def define_options(option_parser):
         'timezone', type=str, default='America/New_York',
         help="Your timezone name", group='Appearance')
     option_parser.define(
-        'maxwidth', type=int, default=600,
-        help="Maximum width of images for non-retina displays",
+        'maxwidth', type=int, default=1200,
+        help="Maximum width of images",
         group='Appearance')
 
     option_parser.add_parse_callback(
