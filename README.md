@@ -4,8 +4,8 @@ Blog platform based on Tornado, MongoDB, and Motor. To be used with MarsEdit.
 
 # Prequisites
 
-* [MongoDB](http://www.mongodb.org/downloads)
 * Python 2.7
+* [MongoDB](http://www.mongodb.org/downloads) 2.4 or later
 * [Tornado](http://www.tornadoweb.org/)
 * [Motor](http://motor.readthedocs.org/)
 * [Greenlet](http://pypi.python.org/pypi/greenlet)
@@ -39,8 +39,7 @@ Blog platform based on Tornado, MongoDB, and Motor. To be used with MarsEdit.
 Start MongoDB
 
     mkdir data
-    mongod --dbpath data --logpath data/mongod.log --fork
-
+    mongod --dbpath data --logpath data/mongod.log --fork --setParameter textSearchEnabled=true
 
 Copy motor\_blog.conf.example to motor\_blog.conf, edit it as desired. Start the application:
 
