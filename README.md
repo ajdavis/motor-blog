@@ -4,8 +4,8 @@ Blog platform based on Tornado, MongoDB, and Motor. To be used with MarsEdit.
 
 # Prequisites
 
-* Python 2.7
 * [MongoDB](http://www.mongodb.org/downloads) 2.4 or later
+* CPython 2.7
 * [Tornado](http://www.tornadoweb.org/)
 * [Motor](http://motor.readthedocs.org/)
 * [Greenlet](http://pypi.python.org/pypi/greenlet)
