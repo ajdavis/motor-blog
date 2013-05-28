@@ -11,11 +11,10 @@ upstream motor_blog {
 }
 
 proxy_next_upstream off;
-server {
 
+server {
     listen 80;
     # listen 443 default ssl;                                                                                                                                                                             
-    # server_name emptysquare.net;                                                                                                                                                                        
 
     location /blog/theme/static {
         alias /home/emptysquare/.virtualenvs/motor_blog/motor-blog/theme/static;
@@ -34,5 +33,10 @@ server {
         proxy_set_header X-Scheme $scheme;
         proxy_set_header Host $http_host;
         proxy_pass http://motor_blog;
+        client_max_body_size 10m;  # Big image uploads ok.
+    }
+
+    location = / {
+        rewrite /? /blog/ permanent;  # If you have no home page.
     }
 }
