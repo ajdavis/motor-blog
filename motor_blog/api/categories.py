@@ -1,3 +1,4 @@
+import datetime
 import xmlrpclib
 
 from bson.objectid import ObjectId
@@ -70,7 +71,10 @@ class Categories(object):
 
         result = yield self.settings['db'].posts.update(
             {'_id': ObjectId(postid)},
-            {'$set': {'categories': embedded_cats}})
+            {'$set': {
+                'categories': embedded_cats,
+                'mod': datetime.datetime.utcnow(),
+            }})
 
         if result['n'] != 1:
             self.result(xmlrpclib.Fault(404, 'Not found'))
