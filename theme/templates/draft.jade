@@ -1,0 +1,58 @@
+extends single
+
+block extrahead
+    script(
+        src='http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js',
+        type='text/javascript')
+
+    script(
+        src='http://cdn.sockjs.org/sockjs-0.3.min.js',
+        type='text/javascript')
+
+    script(type='text/javascript')
+        $(function() {
+            // Substituted by template.
+            var post_id = "#{ post.id }",
+                mod = "#{ post.last_modified }";
+
+            var conn = null;
+
+            function log(msg) {
+                console.log(msg);
+            }
+
+            function connect() {
+                disconnect();
+                conn = new SockJS('http://' + window.location.host + '/blog/sock_js');
+
+                log('Connecting...');
+
+                conn.onopen = function() {
+                    log('Connected, sending last-modified.');
+                    conn.send(JSON.stringify({
+                        post_id: post_id,
+                        mod: mod
+                    }));
+                };
+
+                conn.onmessage = function(e) {
+                    log('Received: ' + e.data);
+                    location.reload();
+                };
+
+                conn.onclose = function() {
+                    log('Disconnected.');
+                    conn = null;
+                };
+            }
+
+            function disconnect() {
+                if (conn != null) {
+                    log('Disconnecting...');
+                    conn.close();
+                    conn = null;
+                }
+            }
+
+            connect();
+        });

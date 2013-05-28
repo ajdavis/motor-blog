@@ -1,6 +1,7 @@
 import os
 import pytz
 
+import sockjs.tornado
 import tornado.web
 from motor.web import GridFSHandler
 from tornado.web import StaticFileHandler
@@ -17,8 +18,10 @@ def get_application(root_dir, db, option_parser):
     static_path = os.path.join(option_parser.theme, 'static')
     admin_static_path = os.path.join(root_dir, 'motor_blog/web/admin-static')
     U = get_url_spec(base_url)
+    sock_js_router = sockjs.tornado.SockJSRouter(
+        DraftReloadConnection, '/blog/sock_js')
 
-    return tornado.web.Application([
+    urls = ([
         # XML-RPC API
         U(r"/rsd", RSDHandler, name='rsd'),
         U(r"/api", APIHandler, name='api'),
@@ -62,10 +65,14 @@ def get_application(root_dir, db, option_parser):
             TagHandler, name='tag-page'),
         U(r"tag/(?P<tag>.+)/?", TagHandler, name='tag'),
         U(r"search/", SearchHandler, name='search'),
+        U(r"/?", HomeHandler, name='home'),
+    ] + sock_js_router.urls + [
+        # PostHandler must be last because slug could be anything.
+        U(r"/(?P<slug>.+)/?", PostHandler, name='post'),
+    ])
 
-        # PostHandler's URL pattern must be last because slug could be anything
-        U(r"(?P<slug>.+)/?", PostHandler, name='post'),
-        U(r"/?", HomeHandler, name='home')],
+    return tornado.web.Application(
+        urls,
         db=db,
         template_path=os.path.join(option_parser.theme, 'templates'),
         tz=pytz.timezone(option_parser.timezone),
