@@ -52,6 +52,8 @@ Visit http://localhost:8888/blog
 I run Motor-Blog on http://emptysquare.net/blog with Nginx at the front and four `server.py` processes.
 Those processes and MongoDB are managed by [Supervisor](http://supervisord.org/).
 I've provided example config files in this repository in `etc/`.
+If you have an Nginx version with WebSocket support (1.3.13 or later)
+then draft posts will autoreload when you update them from MarsEdit.
 
 # MarsEdit setup
 
