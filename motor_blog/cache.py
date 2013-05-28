@@ -45,7 +45,10 @@ def create_events_collection(db):
 
 
 def on(event_name, callback):
-    """Register for event notification"""
+    """Register for event notification.
+
+    If `event_name` is None, callback is run for all events.
+    """
     _callbacks.setdefault(event_name, set()).add(callback)
 
 
@@ -165,8 +168,11 @@ def startup(db):
 
 
 def _on_event(event):
+    # Get callbacks for this event, and those registered with event_name None.
     # Copy, since callbacks themselves may add / remove callbacks.
-    callbacks = copy.copy(_callbacks.get(event['name'], []))
+    callbacks = copy.copy(_callbacks.get(event['name'], set()))
+    callbacks.update(_callbacks.get(None, set()))
+
     for callback in callbacks:
         try:
             callback(event)
