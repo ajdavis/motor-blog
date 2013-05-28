@@ -6,6 +6,7 @@ import xmlrpclib
 from tornado import gen
 from bson.objectid import ObjectId
 
+from motor_blog import cache
 from motor_blog.api import coroutine, rpc
 from motor_blog.models import Post
 
@@ -42,6 +43,7 @@ class Posts(object):
         _id = yield self.settings['db'].posts.insert(new_post.to_python())
 
         self.result(str(_id))
+        cache.event('post_created')
 
     @rpc
     def metaWeblog_newPost(self, blogid, user, password, struct, publish):
@@ -88,6 +90,7 @@ class Posts(object):
 
                 # Done
                 self.result(True)
+                cache.event('post_changed')
 
     @rpc
     def metaWeblog_editPost(self, postid, user, password, struct, publish):
@@ -122,6 +125,7 @@ class Posts(object):
             self.result(xmlrpclib.Fault(404, "Not found"))
         else:
             self.result(True)
+            cache.event('post_deleted')
 
     @rpc
     def blogger_deletePost(self, appkey, postid, user, password, publish):

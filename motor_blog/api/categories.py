@@ -80,3 +80,4 @@ class Categories(object):
             self.result(xmlrpclib.Fault(404, 'Not found'))
         else:
             self.result('')
+            cache.event('post_changed')
