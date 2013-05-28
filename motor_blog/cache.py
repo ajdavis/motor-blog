@@ -10,7 +10,6 @@ import datetime
 
 from tornado import gen
 
-import motor
 import pymongo.errors
 from tornado.concurrent import Future
 from tornado.ioloop import IOLoop
