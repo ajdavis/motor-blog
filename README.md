@@ -71,6 +71,26 @@ Motor-Blog refuses the post if the meta-description field is over 155 characters
 Do "View -> Slug Field" to set a custom slug as the final part of the post's URL.
 If you leave the slug empty, Motor-Blog slugifies the title.
 
+Finally, you may prefer that your images' title text is set to the same value as their alt-text,
+since browsers display image titles as tooltips.
+MarsEdit's default is to set image titles to the images' filenames, but you can override this.
+Open the MarsEdit Media Manager and select an image.
+In the Media Manager's lower-right corner is a "Style" chooser,
+with the option "Customize...":
+
+![Alt text](https://raw.github.com/ajdavis/motor-blog/516f72707419fb04b1412f138bbb1d25a16cbf06/doc/_static/media-manager-style.png)
+
+Choose this and create a new image style with "opening markup" like this:
+
+    <img
+        style="display:block; margin-left:auto; margin-right:auto;"
+        src="#fileurl#"
+        alt="#alttext#"
+        title="#alttext#" />
+
+Note that width and height are unnecessary since
+[Motor-Blog will strip them anyway](#image-handling).
+
 # Blogging
 
 Motor-Blog supports the same Markdown dialect as [cMarkdown](https://github.com/paulsmith/cMarkdown) with
