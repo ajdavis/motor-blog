@@ -84,7 +84,6 @@ class MotorBlogHandler(tornado.web.RequestHandler):
 # TODO: ample documentation, refactor
 def check_last_modified(get):
     @functools.wraps(get)
-    @tornado.web.asynchronous
     @gen.coroutine
     def _get(self, *args, **kwargs):
         category_docs = yield self.get_categories()
@@ -398,7 +397,6 @@ class TagHandler(MotorBlogHandler):
 
 
 class SearchHandler(MotorBlogHandler):
-    @tornado.web.asynchronous
     @gen.coroutine
     def get(self):
         # TODO: refactor with check_last_modified(), this is gross

@@ -66,7 +66,6 @@ class LogoutHandler(MotorBlogAdminHandler):
 
 class DraftsHandler(MotorBlogAdminHandler):
     """Show list of draft posts."""
-    @tornado.web.asynchronous
     @gen.coroutine
     @tornado.web.addslash
     @tornado.web.authenticated
@@ -93,7 +92,6 @@ class AddDraftGuestAccessTokenHandler(MotorBlogAdminHandler):
     ...and share this URL with guests. The token is named so the administrator
     can remember with whom she shared the token ("Joe").
     """
-    @tornado.web.asynchronous
     @gen.coroutine
     def post(self):
         if not self.current_user:
@@ -120,7 +118,6 @@ class AddDraftGuestAccessTokenHandler(MotorBlogAdminHandler):
 
 class DeleteDraftGuestAccessTokenHandler(MotorBlogAdminHandler):
     """Revoke a guest-access URL to a draft."""
-    @tornado.web.asynchronous
     @gen.coroutine
     def post(self):
         if not self.current_user:
@@ -144,7 +141,6 @@ class DeleteDraftGuestAccessTokenHandler(MotorBlogAdminHandler):
 
 class CategoriesAdminHandler(MotorBlogAdminHandler):
     """Show a single draft post or page."""
-    @tornado.web.asynchronous
     @gen.coroutine
     @tornado.web.addslash
     @tornado.web.authenticated
@@ -155,7 +151,6 @@ class CategoriesAdminHandler(MotorBlogAdminHandler):
 
 
 class DeleteCategoryHandler(MotorBlogAdminHandler):
-    @tornado.web.asynchronous
     @gen.coroutine
     def post(self):
         if not self.current_user:
@@ -184,7 +179,6 @@ class DeleteCategoryHandler(MotorBlogAdminHandler):
 
 class DraftHandler(MotorBlogHandler):
     """Show a single draft post or page."""
-    @tornado.web.asynchronous
     @gen.coroutine
     @tornado.web.addslash
     def get(self, slug):
@@ -279,7 +273,6 @@ class DraftReloadConnection(sockjs.tornado.SockJSConnection):
 
 class MediaPageHandler(MotorBlogAdminHandler):
     """Show list of media assets like images."""
-    @tornado.web.asynchronous
     @gen.coroutine
     @tornado.web.addslash
     @tornado.web.authenticated
@@ -296,7 +289,6 @@ class MediaPageHandler(MotorBlogAdminHandler):
 
 
 class DeleteMediaHandler(MotorBlogAdminHandler):
-    @tornado.web.asynchronous
     @gen.coroutine
     def post(self):
         if not self.current_user:
