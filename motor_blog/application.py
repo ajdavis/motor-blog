@@ -37,7 +37,16 @@ def get_application(root_dir, db, option_parser):
             DeleteCategoryHandler, name='delete-category'),
 
         U(r"admin/drafts/?", DraftsHandler, name='drafts'),
+        U(
+            r"admin/drafts/add-guest-access-token",
+            AddDraftGuestAccessTokenHandler, name='add-guest-access-token'),
+
+        U(
+            r"admin/drafts/delete-guest-access-token",
+            DeleteDraftGuestAccessTokenHandler, name='delete-guest-access-token'),
+
         U(r"admin/draft/(?P<slug>.+)/?", DraftHandler, name='draft'),
+
         U(r"admin/media/?", MediaPageHandler, name='media-page'),
         U(r"admin/media/delete", DeleteMediaHandler, name='delete-media'),
         U(

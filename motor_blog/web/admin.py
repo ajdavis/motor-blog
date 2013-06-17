@@ -9,13 +9,15 @@ import sockjs.tornado
 import motor
 
 from motor_blog import cache
-from motor_blog.models import Post, Category
+from motor_blog.models import Post, Category, GuestAccessToken
 from motor_blog.web.handlers import MotorBlogHandler
 
 __all__ = (
     'LoginHandler', 'LogoutHandler',
     'CategoriesAdminHandler', 'DeleteCategoryHandler',
-    'DraftsHandler', 'DraftHandler', 'DraftReloadConnection',
+    'DraftsHandler', 'DraftHandler',
+    'AddDraftGuestAccessTokenHandler', 'DeleteDraftGuestAccessTokenHandler',
+    'DraftReloadConnection',
     'MediaPageHandler', 'DeleteMediaHandler',
 )
 
@@ -80,6 +82,66 @@ class DraftsHandler(MotorBlogAdminHandler):
         self.render('admin-templates/drafts.html', drafts=drafts)
 
 
+class AddDraftGuestAccessTokenHandler(MotorBlogAdminHandler):
+    """Let the administrator create a new guest-access URL to a draft.
+
+    Unpublished drafts are by default visible only to the administrator, but
+    she can create a secret URL like:
+
+    http://emptysqua.re/blog/admin/draft/my-post-slug?guest-access-token=TOKEN
+
+    ...and share this URL with guests. The token is named so the administrator
+    can remember with whom she shared the token ("Joe").
+    """
+    @tornado.web.asynchronous
+    @gen.coroutine
+    def post(self):
+        if not self.current_user:
+            raise tornado.web.HTTPError(401)
+
+        slug = self.get_argument('slug')
+        name = self.get_argument('name')
+        guest_access_token = GuestAccessToken(name=name)
+        db = self.settings['db']
+
+        result = yield db.posts.update({
+            'slug': slug,
+        }, {
+            '$push': {
+                'guest_access_tokens': guest_access_token.to_python()
+            }
+        })
+
+        if result.get('n') != 1:
+            raise tornado.web.HTTPError(404)
+
+        self.redirect(self.reverse_url('drafts'))
+
+
+class DeleteDraftGuestAccessTokenHandler(MotorBlogAdminHandler):
+    """Revoke a guest-access URL to a draft."""
+    @tornado.web.asynchronous
+    @gen.coroutine
+    def post(self):
+        if not self.current_user:
+            raise tornado.web.HTTPError(401)
+
+        slug = self.get_argument('slug')
+        token = ObjectId(self.get_argument('token'))
+        db = self.settings['db']
+
+        result = yield db.posts.update({
+            'slug': slug,
+        }, {
+            '$pull': {'guest_access_tokens': {'token': token}}
+        })
+
+        if result.get('n') != 1:
+            raise tornado.web.HTTPError(404)
+
+        self.redirect(self.reverse_url('drafts'))
+
+
 class CategoriesAdminHandler(MotorBlogAdminHandler):
     """Show a single draft post or page."""
     @tornado.web.asynchronous
@@ -125,9 +187,9 @@ class DraftHandler(MotorBlogHandler):
     @tornado.web.asynchronous
     @gen.coroutine
     @tornado.web.addslash
-    @tornado.web.authenticated
     def get(self, slug):
         slug = slug.rstrip('/')
+        guest_access_token = self.get_argument('guest-access-token', None)
         postdoc = yield self.settings['db'].posts.find_one(
             {'slug': slug},
             {'summary': False, 'original': False})
@@ -136,6 +198,14 @@ class DraftHandler(MotorBlogHandler):
             raise tornado.web.HTTPError(404)
 
         post = Post(**postdoc)
+
+        # If an access token is provided, it must be valid. Otherwise,
+        # administrator must be logged in.
+        if guest_access_token:
+            if not post.has_guest_access_token(ObjectId(guest_access_token)):
+                raise tornado.web.HTTPError(401)
+        elif not self.current_user:
+            raise tornado.web.HTTPError(401)
 
         if post.status == 'publish':
             # Not a draft any more

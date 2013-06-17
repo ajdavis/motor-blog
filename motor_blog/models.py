@@ -3,7 +3,7 @@ import datetime
 from bson.objectid import ObjectId
 from dictshield.document import Document, EmbeddedDocument
 from dictshield.fields import StringField, IntField, DateTimeField
-from dictshield.fields.compound import SortedListField, EmbeddedDocumentField
+from dictshield.fields.compound import SortedListField, EmbeddedDocumentField, ListField
 from dictshield.fields.mongo import ObjectIdField
 
 from motor_blog.text.link import absolute
@@ -66,6 +66,12 @@ class EmbeddedCategory(Category, EmbeddedDocument):
     pass
 
 
+class GuestAccessToken(EmbeddedDocument):
+    """One who knows the guest access token can see the unpublished draft."""
+    name = StringField()
+    token = ObjectIdField(auto_fill=True)
+
+
 class Post(BlogDocument):
     """A post or a page"""
     title = StringField(default='')
@@ -85,6 +91,7 @@ class Post(BlogDocument):
     tags = SortedListField(StringField())
     categories = SortedListField(EmbeddedDocumentField(EmbeddedCategory))
     slug = StringField(default='')
+    guest_access_tokens = ListField(EmbeddedDocumentField(GuestAccessToken))
     wordpress_id = IntField()  # legacy id from WordPress
     pub_date = DateTimeField()
     mod = DateTimeField()
@@ -240,3 +247,12 @@ class Post(BlogDocument):
     @property
     def display_summary(self):
         return self.meta_description if self.meta_description else self.summary
+
+    def has_guest_access_token(self, token):
+        """Is the given ObjectId a valid access token?"""
+        assert isinstance(token, ObjectId)
+        for token_object in self.guest_access_tokens:
+            if token_object.token == token:
+                return True
+
+        return False

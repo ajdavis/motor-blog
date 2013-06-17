@@ -2,13 +2,88 @@
 
 {% block title %}{{ setting('blog_name') }} - Drafts{% end %}
 
+{% block extra-head %}
+    <style>
+
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            /* Disable "add" buttons if "name" not entered. */
+            $('.guest-access-token-form').each(function() {
+                var $form = $(this),
+                    $submit = $('.guest-access-token-submit', $form);
+
+                $('.guest-access-token-name-input', $form).keyup(function() {
+                    if ($(this).val()) {
+                        $submit.removeAttr('disabled');
+                    } else {
+                        $submit.attr('disabled', '');
+                    }
+                });
+            });
+
+            /* Confirm before revoking. */
+            $('.guest-url-delete-form').submit(function() {
+                return confirm("Really revoke access?");
+            });
+        });
+    </script>
+{% end %}
+
 {% block content %}
     {% if drafts %}
         {% for post in drafts %}
             {# TODO: refactor w/ all-posts #}
             <h1><a class="title" href="{{ reverse_url('draft', post.slug) }}">{% raw post.title %}</a></h1>
-            <p><span class="date">{{ post.local_long_date(handler.application) }}</span></p>
-            <p><span class="excerpt">{% raw post.display_summary %}</span></p>
+            <p><span class="draft-date">{{ post.local_long_date(handler.application) }}</span></p>
+            <p><span class="draft-excerpt">{% raw post.display_summary %}</span></p>
+            <h4>Guest Access URLs:</h4>
+            <p class="guest-access-token-info">
+                Grant guests access to view this draft.
+                You can create multiple access URLs and revoke them at any time.
+                Give them memorable names so you know which one to revoke.
+            </p>
+            <ul>
+                {% for token in post.guest_access_tokens %}
+                    <li>
+                        {% set guest_access_url = '%s?guest-access-url=%s' % (
+                            reverse_url('draft', post.slug),
+                            token.token)
+                        %}
+                        <strong>{{ token.name }}</strong>:
+                        {{ guest_access_url }}
+                        <form class="inline-block-form guest-url-view-form"
+                              action="{{ reverse_url('draft', post.slug) }}"
+                              method="get"
+                              target="_blank">
+                            <input type="hidden" name="guest-access-token" value="{{ token.token }}">
+                            <input type="submit" value="View">
+                        </form>
+                        <form class="inline-block-form guest-url-delete-form"
+                              action="{{ reverse_url('delete-guest-access-token') }}"
+                              method="post">
+                            <input type="hidden" name="slug" value="{{ post.slug }}">
+                            <input type="hidden" name="token" value="{{ token.token }}">
+                            <input type="submit" value="Revoke">
+                        </form>
+                    </li>
+                {% end %}
+            </ul>
+            <form class="guest-access-token-form"
+                  action="{{ reverse_url('add-guest-access-token') }}"
+                  method="post">
+                <input type="hidden" name="slug" value="{{ post.slug }}">
+                <label for="{{ post.id }}-name">Name:</label>
+
+                <input class="guest-access-token-name-input"
+                       id="{{ post.id }}-name"
+                       type="text" name="name">
+
+                <input class="guest-access-token-submit"
+                       type="submit" value="add" disabled>
+            </form>
+            <hr>
         {% end %}
     {% else %}
         <p>No drafts. Create some by adding posts as drafts in MarsEdit!</p>

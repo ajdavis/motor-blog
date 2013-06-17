@@ -16,3 +16,11 @@
 .admin-table th {
     background-color: #dedede;
 }
+
+.inline-block-form {
+    display: inline-block;
+}
+
+.draft-date, .draft-excerpt, .guest-access-token-info, .guest-access-token-form {
+    margin-left: 1em;
+}
