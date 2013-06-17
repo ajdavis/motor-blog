@@ -5,12 +5,10 @@
 {% block content %}
     {% if drafts %}
         {% for post in drafts %}
-            <li>
-                {# TODO: refactor w/ all-posts #}
-                <a class="title" href="{{ reverse_url('draft', post.slug) }}">{% raw post.title %} </a>
-                <span class="date">{{ post.local_short_date(handler.application) }}</span>
-                <span class="excerpt"><p>{% raw post.summary %}</p></span>
-            </li>
+            {# TODO: refactor w/ all-posts #}
+            <h1><a class="title" href="{{ reverse_url('draft', post.slug) }}">{% raw post.title %}</a></h1>
+            <p><span class="date">{{ post.local_long_date(handler.application) }}</span></p>
+            <p><span class="excerpt">{% raw post.display_summary %}</span></p>
         {% end %}
     {% else %}
         <p>No drafts. Create some by adding posts as drafts in MarsEdit!</p>
