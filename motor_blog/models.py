@@ -236,3 +236,7 @@ class Post(BlogDocument):
     @property
     def last_modified(self):
         return max(self.date_created, self.mod)
+
+    @property
+    def display_summary(self):
+        return self.meta_description if self.meta_description else self.summary
