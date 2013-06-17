@@ -92,11 +92,9 @@ class AddDraftGuestAccessTokenHandler(MotorBlogAdminHandler):
     ...and share this URL with guests. The token is named so the administrator
     can remember with whom she shared the token ("Joe").
     """
+    @tornado.web.authenticated
     @gen.coroutine
     def post(self):
-        if not self.current_user:
-            raise tornado.web.HTTPError(401)
-
         slug = self.get_argument('slug')
         name = self.get_argument('name')
         guest_access_token = GuestAccessToken(name=name)
@@ -118,11 +116,9 @@ class AddDraftGuestAccessTokenHandler(MotorBlogAdminHandler):
 
 class DeleteDraftGuestAccessTokenHandler(MotorBlogAdminHandler):
     """Revoke a guest-access URL to a draft."""
+    @tornado.web.authenticated
     @gen.coroutine
     def post(self):
-        if not self.current_user:
-            raise tornado.web.HTTPError(401)
-
         slug = self.get_argument('slug')
         token = ObjectId(self.get_argument('token'))
         db = self.settings['db']
@@ -151,11 +147,9 @@ class CategoriesAdminHandler(MotorBlogAdminHandler):
 
 
 class DeleteCategoryHandler(MotorBlogAdminHandler):
+    @tornado.web.authenticated
     @gen.coroutine
     def post(self):
-        if not self.current_user:
-            raise tornado.web.HTTPError(401)
-
         category_slug = self.get_argument('category_slug')
         result = yield self.db.categories.remove({'slug': category_slug})
 
@@ -289,11 +283,9 @@ class MediaPageHandler(MotorBlogAdminHandler):
 
 
 class DeleteMediaHandler(MotorBlogAdminHandler):
+    @tornado.web.authenticated
     @gen.coroutine
     def post(self):
-        if not self.current_user:
-            raise tornado.web.HTTPError(401)
-
         media_id = self.get_argument('media_id')
         fs = yield motor.MotorGridFS(self.settings['db']).open()
         yield fs.delete(ObjectId(media_id))
