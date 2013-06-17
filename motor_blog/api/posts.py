@@ -69,6 +69,8 @@ class Posts(object):
             if not old_post.pub_date and new_post.status == 'publish':
                 new_post.pub_date = datetime.datetime.utcnow()
 
+            # TODO: more general solution for fields that must be preserved.
+            new_post.guest_access_tokens = old_post.guest_access_tokens
             update_result = yield db.posts.update(
                 {'_id': old_post_doc['_id']},
                 {'$set': new_post.to_python()})  # set fields to new values
