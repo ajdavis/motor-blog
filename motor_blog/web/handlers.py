@@ -45,7 +45,8 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         ns.update({
             'q': '',
             'setting': get_setting,
-            'categories': self.categories})
+            'categories': self.categories,
+            'absolute': absolute})
 
         return ns
 

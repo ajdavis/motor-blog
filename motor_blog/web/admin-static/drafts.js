@@ -17,4 +17,16 @@ $(function() {
     $('.guest-url-delete-form').submit(function() {
         return confirm("Really revoke access?");
     });
+
+    /* Copy-to-clipboard buttons. */
+    $('.guest-url-copy-form').each(function() {
+        var clip = new ZeroClipboard($('.copy-button', this)[0]);
+        clip.on('complete', function() {
+            var copy_message = $('.copy-message', this.parentNode);
+
+            copy_message.animate({opacity: 1}, 1000, function() {
+                copy_message.animate({opacity: 0});
+            });
+        });
+    });
 });

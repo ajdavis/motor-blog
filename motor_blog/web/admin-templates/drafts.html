@@ -4,7 +4,12 @@
 
 {% block extra-head %}
     <script type="text/javascript" src="/{{ setting('base_url') }}/admin/static/jquery.min.js"></script>
+    <script type="text/javascript" src="/{{ setting('base_url') }}/admin/static/ZeroClipboard.js"></script>
     <script type="text/javascript" src="/{{ setting('base_url') }}/admin/static/drafts.js"></script>
+    <script type="text/javascript">
+        var moviePath = "/{{ setting('base_url') }}/admin/static/ZeroClipboard.swf";
+        ZeroClipboard.setDefaults({moviePath: moviePath});
+    </script>
 {% end %}
 
 {% block content %}
@@ -24,11 +29,12 @@
                 {% for token in post.guest_access_tokens %}
                     <li>
                         {% set guest_access_url = '%s?guest-access-url=%s' % (
-                            reverse_url('draft', post.slug),
+                            absolute(reverse_url('draft', post.slug)),
                             token.token)
                         %}
+                        {% set guest_access_url_id = 'guest-access-url-%s' % token.token %}
                         <strong>{{ token.name }}</strong>:
-                        {{ guest_access_url }}
+                        <span id="{{ guest_access_url_id }}">{{ guest_access_url }}</span>
                         <form class="inline-block-form guest-url-view-form"
                               action="{{ reverse_url('draft', post.slug) }}"
                               method="get"
@@ -42,6 +48,14 @@
                             <input type="hidden" name="slug" value="{{ post.slug }}">
                             <input type="hidden" name="token" value="{{ token.token }}">
                             <input type="submit" value="Revoke">
+                        </form>
+                        <form class="inline-block-form guest-url-copy-form">
+                            <button class="copy-button"
+                                    data-clipboard-target="{{ guest_access_url_id }}"
+                                    title="Click to copy the URL.">
+                                Copy to clipboard
+                            </button>
+                            <span class="copy-message" style="opacity: 0;">Copied.</span>
                         </form>
                     </li>
                 {% end %}
