@@ -21,8 +21,10 @@ class HTMLPassThrough(HTMLParser):
 
     def handle_endtag(self, tag):
         assert self.stack, "Unmatched closing tag %s" % tag
-        assert self.stack[-1] == tag, \
-            "Unmatched closing tag %s, expected %s" % (tag, self.stack[-1])
+        if self.stack[-1] != tag:
+            raise AssertionError(
+                "Unmatched closing tag %s, expected %s.\nLine %s" % (
+                    tag, self.stack[-1], self.lineno))
         self.stack.pop()
         self.out.append('</%s>' % tag)
 
