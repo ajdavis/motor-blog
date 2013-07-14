@@ -8,8 +8,26 @@ understandably, likes to include the "height" attribute, so we remove it.
 """
 
 import argparse
+import re
+
 import pymongo
-from motor_blog.text import remove_image_sizes
+
+img_pat = re.compile(r'<img([^>^<]+)>')
+width_pat = re.compile(r'width="(\d+)"')
+height_pat = re.compile(r'height="(\d+)"')
+
+
+def remove_image_sizes(html):
+    def sub(img_pat_match):
+        # img_text will be like '<img width="600" height="600" src="...">'.
+        img_text = img_pat_match.group(0)
+
+        # Remove width and height.
+        img_text = width_pat.sub(lambda match: '', img_text)
+        img_text = height_pat.sub(lambda match: '', img_text)
+        return img_text
+
+    return img_pat.sub(sub, html)
 
 
 def parse_args():
@@ -32,7 +50,7 @@ def main(args):
     for post in db.posts.find().sort('_id'):
         print post['title'], post['type'], post['mod']
         for key in ('body', 'original'):
-            post[key] = remove_image_sizes.remove_image_sizes(post[key])
+            post[key] = remove_image_sizes(post[key])
 
         if not args.dry_run:
             print 'saving'

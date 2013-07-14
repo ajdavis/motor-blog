@@ -9,8 +9,7 @@ from dictshield.fields.mongo import ObjectIdField
 from motor_blog.text.link import absolute
 
 import pytz
-from motor_blog.text import (
-    markup, summarize, slugify, remove_image_sizes, plain)
+from motor_blog.text import markup, summarize, slugify, plain
 
 utc_tz = pytz.timezone('UTC')
 
@@ -139,7 +138,6 @@ class Post(BlogDocument):
         else:
             mod = datetime.datetime.utcnow()
 
-        description = remove_image_sizes.remove_image_sizes(description)
         body = markup.markup(description)
 
         rv = cls(

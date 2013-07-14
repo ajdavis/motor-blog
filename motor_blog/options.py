@@ -64,10 +64,6 @@ def define_options(option_parser):
     option_parser.define(
         'timezone', type=str, default='America/New_York',
         help="Your timezone name", group='Appearance')
-    option_parser.define(
-        'maxwidth', type=int, default=1200,
-        help="Maximum width of images",
-        group='Appearance')
 
     option_parser.add_parse_callback(
         functools.partial(check_required_options, option_parser))
@@ -78,8 +74,11 @@ def check_required_options(option_parser):
         'host', 'port', 'blog_name', 'base_url', 'cookie_secret', 'timezone',
     ):
         if not getattr(option_parser, required_option_name, None):
-            message = '%s required. (Did you forget to pass --config?)' % (
-                required_option_name)
+            message = (
+                '%s required. (Did you forget to pass'
+                ' --config=CONFIG_FILE?)' % (
+                    required_option_name))
+
             raise tornado.options.Error(message)
 
 

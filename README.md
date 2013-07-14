@@ -71,9 +71,11 @@ Motor-Blog refuses the post if the meta-description field is over 155 characters
 Do "View -> Slug Field" to set a custom slug as the final part of the post's URL.
 If you leave the slug empty, Motor-Blog slugifies the title.
 
-Finally, you may prefer that your images' title text is set to the same value as their alt-text,
+Finally, you'll want to customize how MarsEdit inserts images.
+This customization serves two purposes: first, we'll remove the width and height
+from `img` tags so Motor-Blog's responsive layout can fit them to the visitor's screen.
+Second, we'll set images' title text is set to the same value as their alt-text,
 since browsers display image titles as tooltips.
-MarsEdit's default is to set image titles to the images' filenames, but you can override this.
 Open the MarsEdit Media Manager and select an image.
 In the Media Manager's lower-right corner is a "Style" chooser,
 with the option "Customize...":
@@ -88,9 +90,6 @@ Choose this and create a new image style with "opening markup" like this:
         alt="#alttext#"
         title="#alttext#" />
 
-Note that width and height are unnecessary since
-[Motor-Blog will strip them anyway](#image-handling).
-
 # Blogging
 
 Motor-Blog supports the same Markdown dialect as [cMarkdown](https://github.com/paulsmith/cMarkdown) with
@@ -104,26 +103,6 @@ Syntax-highlighted code is indented with four spaces, and the first line is like
 is whatever [Pygments](http://pygments.org/languages/) supports, including the following of
 interest to Python coders like me: `py`, `py3`, `pytb` and `py3tb` for tracebacks, and `pycon` for
 console sessions.
-
-## <a id="image-handling"></a>Image Handling
-
-Motor-Blog tries to show images beautifully on every device.
-
-Using MarsEdit, add images your blog posts at full resolution.
-When you upload an image, Motor-Blog resizes the image to 1200px wide and centers it.
-(Images less than 1200px wide are not resized.)
-The assumption is that your theme's columns are a maximum of 600px,
-so all visitors including those with retina displays will see high-resolution images.
-If your theme has columns of some width other than 600px, override `maxwidth`
-in `motor_blog.conf`.
-Motor-Blog strips the `width` and `height` attributes from
-`\<img\>` tags so images can be resized responsively.
-The default theme enables responsive resizing with this CSS rule:
-
-    `img { max-width: 100%; }
-
-The default theme includes double-resolution background images and media
-queries to display them on retina devices.
 
 # Customization
 
