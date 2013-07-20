@@ -28,11 +28,11 @@
             <ul>
                 {% for token in post.guest_access_tokens %}
                     <li>
-                        {% set guest_access_url = '%s?guest-access-url=%s' % (
+                        {% set guest_access_url = '%s?guest-access-token=%s' % (
                             absolute(reverse_url('draft', post.slug)),
                             token.token)
                         %}
-                        {% set guest_access_url_id = 'guest-access-url-%s' % token.token %}
+                        {% set guest_access_url_id = 'guest-access-token-%s' % token.token %}
                         <strong>{{ token.name }}</strong>:
                         <span id="{{ guest_access_url_id }}">{{ guest_access_url }}</span>
                         <form class="inline-block-form guest-url-view-form"
