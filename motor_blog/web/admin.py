@@ -241,6 +241,9 @@ class DraftReloadConnection(sockjs.tornado.SockJSConnection):
         reloads the second API call completes. To ensure the browser has loaded
         the latest version we must check at the end of each page-load whether
         we're still up to date.
+
+        # TODO: might reduce flickering by waiting a second to see if we'll
+            change again, before sending post_changed.
         """
         try:
             # The client tells us this page's last-modified date.
