@@ -3,8 +3,8 @@ port = 8888
 base_url = 'blog'
 user = 'admin'
 password = 'foobar'
-blog_name = author_display_name = 'A. Jesse Jiryu Davis'
-description = "A. Jesse Jiryu Davis's blog on Python, Tornado, MongoDB, Zen, and photography"
+blog_name = author_display_name = 'Your Name'
+description = "Your blog's description."
 google_analytics_id = 'UA-1234578-1' # Replace with your own
 theme = 'theme'
 log_file_prefix = 'log/motor-blog.log'
