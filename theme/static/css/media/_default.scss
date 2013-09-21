@@ -229,7 +229,8 @@ article {
     }
 }
 
-.post-summary p, .post-content li, .post-content p, .post-content li p, {
+.post-content li, .post-content li li, .post-content li li li,
+.post-summary p, .post-content p, .post-content li p {
     @include font-size(14, 21);
 }
 
