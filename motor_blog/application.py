@@ -8,7 +8,6 @@ from tornado.web import StaticFileHandler
 
 from motor_blog.api.handlers import APIHandler, RSDHandler
 from motor_blog.web import get_url_spec
-from motor_blog.web.lytics import TrackingPixelHandler
 from motor_blog.web.handlers import *
 from motor_blog.web.admin import *
 
@@ -59,7 +58,6 @@ def get_application(root_dir, db, option_parser):
 
         # Web
         U(r"media/(.+)", GridFSHandler, {"database": db}, name='media'),
-        U(r"tracking-pixel.gif", TrackingPixelHandler, name='tracking-pixel'),
         U(
             r"theme/static/(.+)",
             StaticFileHandler, {"path": static_path}, name='theme-static'),
