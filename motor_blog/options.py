@@ -51,6 +51,9 @@ def define_options(option_parser):
     option_parser.define('google_analytics_id', type=str, help=(
         "Like 'UA-123456-1'"), group='Integrations')
 
+    option_parser.define('google_analytics_rss_id', type=str, help=(
+        "Like 'UA-123456-1'"), group='Integrations')
+
     # Admin
     option_parser.define('user', type=str, group='Admin')
     option_parser.define('password', type=str, group='Admin')

@@ -14,6 +14,7 @@ from werkzeug.contrib.atom import AtomFeed
 from motor_blog.models import Post, Category
 from motor_blog import cache, models
 from motor_blog.text.link import absolute
+from motor_blog.web.lytics import ga_track_event_url
 
 
 __all__ = (
@@ -338,9 +339,13 @@ class FeedHandler(MotorBlogHandler):
 
         for post in self.posts:
             url = absolute(self.reverse_url('post', post.slug))
+            tracking_pixel_url = ga_track_event_url(self.application, url)
+            tracking_pixel = '<img src="%s" width="1px" height="1px">' \
+                % tracking_pixel_url
+
             feed.add(
                 title=post.title,
-                content=post.body,
+                content=post.body + tracking_pixel,
                 content_type='html',
                 summary=post.summary,
                 author=author,

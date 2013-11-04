@@ -6,6 +6,7 @@ password = 'foobar'
 blog_name = author_display_name = 'Your Name'
 description = "Your blog's description."
 google_analytics_id = 'UA-1234578-1' # Replace with your own
+google_analytics_rss_id = 'UA-1234578-1' # Replace with your own
 theme = 'theme'
 log_file_prefix = 'log/motor-blog.log'
 cookie_secret = 'long secret string'
