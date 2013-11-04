@@ -16,5 +16,4 @@ twitter_handle = 'myhandle'  # No @-sign
 nav_menu = [
     ('/blog/about/', 'About', 'about-nav-item'),
     ('/photography/', 'Photography', 'photography-nav-item'),
-    ('http://feeds.feedburner.com/emptysquare', 'Feed', 'feed-nav-item'),
 ]

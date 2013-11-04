@@ -3,6 +3,9 @@ nav.main-nav
         li.nav-item.menu-nav-item.all-posts-nav-item
             a(href=reverse_url('all-posts')) All Posts
 
+        li.nav-item.menu-nav-item.feed-nav-item
+            a(href=reverse_url('feed')) Feed
+
         for url, title, classname in setting('nav_menu')
             li.nav-item.menu-nav-item(class=classname)
                 a(href=url)= title
