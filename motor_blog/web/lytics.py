@@ -5,7 +5,7 @@ import os
 import urllib
 import uuid
 
-# My fork, https://github.com/ajdavis/google-measurement-protocol
+# https://github.com/mirumee/google-measurement-protocol
 import google_measurement_protocol as gmp
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
