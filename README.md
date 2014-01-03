@@ -92,15 +92,17 @@ Choose this and create a new image style with "opening markup" like this:
 
 # Blogging
 
-Motor-Blog supports the same Markdown dialect as [cMarkdown](https://github.com/paulsmith/cMarkdown) with
-its flags set to the defaults.
-Plain inline code is surrounded by backticks (``).
-Syntax-highlighted code is indented with four spaces, and the first line is like:
+Motor-Blog renders Markdown with [Python-Markdown](http://pythonhosted.org/Markdown).
+Plain inline code is surrounded by single backticks (``).
+Code blocks can be fenced in [a number of styles](http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html),
+such as GitHub's:
 
-        ::: lang="py" highlight="4,5,6"
+    ```python
+    print "foo"
+    ```
 
-... to specify the language syntax and which lines to highlight in yellow. The list of languages
-is whatever [Pygments](http://pygments.org/languages/) supports, including the following of
+The list of languages
+is whatever [Pygments](http://pygments.org/languages/) supports. The following are of
 interest to Python coders like me: `py`, `py3`, `pytb` and `py3tb` for tracebacks, and `pycon` for
 console sessions.
 

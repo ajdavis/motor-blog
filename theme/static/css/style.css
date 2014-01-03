@@ -36,7 +36,6 @@ sub {
   bottom: -0.25em; }
 
 pre {
-  white-space: pre;
   white-space: pre-wrap;
   word-wrap: break-word; }
 
@@ -284,10 +283,8 @@ hr {
 
 pre {
   margin-bottom: 1.25em;
-  font-family: Monaco, Lucida Console, monospace;
   font-size: 1.1em;
-  overflow: auto;
-  line-height: 1.2em; }
+  overflow: auto; }
 
 /* Make inline code spans closer in size to normal Museo text */
 code {
