@@ -1,13 +1,6 @@
-/*
- *
- *  Zombie Responsive System (1.0)	<http://zombiegridsystem.spf13.com/>
- *  by Steve Francia 			<http://spf13.com/>
- *  licensed under MIT			<http://opensource.org/licenses/mit-license.php>
- *
- */
-
-// RUN the following command to generate the css file
-// sass --watch ZGS.scss:style.css
+// To generate the css file:
+//
+//    sass --watch theme/static/css/:theme/static/css/
 
 @import "mydefines";
 
