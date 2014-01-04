@@ -13,6 +13,10 @@ input, textarea, button, select {
     vertical-align: baseline;
 }
 
+ul, ol {
+    margin-bottom: 1em;
+}
+
 /* min-width: 320px (1st gen), 440px (2nd gen), 640px (landscape) */
 // Should put the lowest one you want to support here without media restrictions. 
 // Others in _phone.scss

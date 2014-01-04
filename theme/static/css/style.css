@@ -62,6 +62,9 @@ input, textarea, button, select {
   line-height: normal;
   vertical-align: baseline; }
 
+ul, ol {
+  margin-bottom: 1em; }
+
 /* min-width: 320px (1st gen), 440px (2nd gen), 640px (landscape) */
 body {
   font-family: Helvetica, sans-serif;
