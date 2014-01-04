@@ -50,9 +50,9 @@ h1, h2, h3, h4, h5 {
     }
 }
 
-h1 { @include font-size(28, 28); }
+h1 { @include font-size(25, 25); }
 
-h2 { @include font-size(21, 21); }
+h2 { @include font-size(18, 19); }
 
 h3 { font-variant: small-caps; }
 
@@ -72,15 +72,10 @@ hr {
 }
 
 pre {
+    @include font-size(13, 16);
     margin-bottom: 1.25em;
-    font-size: 1.1em;
     overflow: auto;
     white-space: pre-wrap;
-}
-
-/* Make inline code spans closer in size to normal Museo text */
-code {
-    font-size: 110%;
 }
 
 .container {
@@ -123,9 +118,9 @@ header {
     // center
     margin: 0 auto;
     display: block;
-    width: 3em;
-    height: 3em;
-    border: .36em solid black;
+    width: 42px;
+    height: 42px;
+    border: 5px solid black;
     background-color: $lightgrey;
 }
 
@@ -134,7 +129,7 @@ header {
     list-style: none outside none;
 
     li {
-        @include font-size(14, 21);
+        @include font-size(12, 19);
         display: inline;
         margin: 0.5em;
     }
@@ -184,7 +179,7 @@ article {
 }
 
 .post-meta {
-    @include font-size($font-size - 3, 21);
+    @include font-size($font-size - 4, 19);
     margin: 0 0 1em;
     color: $lightgrey;
 }
@@ -228,7 +223,7 @@ article {
 
 .post-content li, .post-content li li, .post-content li li li,
 .post-summary p, .post-content p, .post-content li p {
-    @include font-size(14, 21);
+    @include font-size(12, 19);
 }
 
 .post-summary {

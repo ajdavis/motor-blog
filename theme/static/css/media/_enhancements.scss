@@ -27,10 +27,10 @@
 // layout around a 2em-thick cross dividing the logo, the article header,
 // the nav links, and the article body.
 @media screen and (min-width: 720px) {
-    $logo_dim: 5.25;
+    $logo_dim: 74px;
     body {
         font-family: Museo-300, serif;
-        line-height: #{20 / $font_size}em;
+        line-height: 20px;
     }
 
     h1, h2, h3, h4, h5 {
@@ -51,11 +51,11 @@
 
     .main-header {
         position: fixed;
-        top: 0.375em;
-        left: 0.375em;
-        padding: 0 0.375em;
-        margin-left: 3em; // 3em * 14px = 42px
-        width: 6em; // 6em * 14px = 84px
+        top: 5px;
+        left: 5px;
+        padding: 0 5px;
+        margin-left: 42px;
+        width: 84px;
 
         h1 {
             @include hidden;
@@ -64,9 +64,8 @@
 
     .main-nav {
         ul {
-            margin-top: 2em; // central cross is 2em thick
+            margin-top: 28px; // central cross is 28px thick
             float: right;
-            line-height: 1.2em;
             color: $grey;
             text-transform: lowercase;
 
@@ -98,9 +97,9 @@
         float: right;
         margin: 0;
         // 1-column-width, minus gutter, square
-        width: #{$logo_dim}em;
-        height: #{$logo_dim}em;
-        border: #{($logo_dim / 9)}em solid black;
+        width: $logo_dim;
+        height: $logo_dim;
+        border: floor($logo_dim / 9) solid black;
     }
 
     .search-text-input {
@@ -109,7 +108,7 @@
 
     .search-text-input, .search-button {
         float: right;
-        width: #{$logo_dim}em;
+        width: $logo_dim;
     }
 
     .search-text-input {
@@ -121,14 +120,14 @@
     }
 
     .post-summary p, .post-content li, .post-content p, .post-list .summary-title {
-        @include font-size(16, 24);
+        @include font-size(14, 21);
     }
 
     section {
         background-color: white;
         text-align: left;
-        margin-left: 11.5em;
-        width: #{475 / $font_size}em; // 475px wide
+        margin-left: 161px;
+        width: 475px;
     }
 
     section > article:first-child {
@@ -137,11 +136,11 @@
 
     article > header, section > header {
         text-align: left;
-        margin: 1em 0 2em; // 2em central cross
+        margin: 14px 0 28px; // 28px central cross
         border-bottom: 1px solid $lightergrey;
 
         // Push down the article title so it's base-aligned with logo
-        height: #{($logo_dim)}em;
+        height: $logo_dim;
 
         // Makes h1.title's "position:absolute; bottom: 0" work.
         position: relative;
@@ -205,7 +204,7 @@
     // Remove button style from bottom nav links
     .nav-previous, .nav-next {
         @include nobutton;
-        @include font-size(20, 24);
+        @include font-size(18, 21);
         font-weight: bold;
         margin-bottom: 1em;
         a:hover {
@@ -220,28 +219,28 @@
     }
 }
 
-// Grow fonts, move content 1em to right
+// Grow fonts, move content 15px to right
 @media screen and (min-width: 1280px) {
     .main-header {
-        left: 0.375em + 1em;
+        left: 20px;
     }
 
     section {
-        width: #{550 / $font_size}em; // 475px wide
-        margin-left: 12.5em;
+        width: 550px;
+        margin-left: 175px;
     }
 
     .post-list {
         .summary-title {
-            @include font-size(22, 26);
+            @include font-size(19, 21);
         }
 
         .date, .excerpt {
-            @include font-size(18, 26);
+            @include font-size(16, 21);
         }
     }
 
     .post-content li, .post-content p {
-        @include font-size(22, 30);
+        @include font-size(19, 26);
     }
 }

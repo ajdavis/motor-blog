@@ -65,8 +65,8 @@ input, textarea, button, select {
 /* min-width: 320px (1st gen), 440px (2nd gen), 640px (landscape) */
 body {
   font-family: Helvetica, sans-serif;
-  font-size: 0.875em;
-  line-height: 1.5em; }
+  font-size: 14px;
+  line-height: 21px; }
 
 blockquote {
   margin-left: 1em; }
@@ -89,12 +89,12 @@ h1, h2, h3, h4, h5 {
       text-decoration: underline; }
 
 h1 {
-  font-size: 1.75em;
-  line-height: 1em; }
+  font-size: 25px;
+  line-height: 25px; }
 
 h2 {
-  font-size: 1.3125em;
-  line-height: 1em; }
+  font-size: 18px;
+  line-height: 19px; }
 
 h3 {
   font-variant: small-caps; }
@@ -115,14 +115,11 @@ hr {
       background-image: url("/blog/theme/static/images/hr-small@2x.png"); } }
 
 pre {
+  font-size: 13px;
+  line-height: 16px;
   margin-bottom: 1.25em;
-  font-size: 1.1em;
   overflow: auto;
   white-space: pre-wrap; }
-
-/* Make inline code spans closer in size to normal Museo text */
-code {
-  font-size: 110%; }
 
 .container {
   *zoom: 1;
@@ -171,9 +168,9 @@ header {
 .logo {
   margin: 0 auto;
   display: block;
-  width: 3em;
-  height: 3em;
-  border: 0.36em solid black;
+  width: 42px;
+  height: 42px;
+  border: 5px solid black;
   background-color: #888888; }
 
 .main-nav ul {
@@ -181,8 +178,8 @@ header {
   margin: 0 auto;
   list-style: none outside none; }
   .main-nav ul li {
-    font-size: 0.875em;
-    line-height: 1.5em;
+    font-size: 12px;
+    line-height: 19px;
     display: inline;
     margin: 0.5em; }
   .main-nav ul .nav-item, .main-nav ul .nav-divider {
@@ -234,8 +231,8 @@ article {
   position: relative; }
 
 .post-meta {
-  font-size: 0.6875em;
-  line-height: 1.90909em;
+  font-size: 10px;
+  line-height: 19px;
   margin: 0 0 1em;
   color: #888888; }
 
@@ -263,8 +260,8 @@ article {
 
 .post-content li, .post-content li li, .post-content li li li,
 .post-summary p, .post-content p, .post-content li p {
-  font-size: 0.875em;
-  line-height: 1.5em; }
+  font-size: 12px;
+  line-height: 19px; }
 
 .post-summary {
   padding-right: 0.5em; }
@@ -286,8 +283,8 @@ article {
     .post-list .summary-title:hover, .post-list .summary-date:hover, .post-list .excerpt:hover {
       text-decoration: underline; }
   .post-list .summary-title {
-    font-size: 1.125em;
-    line-height: 1.16667em;
+    font-size: 18px;
+    line-height: 21px;
     font-weight: bold; }
   .post-list .summary-date {
     color: #888888; }
@@ -347,7 +344,7 @@ article {
 @media screen and (min-width: 720px) {
   body {
     font-family: Museo-300, serif;
-    line-height: 1.42857em; }
+    line-height: 20px; }
 
   h1, h2, h3, h4, h5 {
     font-family: Museo-500, serif;
@@ -366,18 +363,17 @@ article {
 
   .main-header {
     position: fixed;
-    top: 0.375em;
-    left: 0.375em;
-    padding: 0 0.375em;
-    margin-left: 3em;
-    width: 6em; }
+    top: 5px;
+    left: 5px;
+    padding: 0 5px;
+    margin-left: 42px;
+    width: 84px; }
     .main-header h1 {
       display: none !important; }
 
   .main-nav ul {
-    margin-top: 2em;
+    margin-top: 28px;
     float: right;
-    line-height: 1.2em;
     color: #575757;
     text-transform: lowercase; }
     .main-nav ul a {
@@ -398,16 +394,16 @@ article {
   .logo {
     float: right;
     margin: 0;
-    width: 5.25em;
-    height: 5.25em;
-    border: 0.58333em solid black; }
+    width: 74px;
+    height: 74px;
+    border: 8px solid black; }
 
   .search-text-input {
     margin-top: 1em; }
 
   .search-text-input, .search-button {
     float: right;
-    width: 5.25em; }
+    width: 74px; }
 
   .search-text-input {
     margin: 1em 0 0.25em; }
@@ -416,28 +412,28 @@ article {
     margin: 0.25em 0; }
 
   .post-summary p, .post-content li, .post-content p, .post-list .summary-title {
-    font-size: 1em;
-    line-height: 1.5em; }
+    font-size: 14px;
+    line-height: 21px; }
 
   section {
     background-color: white;
     text-align: left;
-    margin-left: 11.5em;
-    width: 33.92857em; }
+    margin-left: 161px;
+    width: 475px; }
 
   section > article:first-child {
     border-top: none; }
 
   article > header, section > header {
     text-align: left;
-    margin: 1em 0 2em;
+    margin: 14px 0 28px;
     border-bottom: 1px solid #aaaaaa;
-    height: 5.25em;
+    height: 74px;
     position: relative; }
 
   .post-meta {
-    font-size: 0.875em;
-    line-height: 1.71429em; }
+    font-size: 14px;
+    line-height: 24px; }
 
   h1.title {
     margin: 0;
@@ -484,8 +480,8 @@ article {
     padding: inherit;
     text-decoration: inherit;
     text-shadow: none;
-    font-size: 1.25em;
-    line-height: 1.2em;
+    font-size: 18px;
+    line-height: 21px;
     font-weight: bold;
     margin-bottom: 1em; }
     .nav-previous a, .nav-next a {
@@ -504,22 +500,22 @@ article {
     margin-bottom: 0.5em; } }
 @media screen and (min-width: 1280px) {
   .main-header {
-    left: 1.375em; }
+    left: 20px; }
 
   section {
-    width: 39.28571em;
-    margin-left: 12.5em; }
+    width: 550px;
+    margin-left: 175px; }
 
   .post-list .summary-title {
-    font-size: 1.375em;
-    line-height: 1.18182em; }
+    font-size: 19px;
+    line-height: 21px; }
   .post-list .date, .post-list .excerpt {
-    font-size: 1.125em;
-    line-height: 1.44444em; }
+    font-size: 16px;
+    line-height: 21px; }
 
   .post-content li, .post-content p {
-    font-size: 1.375em;
-    line-height: 1.36364em; } }
+    font-size: 19px;
+    line-height: 26px; } }
 @media screen and (min-width: 820px) {
   .backgroundplaceholder1 {
     content: ' ';

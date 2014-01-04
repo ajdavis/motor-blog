@@ -8,8 +8,8 @@ $link-hover-color: #2060a0;
 
 // Input is in pixels
 @mixin font-size($font-size, $line-height) {
-    font-size: ($font-size / 16) * 1em;
-    line-height: ($line-height / $font-size) * 1em;
+    font-size: $font-size * 1px;
+    line-height: $line-height * 1px;
 }
 
 @mixin center {
