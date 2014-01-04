@@ -1,10 +1,3 @@
-/*
- *
- *  Zombie Responsive System (1.0)	<http://zombiegridsystem.spf13.com/>
- *  by Steve Francia 			<http://spf13.com/>
- *  licensed under MIT			<http://opensource.org/licenses/mit-license.php>
- *
- */
 html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, a, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, nav, section, menu, time, mark, audio, video, canvas {
   margin: 0;
   padding: 0;
@@ -36,6 +29,7 @@ sub {
   bottom: -0.25em; }
 
 pre {
+  white-space: pre;
   white-space: pre-wrap;
   word-wrap: break-word; }
 
@@ -686,7 +680,7 @@ article {
   .post-content li, .post-content p {
     font-size: 1.375em;
     line-height: 1.36364em; } }
-@media screen and (min-width: 51.25em) {
+@media screen and (min-width: 820px) {
   .backgroundplaceholder1 {
     content: ' ';
     position: fixed;
@@ -696,14 +690,12 @@ article {
     height: 600px;
     background-size: 800px 600px;
     background-repeat: no-repeat;
-    z-index: -99; } }
-@media screen and (max-width: 51.25em) and (-Webkit-max-device-pixel-ratio: 1.4), screen and (max-width: 51.25em) and (max--moz-device-pixel-ratio: 1.4), screen and (max-width: 51.25em) and (-o-max-device-pixel-ratio: 3 / 5), screen and (max-width: 51.25em) and (max-device-pixel-ratio: 1.4), screen and (max-width: 51.25em) and (max-resolution: 1dppx) {
-  .backgroundplaceholder1 {
+    z-index: -99;
     background-image: url("/blog/theme/static/images/paisley-bg-1.png"); } }
-@media screen and (min-width: 51.25em) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 51.25em) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 51.25em) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 51.25em) and (min-device-pixel-ratio: 1.5), screen and (min-width: 51.25em) and (min-resolution: 2dppx) {
+@media screen and (min-width: 820px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 820px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 820px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 820px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 820px) and (min-resolution: 2dppx) {
   .backgroundplaceholder1 {
     background-image: url("/blog/theme/static/images/paisley-bg-1@2x.png"); } }
-@media screen and (min-width: 53.75em) {
+@media screen and (min-width: 860px) {
   .backgroundplaceholder2 {
     content: ' ';
     position: fixed;
@@ -713,14 +705,12 @@ article {
     height: 600px;
     background-size: 800px 600px;
     background-repeat: no-repeat;
-    z-index: -98; } }
-@media screen and (max-width: 53.75em) and (-Webkit-max-device-pixel-ratio: 1.4), screen and (max-width: 53.75em) and (max--moz-device-pixel-ratio: 1.4), screen and (max-width: 53.75em) and (-o-max-device-pixel-ratio: 3 / 5), screen and (max-width: 53.75em) and (max-device-pixel-ratio: 1.4), screen and (max-width: 53.75em) and (max-resolution: 1dppx) {
-  .backgroundplaceholder2 {
+    z-index: -98;
     background-image: url("/blog/theme/static/images/paisley-bg-2.png"); } }
-@media screen and (min-width: 53.75em) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 53.75em) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 53.75em) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 53.75em) and (min-device-pixel-ratio: 1.5), screen and (min-width: 53.75em) and (min-resolution: 2dppx) {
+@media screen and (min-width: 860px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 860px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 860px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 860px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 860px) and (min-resolution: 2dppx) {
   .backgroundplaceholder2 {
     background-image: url("/blog/theme/static/images/paisley-bg-2@2x.png"); } }
-@media screen and (min-width: 64.375em) {
+@media screen and (min-width: 1030px) {
   .backgroundplaceholder3 {
     content: ' ';
     position: fixed;
@@ -730,14 +720,12 @@ article {
     height: 600px;
     background-size: 800px 600px;
     background-repeat: no-repeat;
-    z-index: -97; } }
-@media screen and (max-width: 64.375em) and (-Webkit-max-device-pixel-ratio: 1.4), screen and (max-width: 64.375em) and (max--moz-device-pixel-ratio: 1.4), screen and (max-width: 64.375em) and (-o-max-device-pixel-ratio: 3 / 5), screen and (max-width: 64.375em) and (max-device-pixel-ratio: 1.4), screen and (max-width: 64.375em) and (max-resolution: 1dppx) {
-  .backgroundplaceholder3 {
+    z-index: -97;
     background-image: url("/blog/theme/static/images/paisley-bg-3.png"); } }
-@media screen and (min-width: 64.375em) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 64.375em) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 64.375em) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 64.375em) and (min-device-pixel-ratio: 1.5), screen and (min-width: 64.375em) and (min-resolution: 2dppx) {
+@media screen and (min-width: 1030px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 1030px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 1030px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 1030px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 1030px) and (min-resolution: 2dppx) {
   .backgroundplaceholder3 {
     background-image: url("/blog/theme/static/images/paisley-bg-3@2x.png"); } }
-@media screen and (min-width: 71.875em) {
+@media screen and (min-width: 1150px) {
   .backgroundplaceholder4 {
     content: ' ';
     position: fixed;
@@ -747,14 +735,12 @@ article {
     height: 600px;
     background-size: 800px 600px;
     background-repeat: no-repeat;
-    z-index: -96; } }
-@media screen and (max-width: 71.875em) and (-Webkit-max-device-pixel-ratio: 1.4), screen and (max-width: 71.875em) and (max--moz-device-pixel-ratio: 1.4), screen and (max-width: 71.875em) and (-o-max-device-pixel-ratio: 3 / 5), screen and (max-width: 71.875em) and (max-device-pixel-ratio: 1.4), screen and (max-width: 71.875em) and (max-resolution: 1dppx) {
-  .backgroundplaceholder4 {
+    z-index: -96;
     background-image: url("/blog/theme/static/images/paisley-bg-4.png"); } }
-@media screen and (min-width: 71.875em) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 71.875em) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 71.875em) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 71.875em) and (min-device-pixel-ratio: 1.5), screen and (min-width: 71.875em) and (min-resolution: 2dppx) {
+@media screen and (min-width: 1150px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 1150px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 1150px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 1150px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 1150px) and (min-resolution: 2dppx) {
   .backgroundplaceholder4 {
     background-image: url("/blog/theme/static/images/paisley-bg-4@2x.png"); } }
-@media screen and (min-width: 83.125em) {
+@media screen and (min-width: 1330px) {
   .backgroundplaceholder5 {
     content: ' ';
     position: fixed;
@@ -764,14 +750,12 @@ article {
     height: 600px;
     background-size: 800px 600px;
     background-repeat: no-repeat;
-    z-index: -95; } }
-@media screen and (max-width: 83.125em) and (-Webkit-max-device-pixel-ratio: 1.4), screen and (max-width: 83.125em) and (max--moz-device-pixel-ratio: 1.4), screen and (max-width: 83.125em) and (-o-max-device-pixel-ratio: 3 / 5), screen and (max-width: 83.125em) and (max-device-pixel-ratio: 1.4), screen and (max-width: 83.125em) and (max-resolution: 1dppx) {
-  .backgroundplaceholder5 {
+    z-index: -95;
     background-image: url("/blog/theme/static/images/paisley-bg-5.png"); } }
-@media screen and (min-width: 83.125em) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 83.125em) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 83.125em) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 83.125em) and (min-device-pixel-ratio: 1.5), screen and (min-width: 83.125em) and (min-resolution: 2dppx) {
+@media screen and (min-width: 1330px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 1330px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 1330px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 1330px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 1330px) and (min-resolution: 2dppx) {
   .backgroundplaceholder5 {
     background-image: url("/blog/theme/static/images/paisley-bg-5@2x.png"); } }
-@media screen and (min-width: 96.25em) {
+@media screen and (min-width: 1540px) {
   .backgroundplaceholder6 {
     content: ' ';
     position: fixed;
@@ -781,10 +765,8 @@ article {
     height: 600px;
     background-size: 800px 600px;
     background-repeat: no-repeat;
-    z-index: -94; } }
-@media screen and (max-width: 96.25em) and (-Webkit-max-device-pixel-ratio: 1.4), screen and (max-width: 96.25em) and (max--moz-device-pixel-ratio: 1.4), screen and (max-width: 96.25em) and (-o-max-device-pixel-ratio: 3 / 5), screen and (max-width: 96.25em) and (max-device-pixel-ratio: 1.4), screen and (max-width: 96.25em) and (max-resolution: 1dppx) {
-  .backgroundplaceholder6 {
+    z-index: -94;
     background-image: url("/blog/theme/static/images/paisley-bg-6.png"); } }
-@media screen and (min-width: 96.25em) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 96.25em) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 96.25em) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 96.25em) and (min-device-pixel-ratio: 1.5), screen and (min-width: 96.25em) and (min-resolution: 2dppx) {
+@media screen and (min-width: 1540px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 1540px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 1540px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 1540px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 1540px) and (min-resolution: 2dppx) {
   .backgroundplaceholder6 {
     background-image: url("/blog/theme/static/images/paisley-bg-6@2x.png"); } }

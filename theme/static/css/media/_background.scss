@@ -1,5 +1,5 @@
 @mixin bgimage($minwidth, $number) {
-    @media screen and (min-width: #{$minwidth/16}em) {
+    @media screen and (min-width: #{$minwidth}px) {
         .backgroundplaceholder#{$number} {
             content: ' ';
             position: fixed;
@@ -10,26 +10,18 @@
             background-size: 800px 600px;
             background-repeat:no-repeat;
             z-index: -#{(100 - $number)};
-        }
-    }
 
-    // lodpi
-    @media screen and (max-width: #{$minwidth/16}em) and (-Webkit-max-device-pixel-ratio: 1.4),
-        screen and (max-width: #{$minwidth/16}em) and (max--moz-device-pixel-ratio: 1.4),
-        screen and (max-width: #{$minwidth/16}em) and (-o-max-device-pixel-ratio: 3/5),
-        screen and (max-width: #{$minwidth/16}em) and (max-device-pixel-ratio: 1.4),
-        screen and (max-width: #{$minwidth/16}em) and (max-resolution: 1dppx) {
-        .backgroundplaceholder#{$number} {
+            // Non-retina is default.
             background-image: url("/blog/theme/static/images/paisley-bg-#{$number}.png");
         }
     }
 
-    // hidpi
-    @media screen and (min-width: #{$minwidth/16}em) and (-Webkit-min-device-pixel-ratio: 1.5),
-        screen and (min-width: #{$minwidth/16}em) and (min--moz-device-pixel-ratio: 1.5),
-        screen and (min-width: #{$minwidth/16}em) and (-o-min-device-pixel-ratio: 3/2),
-        screen and (min-width: #{$minwidth/16}em) and (min-device-pixel-ratio: 1.5),
-        screen and (min-width: #{$minwidth/16}em) and (min-resolution: 2dppx) {
+    // Possible retina override.
+    @media screen and (min-width: #{$minwidth}px) and (-Webkit-min-device-pixel-ratio: 1.5),
+        screen and (min-width: #{$minwidth}px) and (min--moz-device-pixel-ratio: 1.5),
+        screen and (min-width: #{$minwidth}px) and (-o-min-device-pixel-ratio: 3/2),
+        screen and (min-width: #{$minwidth}px) and (min-device-pixel-ratio: 1.5),
+        screen and (min-width: #{$minwidth}px) and (min-resolution: 2dppx) {
         .backgroundplaceholder#{$number} {
             background-image: url("/blog/theme/static/images/paisley-bg-#{$number}@2x.png");
         }
