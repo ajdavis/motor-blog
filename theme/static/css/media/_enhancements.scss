@@ -27,8 +27,7 @@
 // layout around a 2em-thick cross dividing the logo, the article header,
 // the nav links, and the article body.
 @media screen and (min-width: 720px) {
-    $tabletlineheight: 1.3;
-    $logo_dim: ($fixed_column - ($line/16)/2);
+    $logo_dim: 5.25;
     body {
         font-family: Museo-300, serif;
         line-height: #{20 / $font_size}em;
