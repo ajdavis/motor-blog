@@ -1,7 +1,7 @@
 @media screen and (min-width: 480px) {
     .main-nav ul {
         li {
-            margin: emStep(2) emStep(2);
+            margin: 0.5em 0.5em;
         }
 
         .photography-nav-item, .feed-nav-item {
@@ -34,7 +34,7 @@
 // the nav links, and the article body.
 @media screen and (min-width: 720px) {
     $tabletlineheight: 1.3;
-    $logo_dim: ($fixed_column - ($line/$em)/2);
+    $logo_dim: ($fixed_column - ($line/16)/2);
     body {
         font-family: Museo-300, serif;
         line-height: #{20 / $font_size}em;
@@ -43,7 +43,7 @@
     h1, h2, h3, h4, h5 {
         font-family: Museo-500, serif;
         font-weight: normal;
-        margin: emStep(4) 0;
+        margin: 1em 0;
     }
 
     .container {
@@ -60,9 +60,9 @@
 
     .main-header {
         position: fixed;
-        top: gutter();
-        left: gutter();
-        @include cellpad;
+        top: 0.375em;
+        left: 0.375em;
+        padding: 0 0.375em;
         margin-left: 3em; // 3em * 14px = 42px
         width: 6em; // 6em * 14px = 84px
 
@@ -92,7 +92,7 @@
             .category-nav-item, .search-item,
             .nav-divider-1, {
                 @include visible;
-                margin: 0 0 emStep(2);
+                margin: 0 0 0.5em;
                 text-align: right;
             }
 
@@ -122,11 +122,11 @@
     }
 
     .search-text-input {
-        margin: emStep(4) 0 emStep(1);
+        margin: 1em 0 0.25em;
     }
 
     .search-button {
-        margin: emStep(1) 0;
+        margin: 0.25em 0;
     }
 
     .post-summary p, .post-content li, .post-content p, .post-list .summary-title {
@@ -183,7 +183,7 @@
     article {
         border-top: none;
         border-bottom: 1px dotted $lightergrey;
-        margin: emStep(2) 0 1em;
+        margin: 0.5em 0 1em;
     }
 
     // Remove article summaries and their "more" right-arrows
@@ -232,7 +232,7 @@
 // Grow fonts, move content 1em to right
 @media screen and (min-width: 1280px) {
     .main-header {
-        left: gutter() + 1em;
+        left: 0.375em + 1em;
     }
 
     section {

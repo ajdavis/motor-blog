@@ -1,5 +1,22 @@
 // Phone is default so no min-width actually set for lowest setting.
 
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+input, textarea, button, select {
+    margin: 0;
+    font-size: 100%;
+    line-height: normal;
+    vertical-align: baseline;
+}
+
 /* min-width: 320px (1st gen), 440px (2nd gen), 640px (landscape) */
 // Should put the lowest one you want to support here without media restrictions. 
 // Others in _phone.scss
@@ -25,7 +42,7 @@ img {
 }
 
 h1, h2, h3, h4, h5 {
-    margin: emStep(2) 0;
+    margin: 0.5em 0;
 
     & > a {
         text-decoration: none;
@@ -65,9 +82,10 @@ hr {
 }
 
 pre {
-    margin-bottom: emStep(5);
+    margin-bottom: 1.25em;
     font-size: 1.1em;
     overflow: auto;
+    white-space: pre-wrap;
 }
 
 /* Make inline code spans closer in size to normal Museo text */
@@ -76,7 +94,8 @@ code {
 }
 
 .container {
-    @include body-container;
+    @include clearfix;
+    margin: 0 7%;
     text-align: center;
 }
 
@@ -86,14 +105,14 @@ header {
 
 .main-header {
     @include clearfix;
-    margin: emStep(2) auto 0;
+    margin: 0.5em auto 0;
 
     h1 {
-        margin: emStep(2) 0 0;
+        margin: 0.5em 0 0;
         a { color: $grey; }
     }
 
-    padding-bottom: emStep(2);
+    padding-bottom: 0.5em;
 }
 
 .home-body .main-header {
@@ -131,13 +150,13 @@ header {
 }
 
 .main-nav ul {
-    @include bulletless;
     @include center;
+    list-style: none outside none;
 
     li {
         @include font-size(14, 21);
         display: inline;
-        margin: emStep(2);
+        margin: 0.5em;
     }
 
     // Start by hiding all nav items and gradually reveal as screen width increases
@@ -157,7 +176,7 @@ header {
 }
 
 .search-text-input, .search-button {
-    height: emStep(6);
+    height: 1.5em;
 }
 
 .search-text-input {
@@ -208,7 +227,7 @@ article {
     	width: 0;
         left: 100%;
        	top: 50%;
-        border: emStep(3) solid transparent;
+        border: 0.75em solid transparent;
        	border-left-color: $grey;
     }
 }
@@ -247,7 +266,7 @@ article {
 }
 
 .post-list {
-    @include bulletless;
+    list-style: none outside none;
     text-align: left;
 
     .summary-title, .summary-date, .excerpt {
@@ -255,7 +274,7 @@ article {
         clear: both;
         text-decoration: none;
         &:hover { text-decoration: underline; }
-        margin: 0 0 emStep(2);
+        margin: 0 0 0.5em;
     }
 
     .summary-title {
@@ -268,12 +287,12 @@ article {
     }
 
     .excerpt {
-        margin-bottom: emStep(8);
+        margin-bottom: 2em;
     }
 }
 
 .nav-below {
-    margin-top: emStep(8);
+    margin-top: 2em;
 }
 
 .nav-below, .nav-below a {
