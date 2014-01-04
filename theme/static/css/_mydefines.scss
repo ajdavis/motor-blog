@@ -27,23 +27,6 @@ $link-hover-color: #2060a0;
     line-height: ($line-height / $font-size) * 1em;
 }
 
-@mixin clearfix {
-// Gently borrowed from bootstrap
-// For clearing floats like a boss h5bp.com/q
-  *zoom: 1;
-  &:before,
-  &:after {
-    display: table;
-    content: "";
-    // Fixes Opera/contenteditable bug:
-    // http://nicolasgallagher.com/micro-clearfix-hack/#comment-36952
-    line-height: 0;
-  }
-  &:after {
-    clear: both;
-  }
-}
-
 @mixin center {
     text-align: center;
     margin: 0 auto;

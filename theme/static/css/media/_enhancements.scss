@@ -15,13 +15,7 @@
         // Replace hr-small.png
         background-image: url("/blog/theme/static/images/hr.png");
 
-        // hidpi
-        @media screen and (-Webkit-min-device-pixel-ratio: 1.5),
-            screen and (min--moz-device-pixel-ratio: 1.5),
-            screen and (-o-min-device-pixel-ratio: 3/2),
-            screen and (min-device-pixel-ratio: 1.5),
-            screen and (min-resolution: 2dppx)
-        {
+        @include hidpi(1.5) {
             background-image: url("/blog/theme/static/images/hr@2x.png");
         }
     }
@@ -53,9 +47,7 @@
 
     .home-body .main-header {
         border: none;
-        -moz-border-image: none;
-       	-webkit-border-image: none;
-       	border-image: none;
+        @include prefixer(border-image, none, webkit moz spec);
     }
 
     .main-header {

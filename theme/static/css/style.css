@@ -52,8 +52,6 @@
 * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   margin: 0;
   padding: 0; }
@@ -112,7 +110,7 @@ hr {
   height: 19px;
   background: white url("/blog/theme/static/images/hr-small.png") no-repeat scroll center;
   background-size: 19px 19px; }
-  @media screen and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min--moz-device-pixel-ratio: 1.5), screen and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-device-pixel-ratio: 1.5), screen and (min-resolution: 2dppx) {
+  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 1.5 / 1), only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
     hr {
       background-image: url("/blog/theme/static/images/hr-small@2x.png"); } }
 
@@ -131,9 +129,8 @@ code {
   margin: 0 7%;
   text-align: center; }
   .container:before, .container:after {
-    display: table;
-    content: "";
-    line-height: 0; }
+    content: " ";
+    display: table; }
   .container:after {
     clear: both; }
 
@@ -146,9 +143,8 @@ header {
   margin: 0.5em auto 0;
   padding-bottom: 0.5em; }
   .main-header:before, .main-header:after {
-    display: table;
-    content: "";
-    line-height: 0; }
+    content: " ";
+    display: table; }
   .main-header:after {
     clear: both; }
   .main-header h1 {
@@ -161,14 +157,16 @@ header {
   border-style: solid;
   border-width: 0 0 33px;
   max-width: 240px;
-  -moz-border-image: url("/blog/theme/static/images/header-bottom-border.png") 0 0 33 0;
-  -webkit-border-image: url("/blog/theme/static/images/header-bottom-border.png") 0 0 33 0;
-  border-image: url("/blog/theme/static/images/header-bottom-border.png") 0 0 33 0; }
-  @media screen and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min--moz-device-pixel-ratio: 1.5), screen and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-device-pixel-ratio: 1.5), screen and (min-resolution: 2dppx) {
+  -webkit-border-image: url(/blog/theme/static/images/header-bottom-border.png) 0 0 33 0;
+  -moz-border-image: url(/blog/theme/static/images/header-bottom-border.png) 0 0 33 0;
+  -o-border-image: url(/blog/theme/static/images/header-bottom-border.png) 0 0 33 0;
+  border-image: url(/blog/theme/static/images/header-bottom-border.png) 0 0 33 0; }
+  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 1.5 / 1), only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
     .home-body .main-header {
-      -moz-border-image: url("/blog/theme/static/images/header-bottom-border@2x.png") 0 0 66 0;
-      -webkit-border-image: url("/blog/theme/static/images/header-bottom-border@2x.png") 0 0 66 0;
-      border-image: url("/blog/theme/static/images/header-bottom-border@2x.png") 0 0 66 0; } }
+      -webkit-border-image: url(/blog/theme/static/images/header-bottom-border@2x.png) 0 0 66 0;
+      -moz-border-image: url(/blog/theme/static/images/header-bottom-border@2x.png) 0 0 66 0;
+      -o-border-image: url(/blog/theme/static/images/header-bottom-border@2x.png) 0 0 66 0;
+      border-image: url(/blog/theme/static/images/header-bottom-border@2x.png) 0 0 66 0; } }
 
 .logo {
   margin: 0 auto;
@@ -342,7 +340,7 @@ article {
   hr {
     background-size: 300px 19px;
     background-image: url("/blog/theme/static/images/hr.png"); } }
-  @media screen and (min-width: 480px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 480px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 480px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 480px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 480px) and (min-resolution: 2dppx) {
+  @media only screen and (min-width: 480px) and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-width: 480px) and (min--moz-device-pixel-ratio: 1.5), only screen and (min-width: 480px) and (-o-min-device-pixel-ratio: 1.5 / 1), only screen and (min-width: 480px) and (min-resolution: 144dpi), only screen and (min-width: 480px) and (min-resolution: 1.5dppx) {
     hr {
       background-image: url("/blog/theme/static/images/hr@2x.png"); } }
 
@@ -362,8 +360,8 @@ article {
 
   .home-body .main-header {
     border: none;
-    -moz-border-image: none;
     -webkit-border-image: none;
+    -moz-border-image: none;
     border-image: none; }
 
   .main-header {
@@ -534,7 +532,7 @@ article {
     background-repeat: no-repeat;
     z-index: -99;
     background-image: url("/blog/theme/static/images/paisley-bg-1.png"); } }
-@media screen and (min-width: 820px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 820px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 820px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 820px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 820px) and (min-resolution: 2dppx) {
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 1.5 / 1), only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
   .backgroundplaceholder1 {
     background-image: url("/blog/theme/static/images/paisley-bg-1@2x.png"); } }
 @media screen and (min-width: 860px) {
@@ -549,7 +547,7 @@ article {
     background-repeat: no-repeat;
     z-index: -98;
     background-image: url("/blog/theme/static/images/paisley-bg-2.png"); } }
-@media screen and (min-width: 860px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 860px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 860px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 860px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 860px) and (min-resolution: 2dppx) {
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 1.5 / 1), only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
   .backgroundplaceholder2 {
     background-image: url("/blog/theme/static/images/paisley-bg-2@2x.png"); } }
 @media screen and (min-width: 1030px) {
@@ -564,7 +562,7 @@ article {
     background-repeat: no-repeat;
     z-index: -97;
     background-image: url("/blog/theme/static/images/paisley-bg-3.png"); } }
-@media screen and (min-width: 1030px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 1030px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 1030px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 1030px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 1030px) and (min-resolution: 2dppx) {
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 1.5 / 1), only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
   .backgroundplaceholder3 {
     background-image: url("/blog/theme/static/images/paisley-bg-3@2x.png"); } }
 @media screen and (min-width: 1150px) {
@@ -579,7 +577,7 @@ article {
     background-repeat: no-repeat;
     z-index: -96;
     background-image: url("/blog/theme/static/images/paisley-bg-4.png"); } }
-@media screen and (min-width: 1150px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 1150px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 1150px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 1150px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 1150px) and (min-resolution: 2dppx) {
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 1.5 / 1), only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
   .backgroundplaceholder4 {
     background-image: url("/blog/theme/static/images/paisley-bg-4@2x.png"); } }
 @media screen and (min-width: 1330px) {
@@ -594,7 +592,7 @@ article {
     background-repeat: no-repeat;
     z-index: -95;
     background-image: url("/blog/theme/static/images/paisley-bg-5.png"); } }
-@media screen and (min-width: 1330px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 1330px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 1330px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 1330px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 1330px) and (min-resolution: 2dppx) {
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 1.5 / 1), only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
   .backgroundplaceholder5 {
     background-image: url("/blog/theme/static/images/paisley-bg-5@2x.png"); } }
 @media screen and (min-width: 1540px) {
@@ -609,6 +607,6 @@ article {
     background-repeat: no-repeat;
     z-index: -94;
     background-image: url("/blog/theme/static/images/paisley-bg-6.png"); } }
-@media screen and (min-width: 1540px) and (-Webkit-min-device-pixel-ratio: 1.5), screen and (min-width: 1540px) and (min--moz-device-pixel-ratio: 1.5), screen and (min-width: 1540px) and (-o-min-device-pixel-ratio: 3 / 2), screen and (min-width: 1540px) and (min-device-pixel-ratio: 1.5), screen and (min-width: 1540px) and (min-resolution: 2dppx) {
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 1.5 / 1), only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
   .backgroundplaceholder6 {
     background-image: url("/blog/theme/static/images/paisley-bg-6@2x.png"); } }

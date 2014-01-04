@@ -17,11 +17,7 @@
     }
 
     // Possible retina override.
-    @media screen and (min-width: #{$minwidth}px) and (-Webkit-min-device-pixel-ratio: 1.5),
-        screen and (min-width: #{$minwidth}px) and (min--moz-device-pixel-ratio: 1.5),
-        screen and (min-width: #{$minwidth}px) and (-o-min-device-pixel-ratio: 3/2),
-        screen and (min-width: #{$minwidth}px) and (min-device-pixel-ratio: 1.5),
-        screen and (min-width: #{$minwidth}px) and (min-resolution: 2dppx) {
+    @include hidpi(1.5) {
         .backgroundplaceholder#{$number} {
             background-image: url("/blog/theme/static/images/paisley-bg-#{$number}@2x.png");
         }

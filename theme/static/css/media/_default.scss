@@ -1,11 +1,7 @@
 // Phone is default so no min-width actually set for lowest setting.
 
 * {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
+    @include box-sizing(border-box);
     margin: 0;
     padding: 0;
 }
@@ -70,13 +66,7 @@ hr {
     background: #fff url("/blog/theme/static/images/hr-small.png") no-repeat scroll center;
     background-size: 19px 19px;
 
-    // hidpi
-    @media screen and (-Webkit-min-device-pixel-ratio: 1.5),
-        screen and (min--moz-device-pixel-ratio: 1.5),
-        screen and (-o-min-device-pixel-ratio: 3/2),
-        screen and (min-device-pixel-ratio: 1.5),
-        screen and (min-resolution: 2dppx)
-    {
+    @include hidpi(1.5) {
         background-image: url("/blog/theme/static/images/hr-small@2x.png");
     }
 }
@@ -122,20 +112,10 @@ header {
     // header-bottom-border.png is 240px x 33px
     border-width:0 0 33px;
     max-width: 240px;
-    -moz-border-image:url("/blog/theme/static/images/header-bottom-border.png") 0 0 33 0;
-   	-webkit-border-image:url("/blog/theme/static/images/header-bottom-border.png") 0 0 33 0;
-   	border-image:url("/blog/theme/static/images/header-bottom-border.png") 0 0 33 0;
+    @include border-image(url(/blog/theme/static/images/header-bottom-border.png) 0 0 33 0);
 
-    // hidpi
-    @media screen and (-Webkit-min-device-pixel-ratio: 1.5),
-        screen and (min--moz-device-pixel-ratio: 1.5),
-        screen and (-o-min-device-pixel-ratio: 3/2),
-        screen and (min-device-pixel-ratio: 1.5),
-        screen and (min-resolution: 2dppx)
-    {
-        -moz-border-image:url("/blog/theme/static/images/header-bottom-border@2x.png") 0 0 66 0;
-       	-webkit-border-image:url("/blog/theme/static/images/header-bottom-border@2x.png") 0 0 66 0;
-       	border-image:url("/blog/theme/static/images/header-bottom-border@2x.png") 0 0 66 0;
+    @include hidpi(1.5) {
+       	@include border-image(url(/blog/theme/static/images/header-bottom-border@2x.png) 0 0 66 0);
     }
 }
 
