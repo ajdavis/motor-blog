@@ -33,6 +33,15 @@ def migrate_from_cMarkdown_to_markdown(text):
         lines = block_match.group().split('\n')
         header_dict = parse_code_header(lines[0].strip())
         new_header = '```%s' % header_dict.get('lang', '')
+
+        # If old header has highlight lines, add them like:
+        #   ```python{2,3}
+        #
+        # This is not standard Markdown. Relies on
+        # https://github.com/waylan/Python-Markdown/pull/274
+        if 'highlight' in header_dict:
+            new_header += '{%s}' % header_dict['highlight']
+
         new_lines = [
             line[4:] if line.startswith('    ') else line
             for line in lines[1:]]

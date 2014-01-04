@@ -7,6 +7,5 @@ __all__ = ('markup', )
 
 
 def markup(text):
-    return markdown.markdown(
-        text,
-        extensions=['codehilite(linenums=False,noclasses=True)', 'extra'])
+    return markdown.markdown(text, extensions=[
+        'codehilite(linenums=False,noclasses=True)', 'fenced_code', 'extra'])
