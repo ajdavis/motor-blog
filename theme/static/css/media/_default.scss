@@ -13,10 +13,6 @@ input, textarea, button, select {
     vertical-align: baseline;
 }
 
-ul, ol {
-    margin-bottom: 1em;
-}
-
 /* min-width: 320px (1st gen), 440px (2nd gen), 640px (landscape) */
 // Should put the lowest one you want to support here without media restrictions. 
 // Others in _phone.scss
@@ -26,7 +22,9 @@ body {
 }
 
 blockquote {
-    margin-left: 1em;
+    margin: 0;
+    padding-left: 1em;
+    border-left: 1px solid #ddd;
 }
 
 p {
@@ -34,7 +32,16 @@ p {
 }
 
 a {
-    color: $dark;
+    color: $link-color;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+code {
+    padding: 0 2px;
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+    border-radius: 3px;
 }
 
 img {
@@ -42,23 +49,32 @@ img {
 }
 
 h1, h2, h3, h4, h5 {
-    margin: 0.5em 0;
+    margin: 2em 0 1em;
 
     & > a {
         text-decoration: none;
         color: $dark;
 
         &:hover {
-            text-decoration: underline;
+            color: $link-color;
         }
     }
 }
 
-h1 { @include font-size(25, 25); }
+h1 {
+    @include font-size(25, 25);
+    color: $dark;
+}
 
-h2 { @include font-size(18, 19); }
+h2 {
+    @include font-size(18, 19);
+    color: $dark;
+}
 
-h3 { font-variant: small-caps; }
+h3 {
+    font-variant: small-caps;
+    letter-spacing: 0.05em;
+}
 
 h4, h5 { font-weight: bold; font-style: italic; }
 
@@ -97,6 +113,7 @@ header {
     margin: 0.5em auto 0;
 
     h1 {
+        @include font-size(20, 24);
         margin: 0.5em 0 0;
         a { color: $grey; }
     }
@@ -136,6 +153,8 @@ header {
         @include font-size(12, 19);
         display: inline;
         margin: 0.5em;
+
+        a { color: $dark; }
     }
 
     // Start by hiding all nav items and gradually reveal as screen width increases
@@ -180,6 +199,16 @@ article {
 
     // Necessary for the right-arrow style, below
     position: relative;
+
+    ul, ol {
+        list-style-position: inside;
+        padding: 0;
+        margin: 0.5em 0;
+
+        li ul, li ol {
+            margin: 0 0 0 1.5em;
+        }
+    }
 }
 
 .post-meta {
@@ -225,11 +254,6 @@ article {
     }
 }
 
-.post-content li, .post-content li li, .post-content li li li,
-.post-summary p, .post-content p, .post-content li p {
-    @include font-size(12, 19);
-}
-
 .post-summary {
     // Make room for the arrow
     padding-right: 0.5em;
@@ -251,6 +275,7 @@ article {
     .summary-title, .summary-date, .excerpt {
         float: left;
         clear: both;
+        font-weight: normal;
         text-decoration: none;
         &:hover { text-decoration: underline; }
         margin: 0 0 0.5em;
@@ -259,6 +284,7 @@ article {
     .summary-title {
         @include font-size(18, 21);
         font-weight: bold;
+        color: $dark;
     }
 
     .summary-date {
@@ -267,6 +293,7 @@ article {
 
     .excerpt {
         margin-bottom: 2em;
+        color: $dark;
     }
 }
 

@@ -1,12 +1,16 @@
 @media screen and (min-width: 480px) {
     .main-nav ul {
+        margin-top: 0.5em;
+
         li {
-            margin: 0.5em 0.5em;
+            margin: 0 0.5em;
         }
 
         .photography-nav-item, .feed-nav-item {
             @include visible-inline;
         }
+
+        .search-item { margin-top: 0.5em; }
     }
 
     hr {
@@ -33,10 +37,20 @@
         line-height: 20px;
     }
 
+    a {
+        font-weight: normal;
+        font-family: Museo-500, serif;
+    }
+
     h1, h2, h3, h4, h5 {
         font-family: Museo-500, serif;
         font-weight: normal;
-        margin: 1em 0;
+        margin: 1.5em 0 1em;
+    }
+
+    h3 {
+        // Museo-500 small caps are overwrought
+        font-family: Museo-300;
     }
 
     .container {
@@ -70,9 +84,10 @@
             text-transform: lowercase;
 
             a {
+                font-family: Museo-300;
                 text-decoration: none;
                 &:hover {
-                    text-decoration: underline;
+                    color: $link-color;
                 }
             }
 
@@ -120,14 +135,14 @@
     }
 
     .post-summary p, .post-content li, .post-content p, .post-list .summary-title {
-        @include font-size(14, 21);
+        @include font-size(15, 23);
     }
 
     section {
         background-color: white;
         text-align: left;
         margin-left: 161px;
-        width: 475px;
+        width: 500px;
     }
 
     section > article:first-child {
@@ -151,6 +166,7 @@
     }
 
     h1.title {
+        color: black;
         margin: 0;
 
         display: block;
@@ -162,7 +178,7 @@
 
         a:hover {
             text-decoration: none;
-            color: $link-hover-color;
+            color: $link-color;
         }
     }
 
@@ -216,17 +232,20 @@
         .summary-title, .date {
             margin-bottom: 0.5em;
         }
+
+        a {        font-family: Museo-300;
+}
     }
 }
 
 // Grow fonts, move content 15px to right
-@media screen and (min-width: 1280px) {
+@media screen and (min-width: 1200px) {
     .main-header {
         left: 20px;
     }
 
     section {
-        width: 550px;
+        width: 590px;
         margin-left: 175px;
     }
 
@@ -241,6 +260,6 @@
     }
 
     .post-content li, .post-content p {
-        @include font-size(19, 26);
+        @include font-size(17, 26);
     }
 }
