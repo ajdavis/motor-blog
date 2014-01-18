@@ -78,7 +78,6 @@ p {
 
 a {
   color: #2060a0;
-  font-weight: bold;
   text-decoration: none; }
 
 code {
@@ -370,10 +369,6 @@ article {
   body {
     font-family: Museo-300, serif;
     line-height: 20px; }
-
-  a {
-    font-weight: normal;
-    font-family: Museo-500, serif; }
 
   h1, h2, h3, h4, h5 {
     font-family: Museo-500, serif;
