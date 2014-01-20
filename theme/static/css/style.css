@@ -511,6 +511,7 @@ article {
     text-shadow: none;
     font-size: 18px;
     line-height: 21px;
+    width: 45%;
     font-weight: bold;
     margin-bottom: 1em; }
     .nav-previous a, .nav-next a {

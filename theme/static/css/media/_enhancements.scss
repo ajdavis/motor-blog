@@ -216,6 +216,7 @@
     .nav-previous, .nav-next {
         @include nobutton;
         @include font-size(18, 21);
+        width: 45%;
         font-weight: bold;
         margin-bottom: 1em;
         a:hover {
