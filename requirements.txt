@@ -5,7 +5,7 @@ git+git://github.com/joshmarshall/tornadorpc.git
 tornado>=3
 git+git://github.com/mongodb/motor.git@47dd7857
 dictshield
-git+git://github.com/ajdavis/Python-Markdown.git@highlight-lines
+git+git://github.com/waylan/Python-Markdown.git@809195fb
 beautifulsoup4
 requests
 PIL

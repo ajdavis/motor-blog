@@ -106,10 +106,10 @@ is whatever [Pygments](http://pygments.org/languages/) supports. The following a
 interest to Python coders like me: `py`, `py3`, `pytb` and `py3tb` for tracebacks, and `pycon` for
 console sessions.
 
-Using a feature [I hope to add to Python-Markdown](https://github.com/waylan/Python-Markdown/pull/274),
+Using a feature [in the latest Python-Markdown](https://github.com/waylan/Python-Markdown/pull/274),
 you can highlight specific lines in a code block:
 
-    ```python{2}
+    ```python hl_lines="2"
     # Line 1.
     # Line 2. This will have a yellow background
     ```
