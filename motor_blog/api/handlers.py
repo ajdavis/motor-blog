@@ -23,10 +23,12 @@ class WordpressParser(XMLRPCParser):
     Dispatches names like 'wp.getRecentPosts' to wp_getRecentPosts().
     """
     def parse_request(self, request_body):
-        ((method_name, params),) = super(WordpressParser, self).parse_request(
-            request_body)
-
-        return ((method_name.replace('.', '_'), params),)
+        result = super(WordpressParser, self).parse_request(request_body)
+        if isinstance(result, xmlrpclib.Fault):
+            raise result
+        else:
+            ((method_name, params),) = result
+            return ((method_name.replace('.', '_'), params),)
 
 
 class APIHandler(
