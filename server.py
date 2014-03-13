@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from functools import partial
 import logging
 import os
 
@@ -32,8 +33,9 @@ if __name__ == "__main__":
             break
 
     # TODO: Mongo connection options
-    db = motor.MotorClient().open_sync().motorblog
-    cache.startup(db)
+    db = motor.MotorClient().motorblog
+    loop = tornado.ioloop.IOLoop.current()
+    loop.run_sync(partial(cache.startup, db))
 
     if opts.rebuild_indexes or opts.ensure_indexes:
         indexes.ensure_indexes(
@@ -47,4 +49,4 @@ if __name__ == "__main__":
     msg = 'Listening on port %s' % opts.port
     print msg
     logging.info(msg)
-    tornado.ioloop.IOLoop.instance().start()
+    loop.start()

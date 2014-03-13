@@ -20,26 +20,25 @@ _callbacks = {}
 _db = None
 
 
+@gen.coroutine
 def create_events_collection(db):
     """Create capped collection.
 
     Pass in a MotorDatabase.
     """
-    sync_cx = db.connection.sync_client()
-    sync_db = sync_cx[db.name]
     try:
         # Size is in bytes; event documents are rare and very small
-        sync_db.create_collection('events', size=100 * 1024, capped=True)
+        yield db.create_collection('events', size=100 * 1024, capped=True)
         logging.info(
-            'Created capped collection "events" in database "%s"' %
-            sync_db.name)
+            'Created capped collection "events" in database "%s"' % db.name)
     except pymongo.errors.CollectionInvalid:
         # Collection already exists
-        if 'capped' not in sync_db.events.options():
+        collection_options = yield db.events.options()
+        if 'capped' not in collection_options:
             logging.error(
                 '%s.events exists and is not a capped collection,\n'
                 'please drop the collection and start this app again.' %
-                sync_db.name)
+                db.name)
 
             sys.exit(1)
 
@@ -112,11 +111,12 @@ def cached(key, invalidate_event):
     return _cached
 
 
+@gen.coroutine
 def startup(db):
     global _db
     assert not _db, "cache.startup() already called once."
     _db = db
-    create_events_collection(db)
+    yield create_events_collection(db)
     loop = IOLoop.current()
 
     @gen.coroutine
