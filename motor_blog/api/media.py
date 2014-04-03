@@ -32,7 +32,7 @@ class Media(object):
     @coroutine
     def store_image(self, name, content, content_type):
         """Put an image in GridFS, and return the URL."""
-        fs = yield motor.MotorGridFS(self.settings['db']).open()
+        fs = motor.MotorGridFS(self.settings['db'])
 
         # This is the tail end of the URL, like 2012/06/foo.png.
         now = datetime.datetime.utcnow()
