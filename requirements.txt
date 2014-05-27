@@ -3,7 +3,7 @@ werkzeug
 pygments
 git+git://github.com/joshmarshall/tornadorpc.git
 tornado>=3
-git+git://github.com/mongodb/motor.git@aeb8268
+motor==0.2
 dictshield
 markdown==2.4
 beautifulsoup4
