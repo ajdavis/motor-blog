@@ -118,6 +118,10 @@ class Posts(object):
     def metaWeblog_getPost(self, postid, user, password):
         return self._get_post(postid)
 
+    @rpc
+    def wp_getPage(self, blogid, postid, user, password):
+        return self._get_post(postid)
+
     @coroutine
     def _delete_post(self, postid):
         # TODO: a notion of 'trashed', not removed
