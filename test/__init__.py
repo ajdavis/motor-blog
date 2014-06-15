@@ -67,7 +67,7 @@ class MotorBlogTest(AsyncHTTPTestCase):
         super(MotorBlogTest, self).tearDown()
 
     def get_db(self):
-        client = motor.MotorClient(io_loop=self.io_loop).open_sync()
+        client = motor.MotorClient(io_loop=self.io_loop)
         return client[self.database_name]
 
     def get_app(self):
