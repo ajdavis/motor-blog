@@ -183,8 +183,11 @@
 
     article {
         border-top: none;
-        border-bottom: 1px dotted $lightergrey;
         margin: 0.5em 0 1em;
+    }
+
+    article.post {
+        border-bottom: 1px dotted $lightergrey;
     }
 
     // Remove article summaries and their "more" right-arrows

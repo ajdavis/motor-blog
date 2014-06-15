@@ -1,6 +1,6 @@
 post_url = reverse_url('post', post.slug)
 
-article.post
+article(class=post.type)
     header
         if (post.type == 'post')
             .post-meta

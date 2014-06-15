@@ -71,7 +71,7 @@ body {
 blockquote {
   margin: 0;
   padding-left: 1em;
-  border-left: 1px solid #dddddd; }
+  border-left: 1px solid #ddd; }
 
 p {
   margin-bottom: 1em; }
@@ -83,7 +83,7 @@ a {
 code {
   font-size: 90%;
   padding: 0 2px;
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   background-color: #f8f8f8;
   border-radius: 3px; }
 
@@ -216,14 +216,14 @@ header {
   width: 65%; }
 
 .search-button {
-  box-shadow: inset 1px 1px 0 0 white;
+  box-shadow: inset 1px 1px 0 0 #ffffff;
   background-color: #ededed;
-  border: 1px solid gainsboro;
+  border: 1px solid #dcdcdc;
   display: inline-block;
   color: #777777;
   padding: 0 12px;
   text-decoration: none;
-  text-shadow: 1px 1px 0 white;
+  text-shadow: 1px 1px 0 #ffffff;
   float: right;
   width: 30%; }
   .search-button a {
@@ -318,14 +318,14 @@ article {
   color: #575757; }
 
 .nav-previous, .nav-next {
-  box-shadow: inset 1px 1px 0 0 white;
+  box-shadow: inset 1px 1px 0 0 #ffffff;
   background-color: #ededed;
-  border: 1px solid gainsboro;
+  border: 1px solid #dcdcdc;
   display: inline-block;
   color: #777777;
   padding: 0 12px;
   text-decoration: none;
-  text-shadow: 1px 1px 0 white;
+  text-shadow: 1px 1px 0 #ffffff;
   width: 50%;
   min-height: 3em;
   padding: 0.8em; }
@@ -480,8 +480,10 @@ article {
 
   article {
     border-top: none;
-    border-bottom: 1px dotted #aaaaaa;
     margin: 0.5em 0 1em; }
+
+  article.post {
+    border-bottom: 1px dotted #aaaaaa; }
 
   article:after {
     display: none !important; }
