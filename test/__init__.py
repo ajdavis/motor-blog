@@ -38,24 +38,18 @@ class MotorBlogTest(AsyncHTTPTestCase):
             sync_db.drop_collection(collection_name)
 
         self.patchers = []
-        patcher = mock.patch.multiple(
-            tornado_options.mockable(),
-            host='localhost',
-            blog_name='My Test Blog',
-            base_url='test-blog',
-            author_display_name='Test J. Author',
-            author_email='t.j.author@example.com',
-            twitter_handle='test_twitter_handle',
-            description='test description',
-            google_analytics_id='TEST GA ID',
-            user='admin',
-            password='password',
-            cookie_secret='test-cookie-secret',
-            debug=True,
-        )
-
-        patcher.start()
-        self.patchers.append(patcher)
+        self.set_option('host', 'localhost')
+        self.set_option('blog_name', 'My Test Blog')
+        self.set_option('base_url', 'test-blog')
+        self.set_option('author_display_name', 'Test J. Author')
+        self.set_option('author_email', 't.j.author@example.com')
+        self.set_option('twitter_handle', 'test_twitter_handle')
+        self.set_option('description', 'test description')
+        self.set_option('google_analytics_id', 'TEST GA ID')
+        self.set_option('user', 'admin')
+        self.set_option('password', 'password')
+        self.set_option('cookie_secret', 'test-cookie-secret')
+        self.set_option('debug', True)
 
         # Sets self.__port, and sets self.app = self.get_app().
         super(MotorBlogTest, self).setUp()
@@ -65,6 +59,13 @@ class MotorBlogTest(AsyncHTTPTestCase):
             patcher.stop()
 
         super(MotorBlogTest, self).tearDown()
+
+    def set_option(self, name, value):
+        patcher = mock.patch.object(tornado_options.mockable(), name, value)
+        patcher.start()
+
+        # So we can reverse it in tearDown.
+        self.patchers.append(patcher)
 
     def get_db(self):
         client = motor.MotorClient(io_loop=self.io_loop)
@@ -104,3 +105,42 @@ class MotorBlogTest(AsyncHTTPTestCase):
         self.assertEqual(200, response.code)
         (data,), _ = xmlrpclib.loads(response.body)
         return data
+
+    def _new(self, api, title, meta_description, body):
+        return self.fetch_rpc(
+            api,
+            (
+                1,  # Blog id, always 1.
+                tornado_options.user,
+                tornado_options.password,
+                {
+                    'mt_keywords': 'a tag,another tag',
+                    'post_status': 'publish',
+                    'mt_excerpt': meta_description,
+                    'title': title,
+                    'description': body},
+                True))
+
+    def new_post(
+            self,
+            title='the title',
+            meta_description='the meta description',
+            body='the body'):
+        """Create a post and return its id"""
+        return self._new(
+            'metaWeblog.newPost',
+            title=title,
+            meta_description=meta_description,
+            body=body)
+
+    def new_page(
+            self,
+            title='the title',
+            meta_description='the meta description',
+            body='the body'):
+        """Create a page and return its id"""
+        return self._new(
+            'wp.newPage',
+            title=title,
+            meta_description=meta_description,
+            body=body)

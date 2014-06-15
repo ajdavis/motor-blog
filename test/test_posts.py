@@ -12,25 +12,13 @@ class PostsTest(test.MotorBlogTest):
         super(PostsTest, self).setUp()
         self.meta_description = 'description "with quotes" and \'single\''
 
-    def new_post(self):
-        """Create a post and return its id"""
-        return self.fetch_rpc(
-            'metaWeblog.newPost',
-            (
-                1,  # Blog id, always 1.
-                tornado_options.user,
-                tornado_options.password,
-                {
-                    'mt_keywords': 'a tag,another tag',
-                    'post_status': 'publish',
-                    'mt_excerpt': self.meta_description,
-                    'title': 'the title',
-                    'description': 'the body'},
-                True))
-
     def test_new_post(self):
         start = datetime.datetime.utcnow()
-        post_id = self.new_post()
+        post_id = self.new_post(
+            title='the title',
+            meta_description=self.meta_description,
+            body='the body')
+
         end = datetime.datetime.utcnow()
 
         post = self.fetch_rpc(
@@ -57,7 +45,11 @@ class PostsTest(test.MotorBlogTest):
                 post['date_created_gmt'], start, end))
 
     def test_post_page(self):
-        self.new_post()
+        post_id = self.new_post(
+            title='the title',
+            meta_description=self.meta_description,
+            body='the body')
+
         title_slug = slugify.slugify('the title')
         post_page = self.fetch(self.reverse_url('post', title_slug))
         self.assertEqual(200, post_page.code)
