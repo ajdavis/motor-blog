@@ -19,7 +19,7 @@ from motor_blog.web.lytics import ga_track_event_url
 
 __all__ = (
     # Web
-    'HomeHandler', 'PostHandler', 'AllPostsHandler',
+    'RecentPostsHandler', 'PostHandler', 'HomeHandler', 'AllPostsHandler',
     'CategoryHandler', 'TagHandler', 'SearchHandler',
 
     # Atom
@@ -132,7 +132,11 @@ def check_last_modified(get):
     return _get
 
 
-class HomeHandler(MotorBlogHandler):
+class RecentPostsHandler(MotorBlogHandler):
+    """Show full content of most recent ten posts.
+
+    This is the default home page.
+    """
     @gen.coroutine
     def get_posts(self, page_num=0):
         cursor = (self.db.posts.find(
@@ -149,7 +153,7 @@ class HomeHandler(MotorBlogHandler):
     @check_last_modified
     def get(self, page_num=0):
         self.render(
-            'home.jade',
+            'recent-posts.jade',
             posts=self.posts, categories=self.categories,
             page_num=int(page_num))
 
@@ -175,7 +179,7 @@ class AllPostsHandler(MotorBlogHandler):
 
 
 class PostHandler(MotorBlogHandler):
-    """Show a single blog post or page"""
+    """Show a single blog post or page, by slug."""
     @gen.coroutine
     def get_posts(self, slug):
         slug = slug.rstrip('/')
@@ -228,6 +232,25 @@ class PostHandler(MotorBlogHandler):
             prev=prev_post,
             next=next_post,
             categories=self.categories)
+
+
+class HomeHandler(PostHandler):
+    """Serve a static home page.
+
+    If the "home_page" slug is set in motor_blog.conf, this handler shows it.
+
+    Used in a URL map like:
+
+        URLSpec(r"/?", HomeHandler, {'slug': home_slug}, name='home')
+
+    """
+    def initialize(self, slug):
+        super(HomeHandler, self).initialize()
+        self.slug = slug
+
+    def get(self):
+        # Return the Future returned by the get() coroutine.
+        return super(HomeHandler, self).get(self.slug)
 
 
 class CategoryHandler(MotorBlogHandler):

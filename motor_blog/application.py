@@ -21,7 +21,7 @@ def get_application(root_dir, db, option_parser):
     sock_js_router = sockjs.tornado.SockJSRouter(
         DraftReloadConnection, '/blog/sock_js')
 
-    urls = ([
+    urls = [
         # XML-RPC API
         U(r"/rsd", RSDHandler, name='rsd'),
         U(r"/api", APIHandler, name='api'),
@@ -70,18 +70,26 @@ def get_application(root_dir, db, option_parser):
             r"category/(?P<slug>.+)/page/(?P<page_num>\d+)/?",
             CategoryHandler, name='category-page'),
         U(r"category/(?P<slug>.+)/?", CategoryHandler, name='category'),
-        U(r"page/(?P<page_num>\d+)/?", HomeHandler, name='page'),
+        U(r"page/(?P<page_num>\d+)/?", RecentPostsHandler, name='page'),
         U(r"all-posts/?", AllPostsHandler, name='all-posts'),
         U(
             r"tag/(?P<tag>.+)/page/(?P<page_num>\d+)/?",
             TagHandler, name='tag-page'),
         U(r"tag/(?P<tag>.+)/?", TagHandler, name='tag'),
         U(r"search/", SearchHandler, name='search'),
-        U(r"/?", HomeHandler, name='home'),
-    ] + sock_js_router.urls + [
-        # PostHandler must be last because slug could be anything.
-        U(r"/(?P<slug>.+)/?", PostHandler, name='post'),
-    ])
+    ]
+
+    home_slug = option_parser.home_page
+    if home_slug:
+        urls.append(U(r"/?", HomeHandler, {'slug': home_slug}, name='home'))
+    else:
+        # Default home page shows ten most recent posts.
+        urls.append(U(r"/?", RecentPostsHandler, name='home'))
+
+    urls += sock_js_router.urls
+
+    # PostHandler must be last because slug could be anything.
+    urls.append(U(r"/(?P<slug>.+)/?", PostHandler, name='post'))
 
     return tornado.web.Application(
         urls,

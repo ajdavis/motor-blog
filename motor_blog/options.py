@@ -64,6 +64,8 @@ def define_options(option_parser):
         " motor_blog.conf)'"), group='Appearance')
     option_parser.define('theme', type=str, default='theme', help=(
         "Directory name of your theme files"), group='Appearance')
+    option_parser.define('home_page', type=str, group='Appearance', help=(
+        "Slug of a static home page (default: recent posts)"))
     option_parser.define(
         'timezone', type=str, default='America/New_York',
         help="Your timezone name", group='Appearance')

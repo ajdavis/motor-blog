@@ -1,6 +1,11 @@
 host = 'localhost'
 port = 8888
 base_url = 'blog'
+
+# By default, the home page includes the full text of your ten most recent
+# posts. Uncomment this to use a page with the given slug, instead.
+# home_page = 'home'
+
 user = 'admin'
 password = 'foobar'
 blog_name = author_display_name = 'Your Name'
