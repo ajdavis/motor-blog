@@ -73,7 +73,7 @@ class DraftsHandler(MotorBlogAdminHandler):
         # TODO: pagination
         db = self.settings['db']
         draft_docs = yield db.posts.find(
-            {'status': 'draft', 'type': 'post'},
+            {'status': 'draft'},
             {'original': False, 'body': False},
         ).sort([('_id', -1)]).to_list(100)
 
