@@ -156,11 +156,12 @@ class RecentPostsHandler(MotorBlogHandler):
         cursor = (self.db.posts.find(
             {'status': 'publish', 'type': 'post'},
             {'original': False},
-        ).sort([('pub_date', -1)])
+        )
+            .sort([('pub_date', -1)])
             .skip(int(page_num) * 10)
             .limit(10))
 
-        result = yield cursor.to_list(100)
+        result = yield cursor.to_list(10)
         raise gen.Return(result)
 
     @tornado.web.addslash
@@ -168,7 +169,8 @@ class RecentPostsHandler(MotorBlogHandler):
     def get(self, page_num=0):
         yield self.render_async(
             'recent-posts.jade',
-            posts=self.posts, categories=self.categories,
+            posts=self.posts,
+            categories=self.categories,
             page_num=int(page_num))
 
 
