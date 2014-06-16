@@ -271,7 +271,7 @@ article {
     list-style: none outside none;
     text-align: left;
 
-    .summary-title, .summary-date, .excerpt {
+    .summary-title, .excerpt {
         display: block;
         font-weight: normal;
         text-decoration: none;
@@ -283,10 +283,6 @@ article {
         @include font-size(18, 21);
         font-weight: bold;
         color: $dark;
-    }
-
-    .summary-date {
-        color: $lightgrey;
     }
 
     .excerpt {

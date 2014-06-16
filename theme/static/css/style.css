@@ -292,20 +292,18 @@ article {
 .post-list {
   list-style: none outside none;
   text-align: left; }
-  .post-list .summary-title, .post-list .summary-date, .post-list .excerpt {
+  .post-list .summary-title, .post-list .excerpt {
     display: block;
     font-weight: normal;
     text-decoration: none;
     margin: 0 0 0.5em; }
-    .post-list .summary-title:hover, .post-list .summary-date:hover, .post-list .excerpt:hover {
+    .post-list .summary-title:hover, .post-list .excerpt:hover {
       text-decoration: underline; }
   .post-list .summary-title {
     font-size: 18px;
     line-height: 21px;
     font-weight: bold;
     color: #343838; }
-  .post-list .summary-date {
-    color: #888888; }
   .post-list .excerpt {
     margin-bottom: 2em;
     color: #343838; }
