@@ -106,41 +106,48 @@ class MotorBlogTest(AsyncHTTPTestCase):
         (data,), _ = xmlrpclib.loads(response.body)
         return data
 
-    def _new(self, api, title, meta_description, body):
-        return self.fetch_rpc(
-            api,
-            (
-                1,  # Blog id, always 1.
-                tornado_options.user,
-                tornado_options.password,
-                {
-                    'mt_keywords': 'a tag,another tag',
-                    'post_status': 'publish',
-                    'mt_excerpt': meta_description,
-                    'title': title,
-                    'description': body},
-                True))
+    def _new(self, api, title, meta_description, body, tag):
+        payload = {
+            'mt_keywords': 'a tag,another tag',
+            'post_status': 'publish',
+            'mt_excerpt': meta_description,
+            'title': title,
+            'description': body}
+
+        if tag:
+            payload['mt_keywords'] = tag
+
+        return self.fetch_rpc(api, (
+            1,  # Blog id, always 1.
+            tornado_options.user,
+            tornado_options.password,
+            payload,
+            True))
 
     def new_post(
             self,
             title='the title',
             meta_description='the meta description',
-            body='the body'):
+            body='the body',
+            tag=None):
         """Create a post and return its id"""
         return self._new(
             'metaWeblog.newPost',
             title=title,
             meta_description=meta_description,
-            body=body)
+            body=body,
+            tag=tag)
 
     def new_page(
             self,
             title='the title',
             meta_description='the meta description',
-            body='the body'):
+            body='the body',
+            tag=None):
         """Create a page and return its id"""
         return self._new(
             'wp.newPage',
             title=title,
             meta_description=meta_description,
-            body=body)
+            body=body,
+            tag=tag)

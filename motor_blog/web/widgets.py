@@ -1,9 +1,9 @@
 """Process "widgets" in blog posts.
 
 I've added a silly syntax for widgets in Markdown. The only widget supported
-shows summaries of the N most recent posts:
+shows summaries of the N most recent posts, optionally with a tag:
 
-    !!recent-posts 10!!
+    !!recent-posts 10 tag!!
 """
 
 import cStringIO
@@ -28,6 +28,7 @@ def process_widgets(handler, db, html):
     rv = cStringIO.StringIO()
 
     match = None
+    pos = 0
     for match in widget_pat.finditer(html):
         parts = [p.strip() for p in match.group(1).split() if p.strip()]
         if parts:
@@ -35,26 +36,28 @@ def process_widgets(handler, db, html):
             if widget_name in all_widgets:
                 f = all_widgets[widget_name]
                 widget_html = yield f(handler, db, *options)
-                rv.write(html[match.pos:match.start()])
-                rv.write(widget_html)
 
-    if match:
-        # At least one widget, write the HTML that came after the last one.
-        rv.write(html[match.end():])
-        raise gen.Return(rv.getvalue())
-    else:
-        # No widgets, return original HTML.
-        raise gen.Return(html)
+                # Text before the match.
+                rv.write(html[pos:match.start()])
+
+                # Replace widget with rendered version.
+                rv.write(widget_html)
+                pos = match.end()
+
+    rv.write(html[pos:])
+    raise gen.Return(rv.getvalue())
 
 
 @gen.coroutine
-def recent_posts(handler, db, n):
+def recent_posts(handler, db, n, tag=None):
     """Show summaries of N most recent posts."""
-    posts = yield db.posts.find(
-        {'status': 'publish', 'type': 'post'},
-        {'original': False},
-    ).sort([('pub_date', -1)]).limit(int(n)).to_list(int(n))
+    limit = int(n)
+    query = {'status': 'publish', 'type': 'post'}
+    if tag:
+        query['tags'] = tag
 
+    cursor = db.posts.find(query, {'original': False})
+    posts = yield cursor.sort([('pub_date', -1)]).limit(limit).to_list(limit)
     rv = cStringIO.StringIO()
     rv.write('<ul class="post-list">')
     for post_doc in posts:
