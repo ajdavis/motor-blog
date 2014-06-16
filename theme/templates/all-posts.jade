@@ -11,3 +11,19 @@ block content
     ul.post-list
         each post in posts
             include post-summary
+    nav
+        .nav-previous
+            a(href=reverse_url('all-posts-page', page_num + 1))
+                span.meta-nav &larr; Older posts
+
+        if (page_num > 0)
+            next_page = page_num - 1
+
+            if (next_page == 0)
+                next_url = reverse_url('all-posts')
+            else
+                next_url = reverse_url('all-posts-page', page_num - 1)
+
+            .nav-next
+                a(href=next_url) Newer posts
+                    span.meta-nav &rarr;

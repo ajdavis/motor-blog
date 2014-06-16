@@ -176,22 +176,26 @@ class RecentPostsHandler(MotorBlogHandler):
 
 class AllPostsHandler(MotorBlogHandler):
     @gen.coroutine
-    def get_posts(self):
+    def get_posts(self, page_num=0):
         cursor = (self.db.posts.find(
             {'status': 'publish', 'type': 'post'},
             {'original': False},
         )
-            .sort([('pub_date', -1)]))
+            .sort([('pub_date', -1)])
+            .skip(int(page_num) * 50)
+            .limit(50))
 
-        results = yield cursor.to_list(100)
+        results = yield cursor.to_list(50)
         raise gen.Return(results)
 
     @tornado.web.addslash
     @check_last_modified
-    def get(self):
+    def get(self, page_num=0):
         yield self.render_async(
             'all-posts.jade',
-            posts=self.posts, categories=self.categories)
+            posts=self.posts,
+            categories=self.categories,
+            page_num=int(page_num))
 
 
 class PostHandler(MotorBlogHandler):

@@ -73,6 +73,10 @@ def get_application(root_dir, db, option_parser):
         U(r"page/(?P<page_num>\d+)/?", RecentPostsHandler, name='page'),
         U(r"all-posts/?", AllPostsHandler, name='all-posts'),
         U(
+            r"all-posts/page/(?P<page_num>\d+)/?",
+            AllPostsHandler,
+            name='all-posts-page'),
+        U(
             r"tag/(?P<tag>.+)/page/(?P<page_num>\d+)/?",
             TagHandler, name='tag-page'),
         U(r"tag/(?P<tag>.+)/?", TagHandler, name='tag'),
