@@ -15,6 +15,7 @@ from motor_blog.models import Post, Category
 from motor_blog import cache, models
 from motor_blog.text.link import absolute
 from motor_blog.web.lytics import ga_track_event_url
+from motor_blog.web.widgets import process_widgets
 
 
 __all__ = (
@@ -49,6 +50,19 @@ class MotorBlogHandler(tornado.web.RequestHandler):
             'absolute': absolute})
 
         return ns
+
+    @gen.coroutine
+    def render_async(self, template_name, **kwargs):
+        """Like RequestHandler.render, with widgets.
+
+        Since widgets may need to do I/O, this must be async and its result
+        is yielded before the caller completes.
+        """
+        html = super(MotorBlogHandler, self).render_string(
+            template_name, **kwargs)
+
+        rendered = yield process_widgets(self, self.db, html)
+        self.finish(rendered)
 
     def head(self, *args, **kwargs):
         # We need to generate the full content for a HEAD request in order
@@ -152,7 +166,7 @@ class RecentPostsHandler(MotorBlogHandler):
     @tornado.web.addslash
     @check_last_modified
     def get(self, page_num=0):
-        self.render(
+        yield self.render_async(
             'recent-posts.jade',
             posts=self.posts, categories=self.categories,
             page_num=int(page_num))
@@ -173,7 +187,7 @@ class AllPostsHandler(MotorBlogHandler):
     @tornado.web.addslash
     @check_last_modified
     def get(self):
-        self.render(
+        yield self.render_async(
             'all-posts.jade',
             posts=self.posts, categories=self.categories)
 
@@ -226,7 +240,7 @@ class PostHandler(MotorBlogHandler):
     @check_last_modified
     def get(self, slug):
         prev_post, post, next_post = self.posts
-        self.render(
+        yield self.render_async(
             'single.jade',
             post=post,
             prev=prev_post,
@@ -283,7 +297,7 @@ class CategoryHandler(MotorBlogHandler):
         else:
             raise tornado.web.HTTPError(404)
 
-        self.render(
+        yield self.render_async(
             'category.jade',
             posts=self.posts, categories=self.categories,
             this_category=this_category, page_num=page_num)
@@ -408,7 +422,7 @@ class TagHandler(MotorBlogHandler):
     def get(self, tag, page_num=0):
         page_num = int(page_num)
         tag = tag.rstrip('/')
-        self.render(
+        yield self.render_async(
             'tag.jade',
             posts=self.posts, categories=self.categories,
             this_tag=tag, page_num=page_num)
@@ -435,4 +449,4 @@ class SearchHandler(MotorBlogHandler):
             posts = [Post(**result['obj']) for result in response['results']]
         else:
             posts = []
-        self.render('search.jade', q=q, posts=posts)
+        yield self.render_async('search.jade', q=q, posts=posts)
