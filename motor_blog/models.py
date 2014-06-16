@@ -131,7 +131,10 @@ class Post(BlogDocument):
             else slugify.slugify(title))
 
         description = struct.get('description', '')
-        status = struct.get('post_status', 'publish')
+        status = (struct.get('post_status')
+                  or struct.get('page_status')
+                  or 'publish')
+
         if 'date_modified_gmt' in struct:
             tup = struct['date_modified_gmt'].timetuple()
             mod = utc_tz.localize(datetime.datetime(*tup[0:6]))
