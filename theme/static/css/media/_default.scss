@@ -272,8 +272,7 @@ article {
     text-align: left;
 
     .summary-title, .summary-date, .excerpt {
-        float: left;
-        clear: both;
+        display: block;
         font-weight: normal;
         text-decoration: none;
         &:hover { text-decoration: underline; }

@@ -293,8 +293,7 @@ article {
   list-style: none outside none;
   text-align: left; }
   .post-list .summary-title, .post-list .summary-date, .post-list .excerpt {
-    float: left;
-    clear: both;
+    display: block;
     font-weight: normal;
     text-decoration: none;
     margin: 0 0 0.5em; }
