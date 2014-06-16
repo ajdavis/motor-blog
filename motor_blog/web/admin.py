@@ -1,12 +1,14 @@
 import datetime
 import json
 import logging
+from urllib import urlencode
+
 import tornado.web
-from tornado import gen
-from tornado.options import options as opts
-from bson import ObjectId
 import sockjs.tornado
 import motor
+from bson import ObjectId
+from tornado import gen
+from tornado.options import options as opts
 
 from motor_blog import cache
 from motor_blog.models import Post, Category, GuestAccessToken
@@ -186,6 +188,10 @@ class DraftHandler(MotorBlogHandler):
             raise tornado.web.HTTPError(404)
 
         post = Post(**postdoc)
+        if post.status == 'publish':
+            # Not a draft any more
+            self.redirect(self.reverse_url('post', slug))
+            return
 
         # If an access token is provided, it must be valid. Otherwise,
         # administrator must be logged in.
@@ -193,11 +199,10 @@ class DraftHandler(MotorBlogHandler):
             if not post.has_guest_access_token(ObjectId(guest_access_token)):
                 raise tornado.web.HTTPError(401)
         elif not self.current_user:
-            raise tornado.web.HTTPError(401)
-
-        if post.status == 'publish':
-            # Not a draft any more
-            self.redirect(self.reverse_url('post', slug))
+            # Redirect to login page. Return here after login.
+            next_url = self.request.uri
+            url = self.get_login_url() + "?" + urlencode({'next': next_url})
+            self.redirect(url)
             return
 
         category_docs = yield self.get_categories()
