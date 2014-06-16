@@ -45,7 +45,7 @@ class PostsTest(test.MotorBlogTest):
                 post['date_created_gmt'], start, end))
 
     def test_post_page(self):
-        post_id = self.new_post(
+        self.new_post(
             title='the title',
             meta_description=self.meta_description,
             body='the body')
