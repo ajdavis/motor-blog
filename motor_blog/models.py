@@ -120,8 +120,7 @@ class Post(BlogDocument):
         if 'mt_keywords' in struct:
             tags = [
                 tag.strip() for tag in struct['mt_keywords'].split(',')
-                if tag.strip()
-            ]
+                if tag.strip()]
         else:
             tags = None
 
