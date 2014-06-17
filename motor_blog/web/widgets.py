@@ -63,7 +63,8 @@ def recent_posts(handler, db, n, tag=None):
     cursor = db.posts.find(query, {'original': False})
     docs = yield cursor.sort([('pub_date', -1)]).limit(limit).to_list(limit)
     posts = [Post(**doc) for doc in docs]
-    modified = max(p.last_modified for p in posts)
+    modified = max(p.last_modified for p in posts) if posts else None
+
     rv = cStringIO.StringIO()
     rv.write('<ul class="post-list">')
     for post in posts:
