@@ -34,7 +34,7 @@ class MotorBlogHandler(tornado.web.RequestHandler):
     def __init__(self, *args, **kwargs):
         super(MotorBlogHandler, self).__init__(*args, **kwargs)
         self.categories = []
-        self.__last_modified = None
+        self._last_modified = None
 
     def get_template_namespace(self):
         ns = super(MotorBlogHandler, self).get_template_namespace()
@@ -52,16 +52,16 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         return ns
 
     def update_last_modified(self, modified):
-        if not self.__last_modified or self.__last_modified < modified:
-            self.__last_modified = modified
+        if not self._last_modified or self._last_modified < modified:
+            self._last_modified = modified
 
     def set_last_modified_header(self):
-        if self.__last_modified:
+        if self._last_modified:
             # If-Modified-Since header is only good to the second. Truncate
             # our own mod-date to match its precision.
             self.set_header(
                 'Last-Modified',
-                self.__last_modified.replace(microsecond=0))
+                self._last_modified.replace(microsecond=0))
 
     @gen.coroutine
     def render_async(self, template_name, **kwargs):
@@ -146,7 +146,7 @@ def check_last_modified(get):
                 date_tuple = email.utils.parsedate(ims_value)
                 if_since = models.utc_tz.localize(
                     datetime.datetime.fromtimestamp(time.mktime(date_tuple)))
-                if if_since >= self.__last_modified:
+                if if_since >= self._last_modified:
                     # No change since client's last request. Tornado will take
                     # care of the rest.
                     self.set_status(304)
