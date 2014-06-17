@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from bs4 import BeautifulSoup
 from bson import ObjectId
@@ -76,7 +76,13 @@ end text''')
 
         # Fetch the home page.
         def assert_date(mod_date):
-            home = self.fetch('/test-blog/')
+            if_modified_since = mod_date - timedelta(seconds=1)
+            home = self.fetch(
+                '/test-blog/',
+                if_modified_since=if_modified_since)
+
+            # 200 OK, not 304 Not Modified.
+            self.assertEqual(200, home.code)
             self.assertEqual(
                 httputil.format_timestamp(mod_date),
                 home.headers['Last-Modified'])
