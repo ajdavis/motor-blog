@@ -3,7 +3,6 @@
 
 import datetime
 import email.utils
-import functools
 import time
 
 import tornado.web
@@ -33,7 +32,6 @@ __all__ = (
 class MotorBlogHandler(tornado.web.RequestHandler):
     def __init__(self, *args, **kwargs):
         super(MotorBlogHandler, self).__init__(*args, **kwargs)
-        self.categories = []
         self._last_modified = None
 
     def get_template_namespace(self):
@@ -46,14 +44,23 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         ns.update({
             'q': '',
             'setting': get_setting,
-            'categories': self.categories,
             'absolute': absolute})
 
         return ns
 
-    def update_last_modified(self, modified):
-        if not self._last_modified or self._last_modified < modified:
-            self._last_modified = modified
+    def update_last_modified(self, thing):
+        if not thing:
+            return
+
+        if isinstance(thing, datetime.datetime):
+            if not self._last_modified or self._last_modified < thing:
+                self._last_modified = thing
+        elif hasattr(thing, 'last_modified'):
+            self._last_modified = thing.last_modified
+        else:
+            # Must be a list of things.
+            for i in thing:
+                self.update_last_modified(i)
 
     def set_last_modified_header(self):
         if self._last_modified:
@@ -80,6 +87,21 @@ class MotorBlogHandler(tornado.web.RequestHandler):
             self.update_last_modified(modified)
 
         self.set_last_modified_header()
+
+        # Adapted from StaticFileHandler.
+        ims_value = self.request.headers.get("If-Modified-Since")
+        if ims_value is not None:
+            date_tuple = email.utils.parsedate(ims_value)
+            if_since = models.utc_tz.localize(
+                datetime.datetime.fromtimestamp(time.mktime(date_tuple)))
+
+            if if_since >= self._last_modified:
+                # No change since client's last request. Tornado will take
+                # care of the rest.
+                self.set_status(304)
+                self.finish()
+                return
+
         self.finish(rendered)
 
     def head(self, *args, **kwargs):
@@ -100,12 +122,16 @@ class MotorBlogHandler(tornado.web.RequestHandler):
     def get_categories(self):
         cursor = self.settings['db'].categories.find().sort('name')
         category_docs = yield cursor.to_list(100)
-
-        raise gen.Return(category_docs)
+        categories = [Category(**doc) for doc in category_docs]
+        raise gen.Return(categories)
 
     @gen.coroutine
-    def get_posts(self, *args, **kwargs):
-        raise NotImplementedError()
+    def get_posts(self, query, fields, sort, skip, limit):
+        collection = self.settings['db'].posts
+        cursor = collection.find(query, fields).sort(sort).skip(skip)
+        docs = yield cursor.limit(limit).to_list(limit)
+        posts = [Post(**doc) for doc in docs]
+        raise gen.Return(posts)
 
     def compute_etag(self):
         # Don't waste time md5summing the output, we'll rely on the
@@ -114,160 +140,105 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         return None
 
 
-# TODO: ample documentation, refactor
-def check_last_modified(get):
-    @functools.wraps(get)
-    @gen.coroutine
-    def _get(self, *args, **kwargs):
-        category_docs = yield self.get_categories()
-        self.categories = categories = [
-            Category(**doc) for doc in category_docs]
-
-        post_docs = yield self.get_posts(*args, **kwargs)
-        if post_docs:
-            # Previous and next posts could be None.
-            self.posts = posts = [
-                Post(**doc) if doc else None
-                for doc in post_docs]
-        else:
-            self.posts = posts = []
-
-        if posts or categories:
-            for post in posts:
-                if post:
-                    self.update_last_modified(post.last_modified)
-
-            for cat in categories:
-                self.update_last_modified(cat.last_modified)
-
-            # Adapted from StaticFileHandler
-            ims_value = self.request.headers.get("If-Modified-Since")
-            if ims_value is not None:
-                date_tuple = email.utils.parsedate(ims_value)
-                if_since = models.utc_tz.localize(
-                    datetime.datetime.fromtimestamp(time.mktime(date_tuple)))
-                if if_since >= self._last_modified:
-                    # No change since client's last request. Tornado will take
-                    # care of the rest.
-                    self.set_status(304)
-                    self.finish()
-                    return
-
-        # Yielding, and returning result, are unneeded. We're not waiting for
-        # a return value, we're waiting for get() to call finish(). But let's
-        # yield and return anyway for sanity's sake.
-        result = yield gen.coroutine(get)(self, *args, **kwargs)
-        raise gen.Return(result)
-
-    return _get
-
-
 class RecentPostsHandler(MotorBlogHandler):
     """Show full content of most recent ten posts.
 
     This is the default home page.
     """
+    @tornado.web.addslash
     @gen.coroutine
-    def get_posts(self, page_num=0):
-        cursor = (self.settings['db'].posts.find(
+    def get(self, page_num=0):
+        posts = yield self.get_posts(
             {'status': 'publish', 'type': 'post'},
             {'original': False},
-        )
-            .sort([('pub_date', -1)])
-            .skip(int(page_num) * 10)
-            .limit(10))
+            [('pub_date', -1)],
+            int(page_num) * 10,
+            10)
 
-        result = yield cursor.to_list(10)
-        raise gen.Return(result)
-
-    @tornado.web.addslash
-    @check_last_modified
-    def get(self, page_num=0):
+        categories = yield self.get_categories()
+        self.update_last_modified(posts + categories)
         yield self.render_async(
             'recent-posts.jade',
-            posts=self.posts,
-            categories=self.categories,
+            posts=posts,
+            categories=categories,
             page_num=int(page_num))
 
 
 class AllPostsHandler(MotorBlogHandler):
+    @tornado.web.addslash
     @gen.coroutine
-    def get_posts(self, page_num=0):
-        cursor = (self.settings['db'].posts.find(
+    def get(self, page_num=0):
+        posts = yield self.get_posts(
             {'status': 'publish', 'type': 'post'},
             {'original': False},
-        )
-            .sort([('pub_date', -1)])
-            .skip(int(page_num) * 50)
-            .limit(50))
+            [('pub_date', -1)],
+            int(page_num) * 50,
+            50)
 
-        results = yield cursor.to_list(50)
-        raise gen.Return(results)
-
-    @tornado.web.addslash
-    @check_last_modified
-    def get(self, page_num=0):
+        categories = yield self.get_categories()
+        self.update_last_modified(posts + categories)
         yield self.render_async(
             'all-posts.jade',
-            posts=self.posts,
-            categories=self.categories,
+            posts=posts,
+            categories=categories,
             page_num=int(page_num))
 
 
 class PostHandler(MotorBlogHandler):
     """Show a single blog post or page, by slug."""
+    @tornado.web.addslash
     @gen.coroutine
-    def get_posts(self, slug):
+    def get(self, slug):
         slug = slug.rstrip('/')
         posts = self.settings['db'].posts
-        postdoc = yield posts.find_one(
+        post_doc = yield posts.find_one(
             {'slug': slug, 'status': 'publish'},
             {'summary': False, 'original': False})
 
-        if not postdoc:
+        if not post_doc:
             raise tornado.web.HTTPError(404)
 
-        if postdoc['type'] == 'redirect':
+        if post_doc['type'] == 'redirect':
             # This redirect marks where a real post or page used to be.
-            # Send the client there. Note we don't run the callback; we're
-            # done.
-            url = self.reverse_url('post', postdoc['redirect'])
+            url = self.reverse_url('post', post_doc['redirect'])
             self.redirect(url, permanent=True)
             return
 
-        # Only posts have prev / next navigation, not pages
-        elif postdoc['type'] == 'post':
+        post = Post(**post_doc)
+
+        # Only posts have prev / next navigation, not pages.
+        if post.type == 'post':
             fields = {'summary': False, 'body': False, 'original': False}
             prev_doc_future = posts.find_one({
                 'status': 'publish', 'type': 'post',
-                'pub_date': {'$lt': postdoc['pub_date']}
+                'pub_date': {'$lt': post.pub_date}
             }, fields, sort=[('pub_date', -1)])
 
             next_doc_future = posts.find_one({
                 'status': 'publish', 'type': 'post',
-                'pub_date': {'$gt': postdoc['pub_date']}
+                'pub_date': {'$gt': post.pub_date}
             }, fields, sort=[('pub_date', 1)])
 
             # Overkill for this case, but in theory we reduce latency by
             # querying for previous and next posts at once, and waiting for
             # both.
-            prevdoc, nextdoc = yield [prev_doc_future, next_doc_future]
+            prev_doc, next_doc = yield [prev_doc_future, next_doc_future]
         else:
-            prevdoc, nextdoc = None, None
+            prev_doc, next_doc = None, None
 
-        # Done
-        raise gen.Return([prevdoc, postdoc, nextdoc])
-
-    @tornado.web.addslash
-    @check_last_modified
-    def get(self, slug):
-        prev_post, post, next_post = self.posts
+        prev_post = Post(**prev_doc) if prev_doc else None
+        next_post = Post(**next_doc) if next_doc else None
+        categories = yield self.get_categories()
+        self.update_last_modified(post)
+        self.update_last_modified(prev_post)
+        self.update_last_modified(next_post)
+        self.update_last_modified(categories)
         yield self.render_async(
             'single.jade',
             post=post,
             prev=prev_post,
             next=next_post,
-            categories=self.categories)
+            categories=categories)
 
 
 class HomeHandler(PostHandler):
@@ -291,71 +262,49 @@ class HomeHandler(PostHandler):
 
 class CategoryHandler(MotorBlogHandler):
     """Page of posts for a category"""
-    @gen.coroutine
-    def get_posts(self, slug, page_num=0):
-        page_num = int(page_num)
-        slug = slug.rstrip('/')
-        cursor = (self.settings['db'].posts.find({
-            'status': 'publish',
-            'type': 'post',
-            'categories.slug': slug,
-        }, {
-            'original': False
-        }).sort(
-            [('pub_date', -1)]
-        ).skip(page_num * 10).limit(10))
-
-        results = yield cursor.to_list(100)
-        raise gen.Return(results)
-
     @tornado.web.addslash
-    @check_last_modified
+    @gen.coroutine
     def get(self, slug, page_num=0):
-        page_num = int(page_num)
         slug = slug.rstrip('/')
-        for this_category in self.categories:
+        categories = yield self.get_categories()
+        for this_category in categories:
             if this_category.slug == slug:
                 break
         else:
             raise tornado.web.HTTPError(404)
 
+        slug = slug.rstrip('/')
+        posts = yield self.get_posts(
+            {'status': 'publish', 'type': 'post', 'categories.slug': slug},
+            {'original': False},
+            [('pub_date', -1)],
+            int(page_num) * 10,
+            10)
+
+        self.update_last_modified(posts + categories)
         yield self.render_async(
             'category.jade',
-            posts=self.posts, categories=self.categories,
-            this_category=this_category, page_num=page_num)
+            posts=posts,
+            categories=categories,
+            this_category=this_category,
+            page_num=int(page_num))
 
 
 # TODO: move to feed.py
 class FeedHandler(MotorBlogHandler):
     @gen.coroutine
-    def get_posts(self, slug=None):
-        query = {'status': 'publish', 'type': 'post'}
-
-        if slug:
-            slug = slug.rstrip('/')
-            query['categories.slug'] = slug
-
-        cursor = (self.settings['db'].posts.find(
-            query,
-            {'summary': False, 'original': False},
-        ).sort([('pub_date', -1)])
-            .limit(20))
-
-        results = yield cursor.to_list(100)
-        raise gen.Return(results)
-
-    @check_last_modified
     def get(self, slug=None):
         if slug:
             slug = slug.rstrip('/')
 
         this_category = None
+        categories = yield self.get_categories()
         if slug:
             # Get all the categories and search for one with the right slug,
             # instead of actually querying for the right category, since
             # get_categories() is cached.
             slug = slug.rstrip('/')
-            for category in self.categories:
+            for category in categories:
                 if category.slug == slug:
                     this_category = category
                     break
@@ -374,12 +323,23 @@ class FeedHandler(MotorBlogHandler):
         else:
             feed_url = absolute(self.reverse_url('feed'))
 
-        if self.posts:
-            updated = max(max(p.mod, p.date_created) for p in self.posts)
+        posts_query = {'status': 'publish', 'type': 'post'}
+        if slug:
+            slug = slug.rstrip('/')
+            posts_query['categories.slug'] = slug
+
+        posts = yield self.get_posts(
+            posts_query,
+            {'summary': False, 'original': False},
+            [('pub_date', -1)],
+            0,
+            20)
+
+        if posts:
+            updated = max(max(p.mod, p.date_created) for p in posts)
         else:
             updated = datetime.datetime.now(tz=self.application.settings['tz'])
 
-        # referer = self.request.headers.get('referer', '-')  # (sic)
         icon = absolute(
             self.reverse_url('theme-static', '/theme/static/square96.png'))
 
@@ -396,7 +356,7 @@ class FeedHandler(MotorBlogHandler):
             icon=icon,
             generator=generator)
 
-        for post in self.posts:
+        for post in posts:
             url = absolute(self.reverse_url('post', post.slug))
             tracking_pixel_url = ga_track_event_url(self.application, url)
             tracking_pixel = '<img src="%s" width="1px" height="1px">' \
@@ -424,40 +384,29 @@ class FeedHandler(MotorBlogHandler):
 
 class TagHandler(MotorBlogHandler):
     """Page of posts for a tag"""
-    @gen.coroutine
-    def get_posts(self, tag, page_num=0):
-        page_num = int(page_num)
-        tag = tag.rstrip('/')
-        cursor = (self.settings['db'].posts.find({
-            'status': 'publish',
-            'type': 'post',
-            'tags': tag,
-        }, {
-            'original': False
-        }).sort([('pub_date', -1)]).skip(page_num * 10).limit(10))
-
-        results = yield cursor.to_list(100)
-        raise gen.Return(results)
-
     @tornado.web.addslash
-    @check_last_modified
+    @gen.coroutine
     def get(self, tag, page_num=0):
-        page_num = int(page_num)
         tag = tag.rstrip('/')
+        posts = yield self.get_posts(
+            {'status': 'publish', 'type': 'post', 'tags': tag},
+            {'original': False},
+            [('pub_date', -1)],
+            int(page_num) * 10,
+            10)
+
+        categories = yield self.get_categories()
+        self.update_last_modified(posts + categories)
         yield self.render_async(
             'tag.jade',
-            posts=self.posts, categories=self.categories,
-            this_tag=tag, page_num=page_num)
+            posts=posts, categories=categories,
+            this_tag=tag, page_num=int(page_num))
 
 
 class SearchHandler(MotorBlogHandler):
     @gen.coroutine
     def get(self):
-        # TODO: refactor with check_last_modified(), this is gross
-        #   we need an async version of RequestHandler.prepare()
-        category_docs = yield self.get_categories()
-        self.categories = [Category(**doc) for doc in category_docs]
-
+        categories = yield self.get_categories()
         q = self.get_argument('q', None)
         if q:
             response = yield self.settings['db'].command(
@@ -471,4 +420,9 @@ class SearchHandler(MotorBlogHandler):
             posts = [Post(**result['obj']) for result in response['results']]
         else:
             posts = []
-        yield self.render_async('search.jade', q=q, posts=posts)
+
+        yield self.render_async(
+            'search.jade',
+            q=q,
+            posts=posts,
+            categories=categories)

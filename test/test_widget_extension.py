@@ -76,16 +76,21 @@ end text''')
 
         # Fetch the home page.
         def assert_date(mod_date):
-            if_modified_since = mod_date - timedelta(seconds=1)
             home = self.fetch(
                 '/test-blog/',
-                if_modified_since=if_modified_since)
+                if_modified_since=(mod_date - timedelta(seconds=1)))
 
             # 200 OK, not 304 Not Modified.
             self.assertEqual(200, home.code)
             self.assertEqual(
                 httputil.format_timestamp(mod_date),
                 home.headers['Last-Modified'])
+
+            home = self.fetch(
+                '/test-blog/',
+                if_modified_since=(mod_date + timedelta(seconds=1)))
+
+            self.assertEqual(304, home.code)
 
         assert_date(datetime(2014, 1, 5))
 
