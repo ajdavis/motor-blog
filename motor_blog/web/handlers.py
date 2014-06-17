@@ -31,10 +31,10 @@ __all__ = (
 
 
 class MotorBlogHandler(tornado.web.RequestHandler):
-    def initialize(self, **kwargs):
-        super(MotorBlogHandler, self).initialize(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(MotorBlogHandler, self).__init__(*args, **kwargs)
         self.categories = []
-        self.db = self.settings['db']
+        self.__last_modified = None
 
     def get_template_namespace(self):
         ns = super(MotorBlogHandler, self).get_template_namespace()
@@ -51,6 +51,18 @@ class MotorBlogHandler(tornado.web.RequestHandler):
 
         return ns
 
+    def update_last_modified(self, modified):
+        if not self.__last_modified or self.__last_modified < modified:
+            self.__last_modified = modified
+
+    def set_last_modified_header(self):
+        if self.__last_modified:
+            # If-Modified-Since header is only good to the second. Truncate
+            # our own mod-date to match its precision.
+            self.set_header(
+                'Last-Modified',
+                self.__last_modified.replace(microsecond=0))
+
     @gen.coroutine
     def render_async(self, template_name, **kwargs):
         """Like RequestHandler.render, with widgets.
@@ -61,7 +73,13 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         html = super(MotorBlogHandler, self).render_string(
             template_name, **kwargs)
 
-        rendered = yield process_widgets(self, self.db, html)
+        rendered, modified = yield process_widgets(
+            self, self.settings['db'], html)
+
+        if modified:
+            self.update_last_modified(modified)
+
+        self.set_last_modified_header()
         self.finish(rendered)
 
     def head(self, *args, **kwargs):
@@ -80,7 +98,7 @@ class MotorBlogHandler(tornado.web.RequestHandler):
     @cache.cached(key='categories', invalidate_event='categories_changed')
     @gen.coroutine
     def get_categories(self):
-        cursor = self.db.categories.find().sort('name')
+        cursor = self.settings['db'].categories.find().sort('name')
         category_docs = yield cursor.to_list(100)
 
         raise gen.Return(category_docs)
@@ -107,6 +125,7 @@ def check_last_modified(get):
 
         post_docs = yield self.get_posts(*args, **kwargs)
         if post_docs:
+            # Previous and next posts could be None.
             self.posts = posts = [
                 Post(**doc) if doc else None
                 for doc in post_docs]
@@ -114,15 +133,12 @@ def check_last_modified(get):
             self.posts = posts = []
 
         if posts or categories:
-            mod = max(
-                thing.last_modified
-                for things in (posts, categories)
-                for thing in things if thing)
+            for post in posts:
+                if post:
+                    self.update_last_modified(post.last_modified)
 
-            # If-Modified-Since header is only good to the second. Truncate
-            # our own mod-date to match its precision.
-            mod = mod.replace(microsecond=0)
-            self.set_header('Last-Modified', mod)
+            for cat in categories:
+                self.update_last_modified(cat.last_modified)
 
             # Adapted from StaticFileHandler
             ims_value = self.request.headers.get("If-Modified-Since")
@@ -130,7 +146,7 @@ def check_last_modified(get):
                 date_tuple = email.utils.parsedate(ims_value)
                 if_since = models.utc_tz.localize(
                     datetime.datetime.fromtimestamp(time.mktime(date_tuple)))
-                if if_since >= mod:
+                if if_since >= self.__last_modified:
                     # No change since client's last request. Tornado will take
                     # care of the rest.
                     self.set_status(304)
@@ -153,7 +169,7 @@ class RecentPostsHandler(MotorBlogHandler):
     """
     @gen.coroutine
     def get_posts(self, page_num=0):
-        cursor = (self.db.posts.find(
+        cursor = (self.settings['db'].posts.find(
             {'status': 'publish', 'type': 'post'},
             {'original': False},
         )
@@ -177,7 +193,7 @@ class RecentPostsHandler(MotorBlogHandler):
 class AllPostsHandler(MotorBlogHandler):
     @gen.coroutine
     def get_posts(self, page_num=0):
-        cursor = (self.db.posts.find(
+        cursor = (self.settings['db'].posts.find(
             {'status': 'publish', 'type': 'post'},
             {'original': False},
         )
@@ -203,7 +219,7 @@ class PostHandler(MotorBlogHandler):
     @gen.coroutine
     def get_posts(self, slug):
         slug = slug.rstrip('/')
-        posts = self.db.posts
+        posts = self.settings['db'].posts
         postdoc = yield posts.find_one(
             {'slug': slug, 'status': 'publish'},
             {'summary': False, 'original': False})
@@ -279,7 +295,7 @@ class CategoryHandler(MotorBlogHandler):
     def get_posts(self, slug, page_num=0):
         page_num = int(page_num)
         slug = slug.rstrip('/')
-        cursor = (self.db.posts.find({
+        cursor = (self.settings['db'].posts.find({
             'status': 'publish',
             'type': 'post',
             'categories.slug': slug,
@@ -319,7 +335,7 @@ class FeedHandler(MotorBlogHandler):
             slug = slug.rstrip('/')
             query['categories.slug'] = slug
 
-        cursor = (self.db.posts.find(
+        cursor = (self.settings['db'].posts.find(
             query,
             {'summary': False, 'original': False},
         ).sort([('pub_date', -1)])
@@ -412,7 +428,7 @@ class TagHandler(MotorBlogHandler):
     def get_posts(self, tag, page_num=0):
         page_num = int(page_num)
         tag = tag.rstrip('/')
-        cursor = (self.db.posts.find({
+        cursor = (self.settings['db'].posts.find({
             'status': 'publish',
             'type': 'post',
             'tags': tag,
@@ -444,7 +460,7 @@ class SearchHandler(MotorBlogHandler):
 
         q = self.get_argument('q', None)
         if q:
-            response = yield self.db.command(
+            response = yield self.settings['db'].command(
                 'text',
                 'posts',
                 search=q,

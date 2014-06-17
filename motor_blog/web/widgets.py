@@ -20,22 +20,26 @@ widget_pat = re.compile(r'<widget>(.*?)</widget>', re.MULTILINE)
 
 @gen.coroutine
 def process_widgets(handler, db, html):
-    """Render widgets.
+    """Render widgets. Returns (HTML, last_modified).
 
     Take a RequestHandler, a MotorDatabase, and HTML text, return HTML with
-    widgets rendered.
+    widgets rendered, and the maximum modified date.
     """
     rv = cStringIO.StringIO()
 
-    match = None
     pos = 0
+    modified = None
     for match in widget_pat.finditer(html):
         parts = [p.strip() for p in match.group(1).split() if p.strip()]
         if parts:
             widget_name, options = parts[0], parts[1:]
             if widget_name in all_widgets:
                 f = all_widgets[widget_name]
-                widget_html = yield f(handler, db, *options)
+                widget_html, m = yield f(handler, db, *options)
+
+                # Track latest last-modified value from all widgets.
+                if not modified or m > modified:
+                    modified = m
 
                 # Text before the match.
                 rv.write(html[pos:match.start()])
@@ -45,7 +49,7 @@ def process_widgets(handler, db, html):
                 pos = match.end()
 
     rv.write(html[pos:])
-    raise gen.Return(rv.getvalue())
+    raise gen.Return((rv.getvalue(), modified))
 
 
 @gen.coroutine
@@ -57,16 +61,16 @@ def recent_posts(handler, db, n, tag=None):
         query['tags'] = tag
 
     cursor = db.posts.find(query, {'original': False})
-    posts = yield cursor.sort([('pub_date', -1)]).limit(limit).to_list(limit)
+    docs = yield cursor.sort([('pub_date', -1)]).limit(limit).to_list(limit)
+    posts = [Post(**doc) for doc in docs]
+    modified = max(p.last_modified for p in posts)
     rv = cStringIO.StringIO()
     rv.write('<ul class="post-list">')
-    for post_doc in posts:
-        rv.write(handler.render_string(
-            'post-summary.jade',
-            post=Post(**post_doc)))
+    for post in posts:
+        rv.write(handler.render_string('post-summary.jade', post=post))
 
     rv.write('</ul>')
-    raise gen.Return(rv.getvalue())
+    raise gen.Return((rv.getvalue(), modified))
 
 
 all_widgets = {'recent-posts': recent_posts}

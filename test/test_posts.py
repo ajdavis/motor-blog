@@ -16,7 +16,7 @@ class PostsTest(test.MotorBlogTest):
         start = datetime.datetime.utcnow()
         post_id = self.new_post(
             title='the title',
-            meta_description=self.meta_description,
+            description=self.meta_description,
             body='the body')
 
         end = datetime.datetime.utcnow()
@@ -47,7 +47,7 @@ class PostsTest(test.MotorBlogTest):
     def test_post_page(self):
         self.new_post(
             title='the title',
-            meta_description=self.meta_description,
+            description=self.meta_description,
             body='the body')
 
         title_slug = slugify.slugify('the title')

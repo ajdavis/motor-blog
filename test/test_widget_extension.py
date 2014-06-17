@@ -1,6 +1,9 @@
 import unittest
+from datetime import datetime
 
 from bs4 import BeautifulSoup
+from bson import ObjectId
+from tornado import httputil
 
 from motor_blog.text.markup import markup
 import test  # Motor-Blog project's test/__init__.py.
@@ -34,30 +37,72 @@ class RecentPostsWidgetTest(test.MotorBlogTest):
         return super(RecentPostsWidgetTest, self).get_app()
 
     def test_recent_posts_widget(self):
-        # Four posts. 'baz' is the most recent one.
-        self.new_post(title='ada', tag='test-tag')
-        self.new_post(title='foo', tag='test-tag')
-        self.new_post(title='bar', meta_description='desc 1', tag='test-tag')
-        self.new_post(title='baz', meta_description='desc 2')
+        # Four posts. 'baz' is the most recent.
+        ada_id = self.new_post(
+            title='ada',
+            tag='tag',
+            created=datetime(2014, 1, 2))
+
+        foo_id = self.new_post(
+            title='foo',
+            tag='tag',
+            created=datetime(2014, 1, 3))
+
+        self.new_post(
+            title='bar',
+            description='desc 1',
+            tag='tag',
+            created=datetime(2014, 1, 4))
+
+        self.new_post(
+            title='baz',
+            description='desc 2',
+            created=datetime(2014, 1, 5))
 
         # Static home page includes a widget that renders one recent post.
-        self.new_page(
+        # Datetimes must be unique since Motor-Blog generates _id from them.
+        home_id = self.new_page(
             title='test-home',
+            created=datetime(2014, 1, 1),
             body='''start text
 
 !!recent-posts 1!!
 
 middle text
 
-!!recent-posts 2 test-tag!!
+!!recent-posts 2 tag!!
 
 end text''')
 
         # Fetch the home page.
-        post_page = self.fetch('/test-blog/')
+        def assert_date(mod_date):
+            home = self.fetch('/test-blog/')
+            self.assertEqual(
+                httputil.format_timestamp(mod_date),
+                home.headers['Last-Modified'])
+
+        assert_date(datetime(2014, 1, 5))
+
+        # Update one of the posts.
+        def update(_id, mod_date):
+            self.sync_db.posts.update(
+                {'_id': ObjectId(_id)},
+                {'$set': {'mod': mod_date}})
+
+        update(foo_id, datetime(2014, 1, 6))
+        assert_date(datetime(2014, 1, 6))
+
+        # Update the home page itself.
+        update(home_id, datetime(2014, 1, 7))
+        assert_date(datetime(2014, 1, 7))
+
+        # The first post is too old to appear, so the
+        # home page's last modified isn't updated.
+        update(ada_id, datetime(2014, 1, 8))
+        assert_date(datetime(2014, 1, 7))
 
         # Find post-summaries list with one most recent post.
-        soup = BeautifulSoup(post_page.body)
+        soup = BeautifulSoup(self.fetch('/test-blog/').body)
         post_list = soup.find_all('ul', attrs={'class', 'post-list'})
         self.assertEqual(2, len(post_list))
 
@@ -96,4 +141,3 @@ end text''')
         self.assertFalse(comes_after(tagged[0], 'start text'))
         self.assertTrue(comes_before(tagged[0], 'middle text'))
         self.assertTrue(comes_after(tagged[1], 'end text'))
-

@@ -1,4 +1,5 @@
 import xmlrpclib
+from bson import ObjectId
 import mock
 import motor
 import pymongo.mongo_client
@@ -12,6 +13,7 @@ from tornado.testing import AsyncHTTPTestCase
 # Patch Tornado with the Jade template loader
 from tornado import template
 from pyjade.ext.tornado import patch_tornado
+
 patch_tornado()
 
 sample_html = """
@@ -28,14 +30,14 @@ class MotorBlogTest(AsyncHTTPTestCase):
     def setUp(self):
         self.database_name = 'test_motorblog'
         sync_client = pymongo.mongo_client.MongoClient()
-        sync_db = sync_client[self.database_name]
+        self.sync_db = sync_client[self.database_name]
         for collection_name in [
                 'events',
                 'fs.chunks',
                 'fs.files',
                 'posts',
                 'categories']:
-            sync_db.drop_collection(collection_name)
+            self.sync_db.drop_collection(collection_name)
 
         self.patchers = []
         self.set_option('host', 'localhost')
@@ -106,48 +108,71 @@ class MotorBlogTest(AsyncHTTPTestCase):
         (data,), _ = xmlrpclib.loads(response.body)
         return data
 
-    def _new(self, api, title, meta_description, body, tag):
+    def _new(
+            self,
+            api,
+            title,
+            description,
+            body,
+            tag,
+            created):
         payload = {
             'mt_keywords': 'a tag,another tag',
             'post_status': 'publish',
-            'mt_excerpt': meta_description,
+            'mt_excerpt': description,
             'title': title,
             'description': body}
 
         if tag:
             payload['mt_keywords'] = tag
 
-        return self.fetch_rpc(api, (
+        if created:
+            payload['date_created_gmt'] = created
+            payload['date_modified_gmt'] = created
+
+        post_id = self.fetch_rpc(api, (
             1,  # Blog id, always 1.
             tornado_options.user,
             tornado_options.password,
             payload,
             True))
 
+        if created:
+            # Hack for testing. pub_date is normally utcnow().
+            self.sync_db.posts.update(
+                {'_id': ObjectId(post_id)},
+                {'$set': {'pub_date': created}})
+
+        return post_id
+
     def new_post(
             self,
             title='the title',
-            meta_description='the meta description',
+            description='the meta description',
             body='the body',
-            tag=None):
+            tag=None,
+            created=None):
         """Create a post and return its id"""
         return self._new(
             'metaWeblog.newPost',
             title=title,
-            meta_description=meta_description,
+            description=description,
             body=body,
-            tag=tag)
+            tag=tag,
+            created=created)
 
     def new_page(
             self,
             title='the title',
-            meta_description='the meta description',
+            description='the meta description',
             body='the body',
-            tag=None):
+            tag=None,
+            created=None):
         """Create a page and return its id"""
         return self._new(
             'wp.newPage',
             title=title,
-            meta_description=meta_description,
+            description=description,
             body=body,
-            tag=tag)
+            tag=tag,
+            created=created)
