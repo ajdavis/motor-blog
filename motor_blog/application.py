@@ -8,9 +8,10 @@ from tornado.web import StaticFileHandler
 
 from motor_blog.api.handlers import APIHandler, RSDHandler
 from motor_blog.web import get_url_spec
-from motor_blog.web.lytics import TrackingPixelHandler
-from motor_blog.web.handlers import *
 from motor_blog.web.admin import *
+from motor_blog.web.feed import FeedHandler
+from motor_blog.web.handlers import *
+from motor_blog.web.lytics import TrackingPixelHandler
 
 
 def get_application(root_dir, db, option_parser):
