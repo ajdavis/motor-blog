@@ -49,6 +49,10 @@ class MotorBlogHandler(tornado.web.RequestHandler):
         return ns
 
     def update_last_modified(self, thing):
+        """Track modification times and use the latest.
+
+        Pass a Model, list of them, or a datetime.
+        """
         if not thing:
             return
 
@@ -63,6 +67,11 @@ class MotorBlogHandler(tornado.web.RequestHandler):
                 self.update_last_modified(i)
 
     def set_last_modified_header(self):
+        """Set "Last-Modified".
+
+        Sets the header to the maximum of any date passed in to
+        update_last_modified().
+        """
         if self._last_modified:
             # If-Modified-Since header is only good to the second. Truncate
             # our own mod-date to match its precision.
