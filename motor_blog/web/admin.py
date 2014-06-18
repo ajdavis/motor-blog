@@ -143,8 +143,7 @@ class CategoriesAdminHandler(MotorBlogAdminHandler):
     @tornado.web.addslash
     @tornado.web.authenticated
     def get(self):
-        category_docs = yield self.get_categories()
-        categories = [Category(**doc) for doc in category_docs]
+        categories = yield self.get_categories()
         self.render('admin-templates/categories.html', categories=categories)
 
 
@@ -205,8 +204,7 @@ class DraftHandler(MotorBlogHandler):
             self.redirect(url)
             return
 
-        category_docs = yield self.get_categories()
-        categories = [Category(**doc) for doc in category_docs]
+        categories = yield self.get_categories()
         self.render(
             'draft.jade',
             post=post, prev=None, next=None, categories=categories)
