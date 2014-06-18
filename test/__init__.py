@@ -57,6 +57,9 @@ class MotorBlogTest(AsyncHTTPTestCase):
         super(MotorBlogTest, self).setUp()
         cache.startup(self.get_db())
 
+        # Clear categories cache.
+        cache._on_event({'name': 'categories_changed'})
+
     def tearDown(self):
         cache.shutdown()
         for patcher in reversed(self.patchers):
