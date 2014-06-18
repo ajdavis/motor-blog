@@ -114,10 +114,15 @@ def cached(key, invalidate_event):
 @gen.coroutine
 def startup(db):
     global _db
-    assert not _db, "cache.startup() already called once."
+    if _db:
+        # Already started.
+        return
+
     _db = db
     yield create_events_collection(db)
-    loop = IOLoop.current()
+
+    # Typically the global loop, but it's a different loop in tests.
+    loop = db.get_io_loop()
 
     @gen.coroutine
     def tail():
@@ -165,6 +170,11 @@ def startup(db):
 
     # Start infinite loop
     tail()
+
+
+def shutdown():
+    global _db
+    _db = None
 
 
 def _on_event(event):

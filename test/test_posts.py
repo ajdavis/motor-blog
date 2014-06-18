@@ -7,16 +7,18 @@ from motor_blog.text import slugify
 import test  # Motor-Blog project's test/__init__.py.
 
 
+meta_description = 'description "with quotes" and \'single\''
+
+
 class PostsTest(test.MotorBlogTest):
     def setUp(self):
         super(PostsTest, self).setUp()
-        self.meta_description = 'description "with quotes" and \'single\''
 
     def test_new_post(self):
         start = datetime.datetime.utcnow()
         post_id = self.new_post(
             title='the title',
-            description=self.meta_description,
+            description=meta_description,
             body='the body')
 
         end = datetime.datetime.utcnow()
@@ -37,7 +39,7 @@ class PostsTest(test.MotorBlogTest):
         self.assertEqual('a tag,another tag', post['mt_keywords'])
         self.assertEqual('publish', post['status'])
         self.assertEqual('the title', post['title'])
-        self.assertEqual(self.meta_description, post['mt_excerpt'])
+        self.assertEqual(meta_description, post['mt_excerpt'])
         self.assertEqual('the body', post['description'])  # Confusing I know.
         self.assertTrue(
             start <= post['date_created_gmt'] <= end,
@@ -47,7 +49,7 @@ class PostsTest(test.MotorBlogTest):
     def test_post_page(self):
         self.new_post(
             title='the title',
-            description=self.meta_description,
+            description=meta_description,
             body='the body')
 
         title_slug = slugify.slugify('the title')
@@ -56,4 +58,4 @@ class PostsTest(test.MotorBlogTest):
         soup = BeautifulSoup(post_page.body)
         description_tag = soup.find('meta', attrs={'name': 'description'})
         self.assertTrue(description_tag)
-        self.assertEqual(self.meta_description, description_tag['content'])
+        self.assertEqual(meta_description, description_tag['content'])

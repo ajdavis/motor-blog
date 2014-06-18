@@ -4,7 +4,7 @@ import mock
 import motor
 import pymongo.mongo_client
 
-from motor_blog import application
+from motor_blog import application, cache
 from motor_blog.options import define_options
 import tornado.web
 from tornado.options import options as tornado_options
@@ -55,8 +55,10 @@ class MotorBlogTest(AsyncHTTPTestCase):
 
         # Sets self.__port, and sets self.app = self.get_app().
         super(MotorBlogTest, self).setUp()
+        cache.startup(self.get_db())
 
     def tearDown(self):
+        cache.shutdown()
         for patcher in reversed(self.patchers):
             patcher.stop()
 
@@ -176,3 +178,19 @@ class MotorBlogTest(AsyncHTTPTestCase):
             body=body,
             tag=tag,
             created=created)
+
+    def new_category(self, name):
+        payload = {'name': name}
+        return self.fetch_rpc('wp.newCategory', (
+            1,  # Blog id, always 1.
+            tornado_options.user,
+            tornado_options.password,
+            payload))
+
+    def set_categories(self, post_id, category_ids):
+        payload = [{'categoryId': _id} for _id in category_ids]
+        return self.fetch_rpc('mt.setPostCategories', (
+            post_id,
+            tornado_options.user,
+            tornado_options.password,
+            payload))
