@@ -46,7 +46,7 @@ class PostsTest(test.MotorBlogTest):
             "Post's date_created_gmt %s isn't between %s and %s" % (
                 post['date_created_gmt'], start, end))
 
-    def test_post_page(self):
+    def test_single_post_view(self):
         self.new_post(
             title='the title',
             description=meta_description,
