@@ -1,7 +1,6 @@
 import datetime
 
 from bs4 import BeautifulSoup
-from tornado import httputil
 from tornado.options import options as tornado_options
 
 from motor_blog.text import slugify
@@ -71,28 +70,16 @@ class PostsTest(test.MotorBlogTest):
             created=datetime.datetime(2014, 1, 2))
 
         title_2_slug = slugify.slugify('title 2')
-
-        def assert_mod(dt):
-            url = self.reverse_url('post', title_2_slug)
-            response = self.fetch(url)
-            self.assertEqual(200, response.code)
-            expected = httputil.format_timestamp(dt)
-            self.assertEqual(expected, response.headers['Last-Modified'])
-
-            response = self.fetch(url, if_modified_since=dt)
-            self.assertEqual(304, response.code)
-
-        assert_mod(datetime.datetime(2014, 1, 2))
-
+        url = self.reverse_url('post', title_2_slug)
+        self.assert_modified(url, datetime.datetime(2014, 1, 2))
         self.new_post(
             title='title 3',
             created=datetime.datetime(2014, 1, 3))
 
-        assert_mod(datetime.datetime(2014, 1, 3))
-
+        self.assert_modified(url, datetime.datetime(2014, 1, 3))
         self.edit_post(
             one_id,
             'title 1',
             updated=datetime.datetime(2014, 1, 4))
 
-        assert_mod(datetime.datetime(2014, 1, 4))
+        self.assert_modified(url, datetime.datetime(2014, 1, 4))

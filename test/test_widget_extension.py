@@ -1,9 +1,8 @@
 import unittest
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from bs4 import BeautifulSoup
 from bson import ObjectId
-from tornado import httputil
 
 from motor_blog.text.markup import markup
 import test  # Motor-Blog project's test/__init__.py.
@@ -75,24 +74,8 @@ middle text
 end text''')
 
         # Fetch the home page.
-        def assert_date(mod_date):
-            home = self.fetch(
-                '/test-blog/',
-                if_modified_since=(mod_date - timedelta(seconds=1)))
-
-            # 200 OK, not 304 Not Modified.
-            self.assertEqual(200, home.code)
-            self.assertEqual(
-                httputil.format_timestamp(mod_date),
-                home.headers['Last-Modified'])
-
-            home = self.fetch(
-                '/test-blog/',
-                if_modified_since=(mod_date + timedelta(seconds=1)))
-
-            self.assertEqual(304, home.code)
-
-        assert_date(datetime(2014, 1, 5))
+        url = self.reverse_url('home')
+        self.assert_modified(url, datetime(2014, 1, 5))
 
         # Update one of the posts.
         def update(_id, mod_date):
@@ -101,16 +84,16 @@ end text''')
                 {'$set': {'mod': mod_date}})
 
         update(foo_id, datetime(2014, 1, 6))
-        assert_date(datetime(2014, 1, 6))
+        self.assert_modified(url, datetime(2014, 1, 6))
 
         # Update the home page itself.
         update(home_id, datetime(2014, 1, 7))
-        assert_date(datetime(2014, 1, 7))
+        self.assert_modified(url, datetime(2014, 1, 7))
 
         # The first post is too old to appear, so the
         # home page's last modified isn't updated.
         update(ada_id, datetime(2014, 1, 8))
-        assert_date(datetime(2014, 1, 7))
+        self.assert_modified(url, datetime(2014, 1, 7))
 
         # Find post-summaries list with one most recent post.
         soup = BeautifulSoup(self.fetch('/test-blog/').body)

@@ -1,12 +1,14 @@
 import xmlrpclib
-from bson import ObjectId
+from datetime import timedelta
+
+import pymongo.mongo_client
 import mock
 import motor
-import pymongo.mongo_client
-
+from bson import ObjectId
 from motor_blog import application, cache
 from motor_blog.options import define_options
 import tornado.web
+from tornado import httputil
 from tornado.options import options as tornado_options
 from tornado.testing import AsyncHTTPTestCase
 
@@ -231,3 +233,16 @@ class MotorBlogTest(AsyncHTTPTestCase):
             tornado_options.user,
             tornado_options.password,
             payload))
+
+    def assert_modified(self, url, mod_date):
+        response = self.fetch(
+            url, if_modified_since=(mod_date - timedelta(seconds=1)))
+
+        # 200 OK, not 304 Not Modified.
+        self.assertEqual(200, response.code)
+        self.assertEqual(
+            httputil.format_timestamp(mod_date),
+            response.headers['Last-Modified'])
+
+        response = self.fetch(url, if_modified_since=mod_date)
+        self.assertEqual(304, response.code)
