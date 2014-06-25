@@ -71,29 +71,28 @@ class PostsTest(test.MotorBlogTest):
             created=datetime.datetime(2014, 1, 2))
 
         title_2_slug = slugify.slugify('title 2')
-        two = self.fetch(self.reverse_url('post', title_2_slug))
-        self.assertEqual(200, two.code)
-        self.assertEqual(
-            httputil.format_timestamp(datetime.datetime(2014, 1, 2)),
-            two.headers['Last-Modified'])
+
+        def assert_mod(dt):
+            url = self.reverse_url('post', title_2_slug)
+            response = self.fetch(url)
+            self.assertEqual(200, response.code)
+            expected = httputil.format_timestamp(dt)
+            self.assertEqual(expected, response.headers['Last-Modified'])
+
+            response = self.fetch(url, if_modified_since=dt)
+            self.assertEqual(304, response.code)
+
+        assert_mod(datetime.datetime(2014, 1, 2))
 
         self.new_post(
             title='title 3',
             created=datetime.datetime(2014, 1, 3))
 
-        two = self.fetch(self.reverse_url('post', title_2_slug))
-        self.assertEqual(200, two.code)
-        self.assertEqual(
-            httputil.format_timestamp(datetime.datetime(2014, 1, 3)),
-            two.headers['Last-Modified'])
+        assert_mod(datetime.datetime(2014, 1, 3))
 
         self.edit_post(
             one_id,
             'title 1',
             updated=datetime.datetime(2014, 1, 4))
 
-        two = self.fetch(self.reverse_url('post', title_2_slug))
-        self.assertEqual(200, two.code)
-        self.assertEqual(
-            httputil.format_timestamp(datetime.datetime(2014, 1, 4)),
-            two.headers['Last-Modified'])
+        assert_mod(datetime.datetime(2014, 1, 4))
