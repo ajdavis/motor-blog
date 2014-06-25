@@ -107,7 +107,7 @@ class MotorBlogHandler(tornado.web.RequestHandler):
             if_since = models.utc_tz.localize(
                 datetime.datetime.fromtimestamp(time.mktime(date_tuple)))
 
-            if if_since >= self._last_modified:
+            if if_since >= self._last_modified.replace(microsecond=0):
                 # No change since client's last request. Tornado will take
                 # care of the rest.
                 self.set_status(304)

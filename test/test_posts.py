@@ -1,6 +1,7 @@
 import datetime
 
 from bs4 import BeautifulSoup
+from bson import ObjectId
 from tornado.options import options as tornado_options
 
 from motor_blog.text import slugify
@@ -83,3 +84,13 @@ class PostsTest(test.MotorBlogTest):
             updated=datetime.datetime(2014, 1, 4))
 
         self.assert_modified(url, datetime.datetime(2014, 1, 4))
+
+    def test_if_modified_since_microseconds(self):
+        # If-Modified-Since is rounded down to the second.
+        post_id = self.new_post(title='title')
+        doc = self.sync_db.posts.find_one({'_id': ObjectId(post_id)})
+        dt = doc['mod']
+        slug = slugify.slugify('title')
+        url = self.reverse_url('post', slug)
+        response = self.fetch(url, if_modified_since=dt.replace(microsecond=0))
+        self.assertEqual(304, response.code)
