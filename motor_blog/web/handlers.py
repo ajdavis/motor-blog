@@ -42,29 +42,38 @@ class MotorBlogHandler(tornado.web.RequestHandler):
 
         return ns
 
-    def update_last_modified(self, thing):
+    def update_last_mod(self, thing):
         """Track modification times and use the latest.
 
-        Pass a Model, list of them, or a datetime.
+        Pass a Model or a datetime.
         """
         if not thing:
             return
 
-        if isinstance(thing, datetime.datetime):
-            if not self._last_modified or self._last_modified < thing:
-                self._last_modified = thing
-        elif hasattr(thing, 'last_modified'):
-            self._last_modified = thing.last_modified
+        def _maybe_update(dt):
+            if not self._last_modified or self._last_modified < dt:
+                self._last_modified = dt
+
+        if hasattr(thing, 'last_modified'):
+            _maybe_update(thing.last_modified)
+        elif isinstance(thing, datetime.datetime):
+            _maybe_update(thing)
         else:
-            # Must be a list of things.
-            for i in thing:
-                self.update_last_modified(i)
+            raise TypeError('update_last_mod called with %s' % type(thing))
+
+    def update_last_mod_from_list(self, things):
+        """Track modification times and use the latest.
+
+        Pass a Model or a datetime.
+        """
+        for t in things:
+            self.update_last_mod(t)
 
     def set_last_modified_header(self):
         """Set "Last-Modified".
 
         Sets the header to the maximum of any date passed in to
-        update_last_modified().
+        update_last_mod().
         """
         if self._last_modified:
             # If-Modified-Since header is only good to the second. Truncate
@@ -87,7 +96,7 @@ class MotorBlogHandler(tornado.web.RequestHandler):
             self, self.settings['db'], html)
 
         if modified:
-            self.update_last_modified(modified)
+            self.update_last_mod(modified)
 
         self.set_last_modified_header()
 
@@ -159,7 +168,7 @@ class RecentPostsHandler(MotorBlogHandler):
             10)
 
         categories = yield self.get_categories()
-        self.update_last_modified(posts + categories)
+        self.update_last_mod_from_list(posts + categories)
         yield self.render_async(
             'recent-posts.jade',
             posts=posts,
@@ -179,7 +188,7 @@ class AllPostsHandler(MotorBlogHandler):
             50)
 
         categories = yield self.get_categories()
-        self.update_last_modified(posts + categories)
+        self.update_last_mod_from_list(posts + categories)
         yield self.render_async(
             'all-posts.jade',
             posts=posts,
@@ -232,10 +241,10 @@ class PostHandler(MotorBlogHandler):
         prev_post = Post(**prev_doc) if prev_doc else None
         next_post = Post(**next_doc) if next_doc else None
         categories = yield self.get_categories()
-        self.update_last_modified(post)
-        self.update_last_modified(prev_post)
-        self.update_last_modified(next_post)
-        self.update_last_modified(categories)
+        self.update_last_mod(post)
+        self.update_last_mod(prev_post)
+        self.update_last_mod(next_post)
+        self.update_last_mod_from_list(categories)
         yield self.render_async(
             'single.jade',
             post=post,
@@ -284,7 +293,7 @@ class CategoryHandler(MotorBlogHandler):
             int(page_num) * 10,
             10)
 
-        self.update_last_modified(posts + categories)
+        self.update_last_mod_from_list(posts + categories)
         yield self.render_async(
             'category.jade',
             posts=posts,
@@ -307,7 +316,7 @@ class TagHandler(MotorBlogHandler):
             10)
 
         categories = yield self.get_categories()
-        self.update_last_modified(posts + categories)
+        self.update_last_mod_from_list(posts + categories)
         yield self.render_async(
             'tag.jade',
             posts=posts, categories=categories,

@@ -150,6 +150,40 @@ class MotorBlogTest(AsyncHTTPTestCase):
 
         return post_id
 
+    def edit_post(
+            self,
+            post_id,
+            title='the title',
+            description='the meta description',
+            body='the body',
+            tag=None,
+            updated=None):
+        """Create a post and return its id"""
+        payload = {
+            'mt_keywords': 'a tag,another tag',
+            'post_status': 'publish',
+            'mt_excerpt': description,
+            'title': title,
+            'description': body}
+
+        if tag:
+            payload['mt_keywords'] = tag
+
+        self.fetch_rpc('metaWeblog.editPost', (
+            post_id,
+            tornado_options.user,
+            tornado_options.password,
+            payload,
+            True))
+
+        if updated:
+            # Hack for testing. mod is normally utcnow().
+            self.sync_db.posts.update(
+                {'_id': ObjectId(post_id)},
+                {'$set': {'mod': updated}})
+
+        return post_id
+
     def new_post(
             self,
             title='the title',

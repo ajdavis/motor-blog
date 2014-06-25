@@ -1,6 +1,7 @@
 import datetime
 
 from bs4 import BeautifulSoup
+from tornado import httputil
 from tornado.options import options as tornado_options
 
 from motor_blog.text import slugify
@@ -59,3 +60,40 @@ class PostsTest(test.MotorBlogTest):
         description_tag = soup.find('meta', attrs={'name': 'description'})
         self.assertTrue(description_tag)
         self.assertEqual(meta_description, description_tag['content'])
+
+    def test_single_post_mod_date(self):
+        one_id = self.new_post(
+            title='title 1',
+            created=datetime.datetime(2014, 1, 1))
+
+        self.new_post(
+            title='title 2',
+            created=datetime.datetime(2014, 1, 2))
+
+        title_2_slug = slugify.slugify('title 2')
+        two = self.fetch(self.reverse_url('post', title_2_slug))
+        self.assertEqual(200, two.code)
+        self.assertEqual(
+            httputil.format_timestamp(datetime.datetime(2014, 1, 2)),
+            two.headers['Last-Modified'])
+
+        self.new_post(
+            title='title 3',
+            created=datetime.datetime(2014, 1, 3))
+
+        two = self.fetch(self.reverse_url('post', title_2_slug))
+        self.assertEqual(200, two.code)
+        self.assertEqual(
+            httputil.format_timestamp(datetime.datetime(2014, 1, 3)),
+            two.headers['Last-Modified'])
+
+        self.edit_post(
+            one_id,
+            'title 1',
+            updated=datetime.datetime(2014, 1, 4))
+
+        two = self.fetch(self.reverse_url('post', title_2_slug))
+        self.assertEqual(200, two.code)
+        self.assertEqual(
+            httputil.format_timestamp(datetime.datetime(2014, 1, 4)),
+            two.headers['Last-Modified'])
