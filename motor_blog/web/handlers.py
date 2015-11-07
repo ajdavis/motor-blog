@@ -329,15 +329,13 @@ class SearchHandler(MotorBlogHandler):
         categories = yield self.get_categories()
         q = self.get_argument('q', None)
         if q:
-            response = yield self.settings['db'].command(
-                'text',
-                'posts',
-                search=q,
-                filter={'status': 'publish', 'type': 'post'},
-                projection={'original': False, 'plain': False},
+            score = {'$meta': 'textScore'}
+            posts = yield self.get_posts(
+                {'$text': {'$search': q}, 'status': 'publish', 'type': 'post'},
+                fields={'original': 0, 'plain': 0, 'score': score},
+                sort=[('score', score)],
+                skip=0,
                 limit=50)
-
-            posts = [Post(**result['obj']) for result in response['results']]
         else:
             posts = []
 
