@@ -4,6 +4,7 @@ import logging
 import os
 
 import motor
+import pymongo
 import tornado.ioloop
 import tornado.web
 from tornado.options import options as opts
@@ -40,9 +41,11 @@ if __name__ == "__main__":
     loop.run_sync(partial(cache.startup, db))
 
     if opts.rebuild_indexes or opts.ensure_indexes:
-        indexes.ensure_indexes(
-            db.connection.sync_client().motorblog,
-            drop=opts.rebuild_indexes)
+        ensure_indexes = partial(indexes.ensure_indexes,
+                                 db,
+                                 drop=opts.rebuild_indexes)
+
+        loop.run_sync(ensure_indexes)
 
     this_dir = os.path.dirname(__file__)
     application = application.get_application(this_dir, db, opts)
