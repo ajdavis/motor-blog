@@ -9,14 +9,16 @@ import tornado.web
 from tornado.options import options as opts
 from tornado import httpserver
 
-# Patch Tornado with the Jade template loader
 from tornado import template
-from pyjade.ext.tornado import patch_tornado
-from motor_blog.options import define_options
 
+from motor_blog.options import define_options
+from motor_blog import indexes, cache, application
+
+# Patch Tornado with the Jade template loader
+from pyjade.ext.tornado import patch_tornado
 patch_tornado()
 
-from motor_blog import indexes, cache, application
+template  # silence warning
 
 # TODO: RPC over HTTPS
 # TODO: a static-url function to set long cache TTL on media URLs
