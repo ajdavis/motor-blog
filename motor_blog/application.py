@@ -102,5 +102,5 @@ def get_application(root_dir, db, option_parser):
         template_path=os.path.join(option_parser.theme, 'templates'),
         tz=pytz.timezone(option_parser.timezone),
         gzip=True,
-        **{k: v.value() for k, v in option_parser._options.items()}
+        **option_parser.as_dict()
     )
