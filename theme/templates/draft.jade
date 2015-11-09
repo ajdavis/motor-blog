@@ -2,11 +2,11 @@ extends single
 
 block extrahead
     script(
-        src='http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js',
+        src='https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js',
         type='text/javascript')
 
     script(
-        src='http://cdn.sockjs.org/sockjs-0.3.min.js',
+        src='https://cdn.sockjs.org/sockjs-0.3.min.js',
         type='text/javascript')
 
     script(type='text/javascript')
@@ -23,7 +23,7 @@ block extrahead
 
             function connect() {
                 disconnect();
-                conn = new SockJS('http://' + window.location.host + '/blog/sock_js');
+                conn = new SockJS(window.location.protocol + '//' + window.location.host + '/blog/sock_js');
 
                 log('Connecting...');
 
