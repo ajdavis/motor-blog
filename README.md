@@ -43,7 +43,7 @@ Start MongoDB
 
 Copy motor\_blog.conf.example to motor\_blog.conf, edit it as desired. Start the application:
 
-    python server.py --debug --conf=motor\_blog.conf
+    python server.py --debug --conf=motor\_blog.conf --ensure-indexes
 
 Visit http://localhost:8888/blog
 
@@ -54,6 +54,9 @@ Those processes and MongoDB are managed by [Supervisor](http://supervisord.org/)
 I've provided example config files in this repository in `etc/`.
 If you have an Nginx version with WebSocket support (1.3.13 or later)
 then draft posts will autoreload when you update them from MarsEdit.
+
+Run `python server.py --ensure-indexes` at once when first installing Motor-Blog on a production MongoDB server.
+(If you see an error when using the search box, "Can't canonicalize query: IndexNotFound text index required for $text query", it means you haven't done this step. In any case, running Motor-Blog without indexes built will risk performance problems.)
 
 # MarsEdit setup
 
