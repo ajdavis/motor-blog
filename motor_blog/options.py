@@ -44,6 +44,8 @@ def define_options(option_parser):
         "Author email to display in feed"), group='Identity')
     option_parser.define('twitter_handle', type=str, help=(
         "Author's Twitter handle (no @-sign)"), group='Identity')
+    option_parser.define('disqus_shortname', type=str, help=(
+        "Site's Disqus identifier"), group='Identity')
     option_parser.define('description', type=str, help=(
         "Site description"), group='Identity')
 

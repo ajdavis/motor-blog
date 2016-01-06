@@ -3,6 +3,7 @@ extends base
 block vars
     title = post.title
     meta_description = post.meta_description or setting('description')
+    disqus_shortname = setting('disqus_shortname')
     body_class = 'single-body'
 
 block content
@@ -54,7 +55,7 @@ block content
         #disqus_thread
             script(type="text/javascript)
                 var disqus_identifier = '#{ disqus_identifier }';
-                var disqus_shortname = 'emptysquare';
+                var disqus_shortname = '#{ disqus_shortname }';
 
                 (function() {
                     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
