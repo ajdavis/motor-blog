@@ -43,7 +43,7 @@ Start MongoDB
 
 Copy motor\_blog.conf.example to motor\_blog.conf, edit it as desired. Start the application:
 
-    python server.py --debug --conf=motor\_blog.conf --ensure-indexes
+    python server.py --debug --conf=motor_blog.conf --ensure-indexes
 
 Visit http://localhost:8888/blog
 
