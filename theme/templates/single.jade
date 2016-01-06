@@ -26,8 +26,8 @@ block content
                 | Tags:
                 each tag, i in post.tags
                     a(
-                        href=reverse_url('tag', tag)
-                        title="All posts tagged #{ tag }")
+                        href=reverse_url('tag', tag).decode("utf-8")
+                        title="All posts tagged ".decode("utf-8")+tag )
                         = tag
                     if (i < len(post.tags) - 1)
                         | ,
@@ -52,7 +52,7 @@ block content
             disqus_identifier = post.id
 
         #disqus_thread
-            script(type="text/javascript)
+            script(type="text/javascript).
                 var disqus_identifier = '#{ disqus_identifier }';
                 var disqus_shortname = 'emptysquare';
 

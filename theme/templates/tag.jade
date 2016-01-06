@@ -1,7 +1,7 @@
 extends base
 
 block vars
-    title = setting('author_display_name') + " | " + this_tag
+    title = setting('author_display_name').decode("utf-8")+" | ".decode("utf-8")+this_tag
     meta_description = setting('description')
     body_class = 'tag-body multi-body'
 
