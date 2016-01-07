@@ -9,7 +9,7 @@ block extrahead
         src="/#{ base_url }/admin/static/sockjs.min.js",
         type='text/javascript')
 
-    script(type='text/javascript')
+    script(type='text/javascript').
         $(function() {
             // Substituted by template.
             var post_id = "#{ post.id }",

@@ -1,7 +1,7 @@
 extends base
 
 block vars
-    title = setting('author_display_name') + " | Search | " + (q or '')
+    title = setting('author_display_name').decode("utf-8") + " | Search | ".decode("utf-8") + (q or ''.decode("utf-8"))
     meta_description = setting('description')
     body_class = 'search-body multi-body'
 
