@@ -152,12 +152,12 @@ class DeleteCategoryHandler(MotorBlogAdminHandler):
     @gen.coroutine
     def post(self):
         category_slug = self.get_argument('category_slug')
-        result = yield self.db.categories.remove({'slug': category_slug})
+        result = yield self.settings['db'].categories.remove({'slug': category_slug})
 
         if not result.get('n'):
             raise tornado.web.HTTPError(404)
 
-        yield self.db.posts.update(
+        yield self.settings['db'].posts.update(
             {},
             {
                 # Hack: Set *all* posts' mod dates to now.
