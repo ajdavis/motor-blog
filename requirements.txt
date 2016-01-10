@@ -13,3 +13,4 @@ git+git://github.com/SyrusAkbary/pyjade.git@a4db664b
 mock
 sockjs-tornado
 git+git://github.com/mirumee/google-measurement-protocol.git@34ded20d
+unidecode
