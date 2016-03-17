@@ -8,7 +8,6 @@ dictshield
 markdown==2.4
 beautifulsoup4
 requests
-PIL
 git+git://github.com/SyrusAkbary/pyjade.git@a4db664b
 mock
 sockjs-tornado
