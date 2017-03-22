@@ -8,6 +8,7 @@ import logging
 import sys
 import datetime
 
+from pymongo import CursorType
 from tornado import gen
 
 import pymongo.errors
@@ -133,7 +134,7 @@ def startup(db):
         def make_cursor():
             return collection.find(
                 {'ts': {'$gte': last_event_ts or now}},
-                tailable=True, await_data=True)
+                cursor_type=CursorType.TAILABLE_AWAIT)
 
         cursor = make_cursor()
 
