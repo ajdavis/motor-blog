@@ -3,9 +3,9 @@ werkzeug
 pygments
 git+git://github.com/joshmarshall/tornadorpc.git
 tornado>=3
-motor==0.4
+motor==1.1
 dictshield
-markdown==2.4
+markdown
 beautifulsoup4
 requests
 git+git://github.com/SyrusAkbary/pyjade.git@a4db664b
