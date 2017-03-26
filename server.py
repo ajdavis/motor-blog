@@ -35,8 +35,7 @@ if __name__ == "__main__":
             print 'Logging to', handler.baseFilename
             break
 
-    # TODO: Mongo connection options
-    db = motor.MotorClient().motorblog
+    db = motor.MotorClient(opts.mongo_uri).get_default_database()
     loop = tornado.ioloop.IOLoop.current()
     loop.run_sync(partial(cache.startup, db))
 

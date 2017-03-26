@@ -32,6 +32,9 @@ def define_options(option_parser):
         "Drop all indexes and recreate before starting"), group='Startup')
 
     # Identity
+    option_parser.define('mongo_uri', default='mongodb://localhost:27017/motorblog', type=str,
+                        help="MongoDB connection URI", group='Identity')
+
     option_parser.define('host', default='localhost', type=str, help=(
         "Server hostname"), group='Identity')
     option_parser.define('blog_name', type=str, help=(
